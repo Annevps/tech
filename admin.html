@@ -37,15 +37,19 @@
   td { padding: 15px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
   .pill { background: rgba(180,240,60,0.1); color: #b4f03c; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: bold; }
 
-  .chat-panel { background: #0e1114; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: flex; flex-direction: column; height: 500px; }
+  /* Estilos do Chat Real */
+  .chat-panel { background: #0e1114; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: flex; flex-direction: column; height: 550px; }
   .chat-header { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
   .chat-header span { color: #b4f03c; font-size: 12px; }
-  .chat-body { padding: 15px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-  .chat-msg { background: #1a1e22; padding: 10px 15px; border-radius: 12px; font-size: 14px; max-width: 90%; }
-  .chat-msg.me { background: #b4f03c; color: #000; align-self: flex-end; }
+  .chat-body { padding: 15px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #0a0d0f; }
+  
+  .chat-msg { background: #1a1e22; padding: 10px 15px; border-radius: 12px; font-size: 14px; max-width: 90%; border-bottom-left-radius: 2px; }
+  .chat-msg.me { background: #b4f03c; color: #000; align-self: flex-end; border-bottom-left-radius: 12px; border-bottom-right-radius: 2px; }
+  .chat-msg small { display: block; font-size: 10px; opacity: 0.6; margin-bottom: 4px; }
+  
   .chat-footer { padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 10px; }
-  .chat-footer input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #06080a; color: white; }
-  .chat-footer button { background: #b4f03c; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+  .chat-footer input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #06080a; color: white; outline: none; }
+  .chat-footer button { background: #b4f03c; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; color: #000; }
 </style>
 </head>
 <body>
@@ -75,6 +79,7 @@
     </div>
 
     <div class="content">
+      <!-- ÁREA DE KPIs E TABELA -->
       <div>
         <div class="kpis" id="admin-kpis">
           <div class="kpi"><h3>Chamados Ativos</h3><b style="color:#555;">-</b></div>
@@ -90,24 +95,26 @@
         </div>
       </div>
 
+      <!-- CHAT REAL -->
       <div class="chat-panel">
         <div class="chat-header">
           <div class="avatar" style="width: 30px; height: 30px; font-size: 14px;">👤</div>
           <div>
             <div style="font-weight: bold; font-size: 14px;">Chat do Cliente</div>
-            <span>Online agora</span>
+            <span>Conectado ao Banco</span>
           </div>
         </div>
-        <div class="chat-body">
-          <div class="chat-msg">Olá! Preciso de ajuda com meu notebook.</div>
-          <div class="chat-msg me">Olá! Pode me informar o número do chamado?</div>
-          <div class="chat-msg">É o chamado TE-0001245.</div>
+        
+        <div class="chat-body" id="chat-mensagens">
+          <p style="color: #97a0a6; text-align: center; margin-top: 20px;">Nenhuma mensagem recente.</p>
         </div>
-        <form class="chat-footer" onsubmit="event.preventDefault(); alert('Chat demonstrativo para a apresentação.');">
-          <input type="text" placeholder="Digite uma mensagem...">
-          <button type="submit">Enviar</button>
+        
+        <form class="chat-footer" id="form-chat">
+          <input type="text" id="input-msg" placeholder="Digite sua resposta..." required>
+          <button type="submit" id="btn-enviar">Enviar</button>
         </form>
       </div>
+      
     </div>
   </div>
 
@@ -115,6 +122,9 @@
   <script src="supabase-config.js"></script>
   <script>
     const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
+    
+    // Variável global para armazenar o ID do admin logado
+    let idAdmin = null;
 
     document.getElementById('btn-sair').addEventListener('click', async (e) => {
       e.preventDefault();
@@ -122,23 +132,26 @@
       window.location.href = "login.html";
     });
 
-    // Função principal de carregamento
+    // ==========================================
+    // 1. CARREGAR DADOS DA TELA (KPIs, TABELA E CHAT)
+    // ==========================================
     async function carregarDados() {
       try {
-        // Tenta buscar os chamados e clientes reais do Supabase
-        const { data: chamados, error: errC } = await db.from("chamados").select("*").order("criado_em", { ascending: false });
-        const { data: usuarios, error: errU } = await db.from("usuarios").select("*").eq("is_admin", false);
+        // Verifica quem está logado para o chat
+        const { data: { session } } = await db.auth.getSession();
+        if (session) idAdmin = session.user.id;
 
-        // Se o banco retornar dados reais, usa eles. Se estiver vazio, usa os dados de exemplo.
+        // Busca chamados
+        const { data: chamados } = await db.from("chamados").select("*").order("criado_em", { ascending: false });
+        const { data: usuarios } = await db.from("usuarios").select("*").eq("is_admin", false);
+
         let listaChamados = (chamados && chamados.length > 0) ? chamados : [
-          { numero: 1245, titulo: "Limpeza e manutenção", status: "Em andamento" },
-          { numero: 1246, titulo: "Troca de pasta térmica", status: "Finalizado" },
-          { numero: 1247, titulo: "Formatação PC Gamer", status: "Aguardando peça" }
+          { id: '00000000-0000-0000-0000-000000000000', numero: 1245, titulo: "Notebook Dell (Teste)", status: "Em andamento" }
         ];
         
-        let qtdClientes = (usuarios && usuarios.length > 0) ? usuarios.length : 12;
+        let qtdClientes = (usuarios && usuarios.length > 0) ? usuarios.length : 1;
 
-        // Atualiza os KPIs na tela
+        // KPIs
         document.getElementById("admin-kpis").innerHTML = `
           <div class="kpi"><h3>Chamados Ativos</h3><b>${listaChamados.length}</b></div>
           <div class="kpi"><h3>Novos / Pendentes</h3><b>${listaChamados.filter(c => c.status.includes('Aguardando') || c.status.includes('Nova')).length}</b></div>
@@ -146,7 +159,7 @@
           <div class="kpi"><h3>Total Clientes</h3><b>${qtdClientes}</b></div>
         `;
 
-        // Monta a tabela
+        // Tabela
         let html = `<table><thead><tr><th>Nº</th><th>Título</th><th>Status</th></tr></thead><tbody>`;
         listaChamados.slice(0, 5).forEach(c => {
           html += `<tr>
@@ -158,13 +171,102 @@
         html += `</tbody></table>`;
         document.getElementById("tabela-chamados").innerHTML = html;
 
+        // Inicia o chat com o primeiro chamado da lista (para demonstração)
+        if (listaChamados.length > 0) {
+            iniciarChat(listaChamados[0].id);
+        }
+
       } catch (err) {
         console.error("Erro ao buscar dados:", err);
-        document.getElementById("tabela-chamados").innerHTML = "<p style='color: #ff7b6b;'>Erro de conexão com o banco.</p>";
       }
     }
 
-    // Executa a função assim que a página abrir
+    // ==========================================
+    // 2. LÓGICA DO CHAT REAL
+    // ==========================================
+    async function iniciarChat(chamadoId) {
+      const chatBody = document.getElementById('chat-mensagens');
+
+      // Função que busca as mensagens no banco
+      async function carregarMensagens() {
+        const { data, error } = await db
+          .from('mensagens')
+          .select('*')
+          .eq('chamado_id', chamadoId)
+          .order('criado_em', { ascending: true });
+
+        if (error) {
+          chatBody.innerHTML = `<p style="color:#ff7b6b;">Erro ao carregar mensagens.</p>`;
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          chatBody.innerHTML = `<p style="color:#97a0a6; text-align:center;">Nenhuma mensagem neste chamado ainda.</p>`;
+          return;
+        }
+
+        // Renderiza as mensagens
+        chatBody.innerHTML = data.map(msg => {
+          const isMe = msg.remetente_id === idAdmin;
+          const hora = new Date(msg.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+          
+          return `
+            <div class="chat-msg ${isMe ? 'me' : ''}">
+              <small>${isMe ? 'Você (Admin)' : 'Cliente'} · ${hora}</small>
+              ${msg.conteudo}
+            </div>
+          `;
+        }).join('');
+
+        // Rola para o final
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }
+
+      // Carrega a primeira vez
+      await carregarMensagens();
+
+      // ==========================================
+      // 3. ENVIAR MENSAGEM
+      // ==========================================
+      const formChat = document.getElementById('form-chat');
+      formChat.onsubmit = async (e) => {
+        e.preventDefault();
+        const input = document.getElementById('input-msg');
+        const btn = document.getElementById('btn-enviar');
+        const texto = input.value.trim();
+
+        if (!texto) return;
+
+        btn.disabled = true;
+        btn.textContent = "...";
+
+        const { error } = await db.from('mensagens').insert({
+          chamado_id: chamadoId,
+          remetente_id: idAdmin,
+          conteudo: texto,
+          interno: false // Se for true, o cliente não vê (nota interna)
+        });
+
+        btn.disabled = false;
+        btn.textContent = "Enviar";
+
+        if (error) {
+          alert("Erro ao enviar mensagem: " + error.message);
+        } else {
+          input.value = ''; // Limpa o campo
+          await carregarMensagens(); // Atualiza a tela
+        }
+      };
+      
+      // Realtime: Escuta novas mensagens do cliente em tempo real
+      db.channel('chat-admin')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'mensagens', filter: `chamado_id=eq.${chamadoId}` }, (payload) => {
+           carregarMensagens(); 
+        })
+        .subscribe();
+    }
+
+    // Inicia a página
     carregarDados();
   </script>
 </body>
