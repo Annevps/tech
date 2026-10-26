@@ -30,17 +30,21 @@
   .kpi { background: #12161a !important; border: 1px solid #333; padding: 20px; border-radius: 12px; }
   .kpi h3 { margin: 0 0 10px 0; font-size: 12px; color: #d1d5db !important; text-transform: uppercase; }
   .kpi b { font-size: 32px; font-family: 'Space Grotesk', sans-serif; color: #b4f03c !important; display: block; }
-  
-  .box { background: #12161a !important; border: 1px solid #333; border-radius: 12px; padding: 24px; }
-  .box h3 { margin: 0 0 20px 0; font-size: 18px; }
-  
+
+  /* TABS E TABELAS */
+  .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+  .tab-btn { background: #12161a; border: 1px solid #333; color: #d1d5db; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+  .tab-btn.active { background: #b4f03c; color: #000 !important; border-color: #b4f03c; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
   table { width: 100%; border-collapse: collapse; }
   th { text-align: left; padding: 12px; font-size: 12px; color: #b4f03c !important; border-bottom: 1px solid #333; text-transform: uppercase; }
   td { padding: 15px 12px; border-bottom: 1px solid #222; font-size: 14px; }
   tr:hover td { background: rgba(255,255,255,0.05); }
   .pill { background: rgba(180,240,60,0.15) !important; color: #b4f03c !important; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: bold; border: 1px solid rgba(180,240,60,0.3); }
 
-  /* CHAT FIXO (DIREITA) */
+  /* CHAT LATERAL */
   .chat-panel { background: #12161a !important; border: 1px solid #333; border-radius: 12px; display: flex; flex-direction: column; height: 600px; position: sticky; top: 100px; }
   .chat-header { padding: 15px; border-bottom: 1px solid #333; display: flex; align-items: center; gap: 10px; background: #1a1e22 !important; }
   .chat-body { padding: 15px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #0a0d0f !important; }
@@ -51,17 +55,35 @@
   .chat-footer input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #06080a !important; color: #fff !important; outline: none; }
   .chat-footer button { background: #b4f03c !important; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; color: #000 !important; }
 
-  /* MODAL DE EDIÇÃO */
-  .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; }
-  .modal-content { background: #12161a !important; border: 1px solid #333; border-radius: 12px; padding: 30px; width: 500px; max-width: 90%; }
-  .modal-content h2 { margin-top: 0; color: #b4f03c !important; }
+  /* MODAL DE DETALHES COMPLETO */
+  .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; overflow-y: auto; padding: 20px; }
+  .modal-box { background: #12161a !important; border: 1px solid #333; border-radius: 12px; width: 100%; max-width: 900px; display: flex; flex-direction: column; max-height: 90vh; }
+  .modal-header { padding: 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+  .modal-header h2 { margin: 0; font-size: 20px; color: #b4f03c !important; }
+  .btn-close { background: none; border: none; color: #fff !important; font-size: 24px; cursor: pointer; }
+  .modal-body { padding: 20px; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .info-group { background: #0a0d0f; padding: 15px; border-radius: 8px; border: 1px solid #333; }
+  .info-group h4 { margin-top: 0; color: #b4f03c !important; border-bottom: 1px solid #333; padding-bottom: 8px; }
+  .info-group p { margin: 5px 0; font-size: 14px; color: #d1d5db; }
+  .info-group strong { color: #fff; }
+  
   .form-group { margin-bottom: 15px; }
   .form-group label { display: block; font-size: 12px; color: #b4f03c !important; margin-bottom: 5px; text-transform: uppercase; }
-  .form-group input, .form-group select { width: 100%; padding: 10px; background: #06080a; border: 1px solid #444; border-radius: 8px; color: #fff; }
-  .modal-actions { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; background: #06080a; border: 1px solid #444; border-radius: 8px; color: #fff; }
+  
+  .modal-actions { padding: 20px; border-top: 1px solid #333; display: flex; gap: 10px; justify-content: flex-end; background: #0a0d0f; border-radius: 0 0 12px 12px; }
   .btn-modal { padding: 10px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
   .btn-modal.primary { background: #b4f03c !important; color: #000 !important; }
   .btn-modal.danger { background: #ff7b6b !important; color: #fff !important; }
+
+  /* KANBAN */
+  .kanban-board { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 20px; }
+  .kanban-col { min-width: 250px; background: #12161a; border-radius: 12px; padding: 15px; border: 1px solid #333; }
+  .kanban-col h4 { margin-top: 0; text-align: center; color: #b4f03c !important; border-bottom: 1px solid #333; padding-bottom: 10px; }
+  .kanban-card { background: #0a0d0f; padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #222; cursor: pointer; }
+  .kanban-card:hover { border-color: #b4f03c; }
+  .kanban-card b { display: block; font-size: 14px; margin-bottom: 5px; }
+  .kanban-card span { font-size: 12px; color: #97a0a6; }
 </style>
 </head>
 <body>
@@ -69,28 +91,35 @@
   <div class="sidebar">
     <a href="index.html" class="logo"><i>TE</i><span>Tech<b>Empire</b></span></a>
     <a href="index.html" class="voltar">← Voltar ao site</a>
-    <a class="active">📊 Visão Geral</a>
+    <a class="active" onclick="mudarTela('dashboard')">📊 Painel</a>
+    <a onclick="mudarTela('kanban')">📋 Gestão (Kanban)</a>
     <a href="login.html" class="sair">Sair da conta</a>
   </div>
 
   <div class="main">
     <div class="topbar">
       <div>
-        <h1>Visão Geral</h1>
-        <span style="color: #d1d5db !important; font-size: 14px;">Gerencie os chamados e converse com os clientes.</span>
+        <h1 id="page-title">Painel Administrativo</h1>
+        <span id="page-subtitle" style="color: #d1d5db !important; font-size: 14px;">Acompanhe as métricas e chamados.</span>
       </div>
     </div>
 
-    <div class="content">
+    <div class="content" id="tela-dashboard">
       <div id="area-principal">
         <div class="kpis" id="admin-kpis"></div>
-        <div class="box">
+        
+        <div class="tabs">
+          <button class="tab-btn active" onclick="mudarAba('todos', this)">Todos</button>
+          <button class="tab-btn" onclick="mudarAba('pendentes', this)">Pendentes</button>
+          <button class="tab-btn" onclick="mudarAba('concluidos', this)">Concluídos</button>
+        </div>
+
+        <div class="box tab-content active" id="aba-todos">
           <h3>Chamados Recebidos</h3>
           <div id="tabela-conteudo"></div>
         </div>
       </div>
 
-      <!-- CHAT LATERAL -->
       <div class="chat-panel" id="painel-chat" style="display: flex;">
         <div class="chat-header">
           <div style="width: 30px; height: 30px; font-size: 14px; background: #b4f03c; color: #000 !important; border-radius: 50%; display: grid; place-items: center;">👤</div>
@@ -108,25 +137,26 @@
         </form>
       </div>
     </div>
+
+    <!-- TELA KANBAN -->
+    <div class="content" id="tela-kanban" style="display: none; grid-template-columns: 1fr;">
+      <div class="kanban-board" id="kanban-board"></div>
+    </div>
   </div>
 
-  <!-- MODAL -->
+  <!-- MODAL DE DETALHES COMPLETO -->
   <div class="modal" id="modal-detalhes">
-    <div class="modal-content">
-      <h2 id="modal-titulo">Detalhes</h2>
-      <div class="form-group">
-        <label>Status do Chamado</label>
-        <select id="edit-status">
-          <option value="Nova chamada">Nova chamada</option>
-          <option value="Aguardando análise">Aguardando análise</option>
-          <option value="Em andamento">Em andamento</option>
-          <option value="Concluída">Concluída</option>
-          <option value="Cancelada">Cancelada</option>
-        </select>
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 id="modal-titulo">Detalhes do Chamado</h2>
+        <button class="btn-close" onclick="fecharModal()">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <!-- Injetado via JS -->
       </div>
       <div class="modal-actions">
-        <button class="btn-modal primary" onclick="salvarStatus()">Salvar Status</button>
-        <button class="btn-modal danger" onclick="excluirChamado()">Excluir</button>
+        <button class="btn-modal primary" onclick="salvarEdicao()">Salvar Alterações</button>
+        <button class="btn-modal danger" onclick="excluirChamado()">Excluir Chamado</button>
         <button class="btn-modal" onclick="fecharModal()" style="background:#333; color:#fff;">Fechar</button>
       </div>
     </div>
@@ -138,47 +168,234 @@
     const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
     let idAdmin = null;
     let chamadoSelecionado = null;
+    let todosChamados = [];
 
     async function init() {
       const { data: { session } } = await db.auth.getSession();
       if (!session) { window.location.href = "login.html"; return; }
       idAdmin = session.user.id;
-      carregarChamados();
+      carregarDados();
     }
 
-    async function carregarChamados() {
+    function mudarTela(tela) {
+      document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      if (tela === 'dashboard') {
+        document.getElementById('tela-dashboard').style.display = 'grid';
+        document.getElementById('tela-kanban').style.display = 'none';
+        document.getElementById('page-title').textContent = 'Painel Administrativo';
+      } else {
+        document.getElementById('tela-dashboard').style.display = 'none';
+        document.getElementById('tela-kanban').style.display = 'block';
+        document.getElementById('page-title').textContent = 'Gestão de Atendimentos';
+        renderizarKanban();
+      }
+    }
+
+    async function carregarDados() {
       const { data: chamados, error } = await db.from("chamados").select("*").order("criado_em", { ascending: false });
       
       if (error) {
         document.getElementById("tabela-conteudo").innerHTML = `<p style="color: red;">Erro: ${error.message}</p>`;
         return;
       }
+      todosChamados = chamados || [];
+
+      // KPIs
+      const hoje = new Date();
+      const mesAtual = hoje.getMonth();
+      const anoAtual = hoje.getFullYear();
+      
+      const abertos = todosChamados.filter(c => c.status !== 'Concluída' && c.status !== 'Cancelada').length;
+      const emAndamento = todosChamados.filter(c => c.status === 'Em andamento').length;
+      
+      const concluidosMes = todosChamados.filter(c => {
+        if (c.status !== 'Concluída' || !c.concluido_em) return false;
+        const d = new Date(c.concluido_em);
+        return d.getMonth() === mesAtual && d.getFullYear() === anoAtual;
+      }).length;
+
+      // Busca pagamentos para o KPI financeiro
+      const { data: pagamentos } = await db.from("pagamentos").select("*").eq("status", "Pago");
+      const totalRecebidoMes = (pagamentos || []).reduce((acc, p) => {
+        if (!p.pago_em) return acc;
+        const d = new Date(p.pago_em);
+        if (d.getMonth() === mesAtual && d.getFullYear() === anoAtual) return acc + Number(p.valor);
+        return acc;
+      }, 0);
 
       document.getElementById("admin-kpis").innerHTML = `
-        <div class="kpi"><h3>Total</h3><b>${chamados ? chamados.length : 0}</b></div>
-        <div class="kpi"><h3>Novos</h3><b>${chamados ? chamados.filter(c => c.status === 'Nova chamada').length : 0}</b></div>
-        <div class="kpi"><h3>Andamento</h3><b>${chamados ? chamados.filter(c => c.status === 'Em andamento').length : 0}</b></div>
-        <div class="kpi"><h3>Concluídos</h3><b>${chamados ? chamados.filter(c => c.status === 'Concluída').length : 0}</b></div>
+        <div class="kpi"><h3>Chamados Abertos</h3><b>${abertos}</b></div>
+        <div class="kpi"><h3>Em Andamento</h3><b>${emAndamento}</b></div>
+        <div class="kpi"><h3>Concluídos (Mês)</h3><b>${concluidosMes}</b></div>
+        <div class="kpi"><h3>Recebido (Mês)</h3><b>R$ ${totalRecebidoMes.toFixed(2).replace('.', ',')}</b></div>
       `;
 
-      if (chamados && chamados.length > 0) {
-        let html = `<table><thead><tr><th>Nº</th><th>Título</th><th>Status</th><th>Ações</th></tr></thead><tbody>`;
-        chamados.forEach(c => {
+      renderizarTabela('todos');
+    }
+
+    function renderizarTabela(filtro) {
+      let lista = todosChamados;
+      if (filtro === 'pendentes') lista = todosChamados.filter(c => c.status !== 'Concluída' && c.status !== 'Cancelada');
+      if (filtro === 'concluidos') lista = todosChamados.filter(c => c.status === 'Concluída');
+
+      if (lista.length > 0) {
+        let html = `<table><thead><tr><th>Nº</th><th>Título</th><th>Status</th><th>Pagamento</th><th>Ações</th></tr></thead><tbody>`;
+        lista.forEach(c => {
           html += `<tr>
             <td>TE-${String(c.numero).padStart(6, '0')}</td>
             <td>${c.titulo}</td>
             <td><span class="pill">${c.status}</span></td>
+            <td>${c.status_pagamento || 'Pendente'}</td>
             <td>
-              <button onclick="abrirChat('${c.id}', '${c.titulo}', '${c.status}')" style="background:#b4f03c; color:#000 !important; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;">Abrir</button>
-              <button onclick="abrirModal('${c.id}', '${c.status}')" style="background:#333; color:#fff !important; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer; margin-left: 5px;">Status</button>
+              <button onclick="abrirDetalhes('${c.id}')" style="background:#b4f03c; color:#000 !important; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;">Gerenciar</button>
+              <button onclick="abrirChat('${c.id}', '${c.titulo}', '${c.status}')" style="background:#333; color:#fff !important; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer; margin-left: 5px;">Chat</button>
             </td>
           </tr>`;
         });
         html += `</tbody></table>`;
         document.getElementById("tabela-conteudo").innerHTML = html;
       } else {
-        document.getElementById("tabela-conteudo").innerHTML = "<p>Nenhum chamado.</p>";
+        document.getElementById("tabela-conteudo").innerHTML = "<p>Nenhum chamado encontrado.</p>";
       }
+    }
+
+    function mudarAba(aba, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderizarTabela(aba);
+    }
+
+    // ============== KANBAN ==============
+    function renderizarKanban() {
+      const etapas = ["Nova chamada", "Aguardando análise", "Em andamento", "Aguardando informações do cliente", "Concluída"];
+      let html = "";
+      
+      etapas.forEach(etapa => {
+        const cards = todosChamados.filter(c => c.status === etapa);
+        html += `<div class="kanban-col">
+          <h4>${etapa} (${cards.length})</h4>
+          ${cards.map(c => `
+            <div class="kanban-card" onclick="abrirDetalhes('${c.id}')">
+              <b>TE-${String(c.numero).padStart(6, '0')}</b>
+              <span>${c.titulo}</span>
+            </div>
+          `).join('')}
+        </div>`;
+      });
+      document.getElementById('kanban-board').innerHTML = html;
+    }
+
+    // ============== MODAL DE DETALHES ==============
+    async function abrirDetalhes(id) {
+      chamadoSelecionado = id;
+      const { data: c } = await db.from("chamados").select("*").eq("id", id).single();
+      if (!c) return;
+
+      document.getElementById('modal-titulo').textContent = `Chamado TE-${String(c.numero).padStart(6, '0')}`;
+      
+      let html = `
+        <div class="info-group">
+          <h4>Informações do Cliente</h4>
+          <p><strong>Nome:</strong> ${c.cliente_nome || 'Não informado'}</p>
+          <p><strong>E-mail:</strong> ${c.cliente_email || 'Não informado'}</p>
+          <p><strong>Telefone:</strong> ${c.cliente_telefone || 'Não informado'}</p>
+        </div>
+        <div class="info-group">
+          <h4>Detalhes do Pedido</h4>
+          <p><strong>Título:</strong> ${c.titulo}</p>
+          <p><strong>Descrição:</strong> ${c.descricao}</p>
+          <p><strong>Data de Abertura:</strong> ${new Date(c.criado_em).toLocaleString('pt-BR')}</p>
+        </div>
+        <div class="form-group">
+          <label>Status do Atendimento</label>
+          <select id="edit-status">
+            <option value="Nova chamada" ${c.status === 'Nova chamada' ? 'selected' : ''}>Nova chamada</option>
+            <option value="Aguardando análise" ${c.status === 'Aguardando análise' ? 'selected' : ''}>Aguardando análise</option>
+            <option value="Em andamento" ${c.status === 'Em andamento' ? 'selected' : ''}>Em andamento</option>
+            <option value="Aguardando informações do cliente" ${c.status === 'Aguardando informações do cliente' ? 'selected' : ''}>Aguardando cliente</option>
+            <option value="Concluída" ${c.status === 'Concluída' ? 'selected' : ''}>Concluída</option>
+            <option value="Cancelada" ${c.status === 'Cancelada' ? 'selected' : ''}>Cancelada</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Situação do Pagamento</label>
+          <select id="edit-pagamento">
+            <option value="Pendente" ${c.status_pagamento === 'Pendente' ? 'selected' : ''}>Pendente</option>
+            <option value="Pago" ${c.status_pagamento === 'Pago' ? 'selected' : ''}>Pago</option>
+            <option value="Recusado" ${c.status_pagamento === 'Recusado' ? 'selected' : ''}>Recusado</option>
+            <option value="Reembolsado" ${c.status_pagamento === 'Reembolsado' ? 'selected' : ''}>Reembolsado</option>
+          </select>
+        </div>
+        <div class="info-group">
+          <h4>Arquivos Anexados</h4>
+          <div id="modal-anexos"><p>Carregando...</p></div>
+        </div>
+        <div class="info-group">
+          <h4>Histórico de Status</h4>
+          <div id="modal-historico"><p>Carregando...</p></div>
+        </div>
+      `;
+      document.getElementById('modal-body').innerHTML = html;
+      document.getElementById('modal-detalhes').style.display = 'flex';
+
+      carregarAnexos(id);
+      carregarHistorico(id);
+    }
+
+    function fecharModal() {
+      document.getElementById('modal-detalhes').style.display = 'none';
+      chamadoSelecionado = null;
+    }
+
+    async function carregarAnexos(chamadoId) {
+      const div = document.getElementById('modal-anexos');
+      const { data } = await db.from("arquivos_chamados").select("*").eq("chamado_id", chamadoId);
+      if (!data || data.length === 0) { div.innerHTML = "<p>Nenhum arquivo.</p>"; return; }
+      
+      let html = "";
+      for (const arq of data) {
+        const { data: urlData } = await db.storage.from('anexos').createSignedUrl(arq.caminho_storage, 3600);
+        if (urlData) html += `<p><a href="${urlData.signedUrl}" target="_blank" style="color:#b4f03c;">📎 ${arq.nome_original}</a></p>`;
+      }
+      div.innerHTML = html || "<p>Erro ao carregar arquivos.</p>";
+    }
+
+    async function carregarHistorico(chamadoId) {
+      const div = document.getElementById('modal-historico');
+      const { data } = await db.from("historico_status").select("*").eq("chamado_id", chamadoId).order("criado_em", { ascending: false });
+      if (!data || data.length === 0) { div.innerHTML = "<p>Sem histórico.</p>"; return; }
+      
+      div.innerHTML = data.map(h => `<p>${new Date(h.criado_em).toLocaleString('pt-BR')}: ${h.status_anterior || 'Início'} → <b>${h.status_novo}</b></p>`).join('');
+    }
+
+    async function salvarEdicao() {
+      if (!chamadoSelecionado) return;
+      const novoStatus = document.getElementById('edit-status').value;
+      const novoPagamento = document.getElementById('edit-pagamento').value;
+
+      const { error } = await db.from("chamados").update({ 
+        status: novoStatus,
+        status_pagamento: novoPagamento
+      }).eq("id", chamadoSelecionado);
+
+      if (!error) {
+        // Registra no histórico
+        await db.from("historico_status").insert({ chamado_id: chamadoSelecionado, status_novo: novoStatus });
+        alert("Chamado atualizado!");
+        fecharModal();
+        carregarDados();
+      } else {
+        alert("Erro: " + error.message);
+      }
+    }
+
+    async function excluirChamado() {
+      if (!confirm("Excluir chamado?")) return;
+      await db.from("chamados").delete().eq("id", chamadoSelecionado);
+      fecharModal();
+      carregarDados();
     }
 
     // ============== CHAT ==============
@@ -218,34 +435,6 @@
       if (error) alert("Erro ao enviar: " + error.message);
       else { input.value = ''; await carregarMensagens(chamadoSelecionado); }
     };
-
-    // ============== MODAL DE STATUS ==============
-    function abrirModal(id, statusAtual) {
-      chamadoSelecionado = id;
-      document.getElementById('edit-status').value = statusAtual;
-      document.getElementById('modal-detalhes').style.display = 'flex';
-    }
-
-    function fecharModal() {
-      document.getElementById('modal-detalhes').style.display = 'none';
-    }
-
-    async function salvarStatus() {
-      const novoStatus = document.getElementById('edit-status').value;
-      const { error } = await db.from("chamados").update({ status: novoStatus }).eq("id", chamadoSelecionado);
-      if (!error) {
-        alert("Status atualizado!");
-        fecharModal();
-        carregarChamados();
-      }
-    }
-
-    async function excluirChamado() {
-      if (!confirm("Tem certeza que deseja excluir?")) return;
-      await db.from("chamados").delete().eq("id", chamadoSelecionado);
-      fecharModal();
-      carregarChamados();
-    }
 
     init();
   </script>
