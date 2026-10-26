@@ -3,150 +3,192 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#07090b">
 <title>Meu Perfil — TechEmpire</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
 <style>
-  .perfil-container { max-width: 600px; margin: 0 auto; }
-  .perfil-box { background: var(--s2); border: 1px solid var(--line); border-radius: 16px; padding: 30px; margin-bottom: 24px; }
-  .perfil-box h3 { margin-top: 0; font-family: var(--head); border-bottom: 1px solid var(--line); padding-bottom: 15px; margin-bottom: 20px; }
-  .form-group { margin-bottom: 15px; }
-  .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 5px; }
-  .form-group input { width: 100%; padding: 12px; background: var(--s1); border: 1px solid var(--line2); border-radius: 8px; color: var(--ink); outline: none; }
-  .form-group input:disabled { opacity: 0.5; cursor: not-allowed; }
-  .btn-salvar { background: var(--lime); color: #000; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
-  .msg { padding: 12px; border-radius: 8px; margin-bottom: 15px; display: none; font-weight: bold; }
+  /* CSS independente para não depender do style.css que pode estar bugado */
+  * { box-sizing: border-box; }
+  body { background: #06080a !important; margin: 0; font-family: 'Inter', sans-serif; color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; }
+  h1, h2, h3, p, span, a { color: #ffffff; margin: 0; }
+  
+  .header { background: #0a0d0f; padding: 20px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: bold; color: #fff; }
+  .logo i { background: #b4f03c; color: #000; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; font-style: normal; font-size: 16px; }
+  .logo b { color: #b4f03c; }
+  .nav-links a { color: #97a0a6; text-decoration: none; margin-left: 20px; font-weight: 500; }
+  .nav-links a:hover { color: #b4f03c; }
+
+  .main { flex: 1; padding: 40px 20px; display: flex; justify-content: center; }
+  .container { width: 100%; max-width: 600px; }
+  
+  .box { background: #12161a; border: 1px solid #333; border-radius: 16px; padding: 30px; margin-bottom: 24px; }
+  .box h3 { font-family: 'Space Grotesk', sans-serif; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; font-size: 20px; }
+  
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 600; color: #b4f03c; margin-bottom: 6px; }
+  .form-group input { width: 100%; padding: 12px; background: #06080a; border: 1px solid #444; border-radius: 8px; color: #fff; outline: none; font-size: 15px; }
+  .form-group input:focus { border-color: #b4f03c; }
+  .form-group input:disabled { opacity: 0.5; cursor: not-allowed; background: #1a1e22; }
+  
+  .btn-salvar { background: #b4f03c; color: #000; border: none; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; transition: 0.2s; }
+  .btn-salvar:hover { background: #a3d933; }
+  
+  .msg { padding: 12px; border-radius: 8px; margin-bottom: 20px; display: none; font-weight: bold; text-align: center; }
   .msg.on { display: block; }
-  .msg.ok { background: rgba(180,240,60,0.15); color: var(--lime); border: 1px solid var(--lime); }
+  .msg.ok { background: rgba(180,240,60,0.15); color: #b4f03c; border: 1px solid #b4f03c; }
   .msg.err { background: rgba(255,123,107,0.15); color: #ff7b6b; border: 1px solid #ff7b6b; }
 </style>
 </head>
-<body data-page="perfil" data-auth="client">
-<header id="site-header"></header>
-<main class="wrap-main">
-  <div class="perfil-container">
-    <h2 style="font-family: var(--head); font-size: 32px; margin-bottom: 20px;">Meu Perfil</h2>
-    
-    <div class="perfil-box">
-      <h3>Dados Pessoais</h3>
-      <div class="msg" id="msg-dados"></div>
-      
-      <div class="form-group">
-        <label>Nome Completo</label>
-        <input type="text" id="nome" placeholder="Seu nome">
-      </div>
-      
-      <div class="form-group">
-        <label>E-mail (Não pode ser alterado)</label>
-        <input type="email" id="email" disabled>
-      </div>
+<body>
 
-      <div class="form-group">
-        <label>CPF (Não pode ser alterado)</label>
-        <input type="text" id="cpf" disabled>
-      </div>
-      
-      <div class="form-group">
-        <label>Telefone / WhatsApp</label>
-        <input type="text" id="telefone" placeholder="(00) 00000-0000">
-      </div>
-      
-      <button class="btn-salvar" onclick="salvarDados()">Salvar Dados</button>
+  <header class="header">
+    <a href="index.html" class="logo"><i>TE</i><span>Tech<b>Empire</b></span></a>
+    <div class="nav-links">
+      <a href="painel.html">Meu Painel</a>
+      <a href="#" onclick="sair()" style="color: #ff7b6b;">Sair</a>
     </div>
+  </header>
 
-    <div class="perfil-box">
-      <h3>Alterar Senha</h3>
-      <div class="msg" id="msg-senha"></div>
+  <main class="main">
+    <div class="container">
+      <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; margin-bottom: 20px;">Meu Perfil</h2>
       
-      <div class="form-group">
-        <label>Nova Senha</label>
-        <input type="password" id="nova-senha" placeholder="Mínimo 6 caracteres">
+      <div class="box">
+        <h3>Dados Pessoais</h3>
+        <div class="msg" id="msg-dados"></div>
+        
+        <div class="form-group">
+          <label>Nome Completo</label>
+          <input type="text" id="nome" placeholder="Carregando...">
+        </div>
+        
+        <div class="form-group">
+          <label>E-mail (Não editável)</label>
+          <input type="email" id="email" disabled>
+        </div>
+
+        <div class="form-group">
+          <label>CPF (Não editável)</label>
+          <input type="text" id="cpf" disabled>
+        </div>
+        
+        <div class="form-group">
+          <label>Telefone / WhatsApp</label>
+          <input type="text" id="telefone" placeholder="(00) 00000-0000">
+        </div>
+        
+        <button class="btn-salvar" onclick="salvarDados()">Salvar Dados</button>
       </div>
-      
-      <button class="btn-salvar" onclick="alterarSenha()">Atualizar Senha</button>
+
+      <div class="box">
+        <h3>Alterar Senha</h3>
+        <div class="msg" id="msg-senha"></div>
+        
+        <div class="form-group">
+          <label>Nova Senha</label>
+          <input type="password" id="nova-senha" placeholder="Mínimo 6 caracteres">
+        </div>
+        
+        <button class="btn-salvar" onclick="alterarSenha()">Atualizar Senha</button>
+      </div>
     </div>
-  </div>
-</main>
-<footer id="site-footer"></footer>
+  </main>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="supabase-config.js"></script>
-<script src="data.js"></script>
-<script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script>
+    // Inicia a conexão direta com o Supabase
+    const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
+    let userId = null;
 
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    // Aguarda a autenticação do script.js principal
-    setTimeout(async () => {
-      if (!window.App || !window.App.session) { window.location.href = "login.html"; return; }
+    // Função para deslogar
+    async function sair() {
+      await db.auth.signOut();
+      window.location.href = "login.html";
+    }
+
+    // Função que roda ao abrir a página
+    async function init() {
+      // Pega a sessão do usuário
+      const { data: { session } } = await db.auth.getSession();
       
-      const db = window.supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
-      const userId = window.App.session.user.id;
+      // Se não estiver logado, manda pro login (e para o loop aqui)
+      if (!session) {
+        window.location.href = "login.html";
+        return;
+      }
 
-      // 1. Carrega os dados do perfil do banco
-      const { data: perfil } = await db.from("usuarios").select("*").eq("id", userId).single();
+      userId = session.user.id;
+
+      // Busca os dados na tabela 'usuarios'
+      const { data: perfil, error } = await db.from("usuarios").select("*").eq("id", userId).single();
       
       if (perfil) {
         document.getElementById('nome').value = perfil.nome || "";
-        document.getElementById('email').value = perfil.email || window.App.session.user.email;
+        document.getElementById('email').value = perfil.email || session.user.email;
         document.getElementById('cpf').value = perfil.cpf || "";
         document.getElementById('telefone').value = perfil.telefone || "";
+      } else {
+        document.getElementById('nome').placeholder = "Erro ao carregar perfil";
+      }
+    }
+
+    // Função para salvar os dados
+    async function salvarDados() {
+      const nome = document.getElementById('nome').value.trim();
+      const telefone = document.getElementById('telefone').value.trim();
+      const msgDiv = document.getElementById('msg-dados');
+
+      if (!nome) {
+        msgDiv.textContent = "O nome não pode ficar vazio.";
+        msgDiv.className = "msg on err";
+        return;
       }
 
-      // 2. Função para Salvar Dados
-      window.salvarDados = async () => {
-        const nome = document.getElementById('nome').value.trim();
-        const telefone = document.getElementById('telefone').value.trim();
-        const msgDiv = document.getElementById('msg-dados');
+      msgDiv.textContent = "Salvando...";
+      msgDiv.className = "msg on ok";
 
-        if (!nome) {
-          msgDiv.textContent = "O nome não pode ficar vazio.";
-          msgDiv.className = "msg on err";
-          return;
-        }
+      const { error } = await db.from("usuarios").update({ nome, telefone }).eq("id", userId);
 
-        const { error } = await db.from("usuarios").update({ nome, telefone }).eq("id", userId);
+      if (error) {
+        msgDiv.textContent = "Erro: " + error.message;
+        msgDiv.className = "msg on err";
+      } else {
+        msgDiv.textContent = "Dados atualizados com sucesso!";
+        msgDiv.className = "msg on ok";
+        setTimeout(() => msgDiv.className = "msg", 3000);
+      }
+    }
 
-        if (error) {
-          msgDiv.textContent = "Erro ao salvar os dados: " + error.message;
-          msgDiv.className = "msg on err";
-        } else {
-          msgDiv.textContent = "Dados atualizados com sucesso!";
-          msgDiv.className = "msg on ok";
-          // Atualiza o nome no menu superior
-          if (window.App.perfil) window.App.perfil.nome = nome;
-        }
-      };
+    // Função para alterar a senha
+    async function alterarSenha() {
+      const novaSenha = document.getElementById('nova-senha').value;
+      const msgDiv = document.getElementById('msg-senha');
 
-      // 3. Função para Alterar Senha
-      window.alterarSenha = async () => {
-        const novaSenha = document.getElementById('nova-senha').value;
-        const msgDiv = document.getElementById('msg-senha');
+      if (novaSenha.length < 6) {
+        msgDiv.textContent = "A senha deve ter no mínimo 6 caracteres.";
+        msgDiv.className = "msg on err";
+        return;
+      }
 
-        if (novaSenha.length < 6) {
-          msgDiv.textContent = "A senha deve ter no mínimo 6 caracteres.";
-          msgDiv.className = "msg on err";
-          return;
-        }
+      msgDiv.textContent = "Alterando...";
+      msgDiv.className = "msg on ok";
 
-        // Usa o método nativo do Supabase para alterar a senha do usuário logado
-        const { error } = await db.auth.updateUser({ password: novaSenha });
+      const { error } = await db.auth.updateUser({ password: novaSenha });
 
-        if (error) {
-          msgDiv.textContent = "Erro ao alterar a senha: " + error.message;
-          msgDiv.className = "msg on err";
-        } else {
-          msgDiv.textContent = "Senha alterada com sucesso!";
-          msgDiv.className = "msg on ok";
-          document.getElementById('nova-senha').value = "";
-        }
-      };
+      if (error) {
+        msgDiv.textContent = "Erro: " + error.message;
+        msgDiv.className = "msg on err";
+      } else {
+        msgDiv.textContent = "Senha alterada com sucesso!";
+        msgDiv.className = "msg on ok";
+        document.getElementById('nova-senha').value = "";
+        setTimeout(() => msgDiv.className = "msg", 3000);
+      }
+    }
 
-    }, 1000); // Aguarda 1 segundo para o login carregar
-  });
-</script>
+    // Roda a função principal assim que a página carrega
+    init();
+  </script>
 </body>
 </html>
