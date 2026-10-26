@@ -16,6 +16,7 @@ const num = n => "TE-" + String(n ?? "").padStart(6, "0");
 const digitos = v => String(v || "").replace(/\D/g, "");
 const qs = k => new URLSearchParams(location.search).get(k);
 const opts = (arr, sel) => arr.map(x => `<option ${x === sel ? "selected" : ""}>${esc(x)}</option>`).join("");
+const stPill = s => { const m = { "Em andamento": "run", "Concluída": "done", "Cancelada": "off", "Nova chamada": "new" }; return `<span class="st ${m[s] || "wait"}">${esc(s)}</span>`; };
 const pill = (t, cinza) => `<span class="pill ${cinza ? "gray" : ""}">${esc(t)}</span>`;
 const tabela = (cab, linhas) => linhas.length ? `<div class="tw"><table><thead><tr>${cab.map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody>${linhas.join("")}</tbody></table></div>` : `<p class="empty">Nada por aqui ainda.</p>`;
 function toast(t) { let e = $("#toast"); if (!e) { e = document.createElement("div"); e.id = "toast"; e.setAttribute("role", "status"); document.body.append(e); } e.textContent = t; e.style.display = "block"; clearTimeout(toast.t); toast.t = setTimeout(() => e.style.display = "none", 3500); }
@@ -38,9 +39,13 @@ document.addEventListener("change", e => { const b = e.target.closest("[data-chg
 function desenharChrome() {
   const adm = App.perfil?.is_admin, logado = !!App.session, atual = location.pathname.split("/").pop() || "index.html";
   if (adm) {
-    $("#site-header").innerHTML = `<div class="bar-in"><a class="logo" href="admin.html" aria-label="TechEmpire — painel"><i>TE</i><span>Tech<b>Empire</b></span></a>
-      <button class="menu" aria-expanded="false" aria-label="Abrir menu">☰</button><nav id="nav"><a href="admin.html" class="on">Painel de atendimento</a><button class="btn sm" data-act="sair">Sair</button></nav></div>`;
-    $(".menu").onclick = e => { const n = $("#nav").classList.toggle("open"); e.currentTarget.setAttribute("aria-expanded", n); };
+    const nome = App.perfil?.nome || "Administrador", ini = esc(nome.trim()[0] || "A").toUpperCase();
+    $("#site-header").innerHTML = `<div class="bar-in wide"><a class="logo" href="admin.html" aria-label="TechEmpire — painel"><i>TE</i><span>Tech<b>Empire</b></span></a>
+      <form class="search" id="busca-global" role="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input name="q" type="search" placeholder="Buscar chamados ou clientes…" aria-label="Buscar chamados ou clientes"></form>
+      <div class="top-r"><a class="bell" href="admin.html#/mensagens" aria-label="Mensagens novas"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8M10 21a2 2 0 0 0 4 0"/></svg><i></i></a>
+      <div class="user"><span class="av">${ini}</span><span class="un"><b>${esc(nome)}</b><small>Administrador</small></span></div><button class="btn sm" data-act="sair">Sair</button></div></div>`;
+    $("#busca-global").onsubmit = e => { e.preventDefault(); const v = e.target.q.value.trim(); location.href = "admin.html#/chamados" + (v ? "?q=" + encodeURIComponent(v) : ""); };
+    sb.from("mensagens").select("*", { count: "exact", head: true }).eq("lida", false).eq("interna", false).neq("remetente_id", App.session.user.id).then(r => { if (r.count) $(".bell")?.classList.add("on"); });
     $("#site-footer").innerHTML = `<div class="copy" style="margin:0 auto">© ${new Date().getFullYear()} TechEmpire · Painel administrativo</div>`; return;
   }
   const l = (href, txt) => `<a href="${href}" class="${atual === href ? "on" : ""}">${txt}</a>`;
@@ -97,6 +102,7 @@ async function desenharArquivos(el, chamadoId) {
     return `<figure class="file">${t.startsWith("image/") ? `<img src="${esc(u)}" alt="${esc(a.nome_original)}" loading="lazy">` : t.startsWith("video/") ? `<video src="${esc(u)}" controls preload="metadata"></video>` : ""}<figcaption><a href="${esc(u)}" target="_blank" rel="noopener">${esc(a.nome_original)}</a></figcaption></figure>`; }).join("") + "</div>";
 }
 function iniciarChat(el, chamadoId, admin) {
+  if (iniciarChat.parar) iniciarChat.parar();
   el.innerHTML = `<div class="chat"><div class="chat-log" aria-live="polite"><p class="empty">Carregando conversa…</p></div>
     <form class="chat-form"><textarea name="t" rows="1" placeholder="Escreva sua mensagem…" required></textarea>
     <label class="clip" title="Anexar arquivo">📎<input type="file" name="f" multiple hidden accept="image/*,video/*,.pdf,.txt"></label>
@@ -122,8 +128,8 @@ function iniciarChat(el, chamadoId, admin) {
     const { error } = await sb.from("mensagens").insert({ chamado_id: chamadoId, remetente_id: App.session.user.id, conteudo: texto, interna: admin ? !!form.int?.checked : false });
     ocupado(form, false); if (error) return toast("Não foi possível enviar a mensagem."); if (falhas) toast(falhas + " arquivo(s) não enviado(s) (máx. 50 MB)."); form.t.value = ""; form.f.value = ""; await carregar(); log.scrollTop = log.scrollHeight; });
   form.t.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); } });
-  sb.channel("chat-" + chamadoId).on("postgres_changes", { event: "INSERT", schema: "public", table: "mensagens", filter: `chamado_id=eq.${chamadoId}` }, carregar).subscribe();
-  setInterval(carregar, 20000); return carregar();
+  const canal = sb.channel("chat-" + chamadoId).on("postgres_changes", { event: "INSERT", schema: "public", table: "mensagens", filter: `chamado_id=eq.${chamadoId}` }, carregar).subscribe();
+  const tmr = setInterval(carregar, 20000); iniciarChat.parar = () => { clearInterval(tmr); sb.removeChannel(canal); }; return carregar();
 }
 async function desenharHistorico(el, chamadoId) {
   const { data } = await sb.from("historico_status").select("*").eq("chamado_id", chamadoId).order("criado_em");
@@ -283,21 +289,32 @@ Pages.admin = async () => {
   const Rotas = {
     async inicio() {
       const c = async (t, fn) => { let q = sb.from(t).select("*", { count: "exact", head: true }); if (fn) q = fn(q); return (await q).count ?? 0; };
-      const r = await Promise.all([c("usuarios", q => q.eq("is_admin", false)), c("chamados"), c("chamados", q => q.in("status", ["Nova chamada", "Aguardando análise"])), c("chamados", q => q.eq("status", "Em andamento")), c("chamados", q => q.eq("status", "Concluída")), c("chamados", q => q.eq("categoria", "site")), c("forleads"), c("pagamentos", q => q.in("status", ["Pendente", "Aguardando pagamento"])), c("pagamentos", q => q.eq("status", "Pago")), c("mensagens", q => q.eq("lida", false).eq("interna", false).neq("remetente_id", App.session.user.id))]);
-      const L = ["Clientes", "Chamados", "Pendentes", "Em andamento", "Concluídos", "Projetos de site", "Leads", "Pagamentos pendentes", "Pagamentos confirmados", "Mensagens não lidas"];
+      const [nCli, nSite, nLead, nPP, nPG] = await Promise.all([c("usuarios", q => q.eq("is_admin", false)), c("chamados", q => q.eq("categoria", "site")), c("forleads"), c("pagamentos", q => q.in("status", ["Pendente", "Aguardando pagamento"])), c("pagamentos", q => q.eq("status", "Pago"))]);
       const [lista, nl] = await Promise.all([carregarChamados(), mapaNaoLidas()]);
-      const link = c => `<a class="rowlink" href="admin-chamado.html?id=${c.id}"><span><b>${num(c.numero)}</b> · ${esc(c.titulo)}<small>${esc(c.cliente?.nome)} · ${fmtData(c.criado_em)}</small></span>${badge(nl[c.id])}</a>`;
+      const ESPERA = ["Nova chamada", "Aguardando análise", "Aprovada"], espera = lista.filter(x => ESPERA.includes(x.status)), andando = lista.filter(x => x.status === "Em andamento").length, feitos = lista.filter(x => x.status === "Concluída").length, nMsg = Object.values(nl).reduce((t, n) => t + n, 0);
+      const fila = espera.slice().sort((a, b) => new Date(a.criado_em) - new Date(b.criado_em)).slice(0, 5), ultimos = lista.slice(0, 7);
+      const kp = (href, cls, svg, n, l, sub) => `<a class="kpc" href="${href}"><span class="kic ${cls}"><svg viewBox="0 0 24 24">${svg}</svg></span><span class="arr">›</span><b>${n}</b><span class="kl">${l}</span><small>${sub}</small></a>`;
       const filaItem = c => `<div class="rowlink"><a href="admin-chamado.html?id=${c.id}" style="text-decoration:none;flex:1"><b>${num(c.numero)}</b> · ${esc(c.titulo)}<small>${esc(c.cliente?.nome)} · ${c.categoria === "site" ? "Site" : "Manutenção"} · ${fmtData(c.criado_em)}</small></a>${badge(nl[c.id])}<button class="btn primary sm" data-act="atender" data-id="${c.id}" data-de="${esc(c.status)}">Atender</button></div>`;
-      const fila = lista.filter(x => ["Nova chamada", "Aguardando análise", "Aprovada"].includes(x.status)).sort((a, b) => new Date(a.criado_em) - new Date(b.criado_em)).slice(0, 8), andamento = lista.filter(x => x.status === "Em andamento").slice(0, 8), comMsg = lista.filter(x => nl[x.id]).slice(0, 6);
-      const cont = Object.fromEntries(STATUS.map(s => [s, lista.filter(x => x.status === s).length])), mx = Math.max(1, ...Object.values(cont));
-      $("#conteudo-admin").innerHTML = `<h2>Início</h2><div class="kpis">${r.map((n, i) => `<div class="k"><b>${n}</b><span>${L[i]}</span></div>`).join("")}</div>
-      <div class="box"><h3>⚡ Fila de atendimento</h3><p class="sub" style="margin-bottom:12px">Do mais antigo para o mais novo. Clique em Atender para começar.</p>${fila.length ? fila.map(filaItem).join("") : '<p class="empty">Nenhum chamado esperando. Tudo em dia!</p>'}</div>
-      <div class="two"><div class="box"><h3>🔧 Em andamento</h3>${andamento.length ? andamento.map(link).join("") : '<p class="empty">Nenhum chamado em andamento.</p>'}</div>
-      <div class="box"><h3>💬 Mensagens não lidas</h3>${comMsg.length ? comMsg.map(link).join("") : '<p class="empty">Nenhuma mensagem nova.</p>'}</div></div>
-      <div class="box"><h3>Chamados por status</h3>${STATUS.map(s => `<div class="barra"><span>${esc(s)}</span><div><i style="width:${cont[s] / mx * 100}%"></i></div><b>${cont[s]}</b></div>`).join("")}</div>`;
+      const conv = lista.slice().sort((a, b) => (nl[b.id] || 0) - (nl[a.id] || 0)).slice(0, 30), pad = conv[0];
+      const nome = (App.perfil?.nome || "").split(" ")[0] || "admin";
+      $("#conteudo-admin").innerHTML = `<div class="home-grid"><div class="home-main">
+        <p class="hello">Bem-vindo, ${esc(nome)}!</p><h2 class="big">Painel de atendimento</h2><p class="sub">Aqui você atende os chamados, acompanha os serviços e conversa com os clientes.</p>
+        <div class="kp">${kp("#/chamados", "g", '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>', lista.length, "Chamados", espera.length ? espera.length + " aguardando atendimento" : "Nenhum chamado pendente")}
+          ${kp("#/chamados", "b", '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.2-.6-.6-2.2z"/>', andando, "Em andamento", andando ? "Serviços sendo executados" : "Nenhum serviço em andamento")}
+          ${kp("#/chamados", "p", '<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>', feitos, "Finalizados", feitos ? "Serviços concluídos" : "Nenhum serviço finalizado")}
+          ${kp("#/mensagens", "m", '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>', nMsg, "Mensagens novas", nMsg ? "Clientes aguardando resposta" : "Nenhuma mensagem nova")}</div>
+        <div class="box"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h3 style="margin:0">⚡ Fila de atendimento</h3><span class="sub" style="margin:0">Do mais antigo para o mais novo</span></div>${fila.length ? fila.map(filaItem).join("") : '<p class="empty">Nenhum chamado esperando. Tudo em dia!</p>'}</div>
+        <div class="box"><div class="row" style="justify-content:space-between;margin-bottom:10px"><div><h3 style="margin:0">🕒 Últimos chamados</h3><span class="sub" style="margin:0">Acompanhe os atendimentos mais recentes.</span></div><a class="btn sm" href="#/chamados">Ver todos ›</a></div>
+          ${tabela(["Data", "Cliente", "Chamado", "Status", ""], ultimos.map(x => `<tr><td>${new Date(x.criado_em).toLocaleDateString("pt-BR")}</td><td>${esc(x.cliente?.nome)}</td><td>${esc(x.titulo)}<br><small style="color:var(--muted)">${num(x.numero)} · ${x.categoria === "site" ? "Site" : "Manutenção"}</small></td><td>${stPill(x.status)}</td><td><a class="btn sm" href="admin-chamado.html?id=${x.id}">Abrir</a></td></tr>`))}</div>
+        <div class="mini-stats"><div><b>${nCli}</b><span>Clientes</span></div><div><b>${nSite}</b><span>Projetos de site</span></div><div><b>${nLead}</b><span>Leads</span></div><div><b>${nPP}</b><span>Pgtos pendentes</span></div><div><b>${nPG}</b><span>Pgtos confirmados</span></div></div>
+      </div>
+      <aside class="chat-card"><div class="chat-head"><span class="kic g"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></span><div><h3 style="margin:0">Chat do Cliente</h3><small id="chat-sub">Fale com o cliente</small></div><span class="online">Online</span></div>
+        ${pad ? `<select id="chat-sel" class="mini" style="width:100%;margin-bottom:10px" aria-label="Escolher conversa">${conv.map(x => `<option value="${x.id}">${nl[x.id] ? "💬 " + nl[x.id] + " · " : ""}${num(x.numero)} · ${esc(x.cliente?.nome || "")} · ${esc(x.titulo)}</option>`).join("")}</select><div id="chat-home"></div><a class="btn sm" id="chat-abrir" style="margin-top:10px" href="admin-chamado.html?id=${pad.id}">Abrir chamado</a>` : '<p class="empty">Quando um cliente abrir um chamado, a conversa aparece aqui.</p>'}</aside></div>`;
+      if (pad) { const abrirChat = id => { const x = lista.find(y => y.id === id); $("#chat-sub").textContent = (x?.cliente?.nome || "Cliente") + " · " + num(x?.numero); $("#chat-abrir").href = "admin-chamado.html?id=" + id; iniciarChat($("#chat-home"), id, true); };
+        $("#chat-sel").onchange = e => abrirChat(e.target.value); abrirChat(pad.id); }
     },
     async chamados(param) {
-      const cli = new URLSearchParams(param || "").get("c"); let modo = Rotas._modo || "lista", chip = "";
+      const pr0 = new URLSearchParams(param || ""), cli = pr0.get("c"); let modo = Rotas._modo || "lista", chip = "";
       const [todos, nl, pg] = await Promise.all([carregarChamados(cli), mapaNaoLidas(), mapaPagamentos()]);
       $("#conteudo-admin").innerHTML = `<div class="row" style="justify-content:space-between;margin-bottom:12px"><h2 style="margin:0">Chamados${cli ? " do cliente" : ""}</h2><div class="row"><button class="btn sm" data-act="modo" data-m="lista">☰ Lista</button><button class="btn sm" data-act="modo" data-m="quadro">▦ Quadro</button></div></div>
         <div class="chips" id="chips"></div>
@@ -322,7 +339,7 @@ Pages.admin = async () => {
         }
       };
       Act.modo = d => { modo = d.m; Rotas._modo = modo; desenhar(); }; Act.chip = d => { chip = d.s; desenhar(); };
-      ["bq", "bc", "bp", "bo"].forEach(i => $("#" + i).oninput = desenhar); desenhar();
+      ["bq", "bc", "bp", "bo"].forEach(i => $("#" + i).oninput = desenhar); if (pr0.get("q")) $("#bq").value = pr0.get("q"); desenhar();
     },
     async mensagens() {
       const me = App.session.user.id; const { data: ms } = await sb.from("mensagens").select("chamado_id,remetente_id,conteudo,lida,interna,criado_em").order("criado_em", { ascending: false }).limit(400);
@@ -379,7 +396,7 @@ Pages.admin = async () => {
   Act.converter = async d => { if (!d.email) return toast("O lead precisa ter e-mail para converter."); const { data: u } = await sb.from("usuarios").select("id").eq("email", d.email.toLowerCase()).maybeSingle();
     if (!u) return toast("Este contato ainda não criou conta. Peça que se cadastre com este e-mail e converta depois.");
     const { error } = await sb.from("forleads").update({ cliente_id: u.id, etapa: "Convertido em cliente" }).eq("id", d.id); toast(error ? "Erro" : "Lead vinculado ao cliente existente"); Rotas.leads(); };
-  async function rota() { const [p, param] = (location.hash.replace("#/", "") || "inicio").split("?"); const nome = Rotas[p] && !p.startsWith("_") ? p : "inicio";
+  async function rota() { if (iniciarChat.parar) iniciarChat.parar(); const [p, param] = (location.hash.replace("#/", "") || "inicio").split("?"); const nome = Rotas[p] && !p.startsWith("_") ? p : "inicio";
     $$(".side a").forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#/" + (nome === "inicio" ? "" : nome) || (nome === "inicio" && a.getAttribute("href") === "#/")));
     try { await Rotas[nome](param); } catch (e) { $("#conteudo-admin").innerHTML = '<p class="empty">Erro ao carregar.</p>'; } }
   window.addEventListener("hashchange", rota); rota();
