@@ -3,112 +3,96 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#07090b">
-<title>Detalhes do Chamado — TechEmpire</title>
+<title>Meu Chamado — TechEmpire</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
 <style>
-  .chat-container { display: flex; flex-direction: column; height: 500px; background: #0a0d0f; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-top: 20px; overflow: hidden; }
+  body { background: #06080a !important; color: #fff; font-family: 'Inter', sans-serif; margin: 0; padding: 40px 20px; display: flex; justify-content: center; }
+  .container { width: 100%; max-width: 800px; }
+  h1 { font-family: 'Space Grotesk', sans-serif; font-size: 28px; }
+  .box { background: #12161a; border: 1px solid #333; border-radius: 12px; padding: 24px; margin-top: 20px; }
+  .chat-container { display: flex; flex-direction: column; height: 400px; background: #0a0d0f; border-radius: 12px; overflow: hidden; margin-top: 15px; border: 1px solid #333; }
   .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-  .chat-msg { background: #1a1e22; color: #fff; padding: 12px 18px; border-radius: 12px; font-size: 15px; max-width: 80%; border-bottom-left-radius: 2px; align-self: flex-start; }
-  .chat-msg.me { background: var(--lime); color: #000; align-self: flex-end; border-bottom-left-radius: 12px; border-bottom-right-radius: 2px; }
-  .chat-msg small { display: block; font-size: 11px; opacity: 0.7; margin-bottom: 4px; }
-  .chat-footer { padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 10px; background: #12161a; }
+  .chat-msg { background: #1a1e22; padding: 12px 18px; border-radius: 12px; font-size: 14px; max-width: 80%; border-bottom-left-radius: 2px; align-self: flex-start; }
+  .chat-msg.me { background: #b4f03c; color: #000; align-self: flex-end; border-bottom-left-radius: 12px; border-bottom-right-radius: 2px; }
+  .chat-msg small { display: block; font-size: 10px; opacity: 0.7; margin-bottom: 4px; }
+  .chat-footer { padding: 15px; border-top: 1px solid #333; display: flex; gap: 10px; background: #12161a; }
   .chat-footer input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #06080a; color: #fff; outline: none; }
-  .chat-footer button { background: var(--lime); border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; color: #000; }
+  .chat-footer button { background: #b4f03c; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; color: #000; }
+  a { color: #b4f03c; text-decoration: none; font-weight: bold; }
 </style>
 </head>
-<body data-page="chamado" data-auth="client">
-<header id="site-header"></header>
-<main class="wrap-main">
-  <div id="conteudo"><p class="empty">Carregando chamado...</p></div>
-</main>
-<footer id="site-footer"></footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<body>
+<div class="container">
+  <a href="painel.html">← Voltar para Meus Chamados</a>
+  <div id="conteudo"><p>Carregando...</p></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
-<script src="data.js"></script>
-<script src="script.js"></script>
-
 <script>
-  document.addEventListener("DOMContentLoaded", async () => {
-    setTimeout(async () => {
-      if (!window.App || !window.App.session) { window.location.href = "login.html"; return; }
-      
-      const db = window.supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
-      const idCliente = window.App.session.user.id;
-      const urlParams = new URLSearchParams(window.location.search);
-      const chamadoId = urlParams.get('id');
-      const isNovo = urlParams.get('novo');
+  const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
 
-      if (!chamadoId) { document.getElementById('conteudo').innerHTML = '<p class="empty">Chamado não encontrado.</p>'; return; }
+  async function carregarTela() {
+    const { data: { session } } = await db.auth.getSession();
+    if (!session) { window.location.href = "login.html"; return; }
+    const idCliente = session.user.id;
 
-      const { data: c, error } = await db.from("chamados").select("*").eq("id", chamadoId).single();
-      if (error || !c) { document.getElementById('conteudo').innerHTML = '<p class="empty">Erro ao carregar o chamado.</p>'; return; }
+    const params = new URLSearchParams(window.location.search);
+    const chamadoId = params.get('id');
+    if (!chamadoId) { document.getElementById('conteudo').innerHTML = '<p>Chamado não encontrado.</p>'; return; }
 
-      document.getElementById('conteudo').innerHTML = `
-        <p><a href="painel.html" style="color: var(--lime); text-decoration: none;">← Voltar</a></p>
-        ${isNovo ? '<div class="msg on ok" style="margin-bottom: 20px; display: block;">Chamado criado com sucesso!</div>' : ''}
-        <h2 style="font-family: var(--head); font-size: 32px;">TE-${String(c.numero).padStart(6, '0')} · ${c.titulo}</h2>
-        <p><span class="pill">${c.status}</span> <span class="sub">Aberto em ${new Date(c.criado_em).toLocaleString('pt-BR')}</span></p>
-        <div class="box" style="margin-top: 20px;"><h3>Sua solicitação</h3><p style="white-space: pre-wrap; color: #d1d5db;">${c.descricao}</p></div>
-        <div class="box" style="margin-top: 20px; padding: 0; background: transparent; border: none;">
-          <h3>💬 Conversa com a TechEmpire</h3>
-          <div class="chat-container">
-            <div class="chat-body" id="chat-cliente"><p style="text-align:center; color:#97a0a6;">Carregando...</p></div>
-            <form class="chat-footer" id="form-chat-cliente">
-              <input type="text" id="input-msg-cliente" placeholder="Digite sua mensagem..." required autocomplete="off">
-              <button type="submit" id="btn-enviar-cliente">Enviar</button>
-            </form>
-          </div>
+    const { data: c } = await db.from("chamados").select("*").eq("id", chamadoId).single();
+    if (!c) { document.getElementById('conteudo').innerHTML = '<p>Chamado não encontrado.</p>'; return; }
+
+    document.getElementById('conteudo').innerHTML = `
+      <h1>${c.titulo}</h1>
+      <p>Status: <b>${c.status}</b></p>
+      <div class="box">
+        <h3>Descrição</h3>
+        <p>${c.descricao}</p>
+      </div>
+      <div class="box">
+        <h3>💬 Conversa com a TechEmpire</h3>
+        <div class="chat-container">
+          <div class="chat-body" id="chat-body"><p>Carregando chat...</p></div>
+          <form class="chat-footer" id="form-chat">
+            <input type="text" id="input-msg" placeholder="Digite sua mensagem..." required>
+            <button type="submit">Enviar</button>
+          </form>
         </div>
-      `;
+      </div>
+    `;
 
-      async function carregarMensagensCliente() {
-        const chatBody = document.getElementById('chat-cliente');
-        const { data, error } = await db.from('mensagens').select('*').eq('chamado_id', chamadoId).order('criado_em', { ascending: true });
-        
-        if (error || !data || data.length === 0) {
-          chatBody.innerHTML = `<p style="text-align:center; color:#97a0a6;">Nenhuma mensagem ainda. Envie a primeira!</p>`;
-          return;
-        }
-        
-        chatBody.innerHTML = data.map(msg => {
-          const isMe = String(msg.remetente_id) === String(idCliente);
-          const hora = new Date(msg.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-          return `<div class="chat-msg ${isMe ? 'me' : ''}"><small>${isMe ? 'Você' : 'TechEmpire'} · ${hora}</small>${msg.conteudo}</div>`;
-        }).join('');
-        
-        chatBody.scrollTop = chatBody.scrollHeight;
+    async function carregarChat() {
+      const chatBody = document.getElementById('chat-body');
+      const { data } = await db.from('mensagens').select('*').eq('chamado_id', chamadoId).order('criado_em', { ascending: true });
+      
+      if (!data || data.length === 0) {
+        chatBody.innerHTML = `<p style="color:#97a0a6; text-align:center;">Nenhuma mensagem ainda. Envie a primeira!</p>`;
+        return;
       }
 
-      document.getElementById('form-chat-cliente').onsubmit = async (e) => {
-        e.preventDefault();
-        const input = document.getElementById('input-msg-cliente');
-        const btn = document.getElementById('btn-enviar-cliente');
-        const texto = input.value.trim();
-        if (!texto) return;
+      chatBody.innerHTML = data.map(msg => {
+        const isMe = msg.remetente_id === idCliente;
+        return `<div class="chat-msg ${isMe ? 'me' : ''}"><small>${isMe ? 'Você' : 'TechEmpire'}</small>${msg.conteudo}</div>`;
+      }).join('');
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
 
-        btn.disabled = true; btn.textContent = "...";
+    document.getElementById('form-chat').onsubmit = async (e) => {
+      e.preventDefault();
+      const input = document.getElementById('input-msg');
+      const texto = input.value.trim();
+      if (!texto) return;
 
-        const { error } = await db.from('mensagens').insert({
-          chamado_id: chamadoId,
-          remetente_id: idCliente,
-          conteudo: texto
-        });
+      const { error } = await db.from('mensagens').insert({ chamado_id: chamadoId, remetente_id: idCliente, conteudo: texto });
+      if (error) { alert("Erro ao enviar: " + error.message); } 
+      else { input.value = ''; await carregarChat(); }
+    };
 
-        btn.disabled = false; btn.textContent = "Enviar";
-
-        if (error) {
-          alert("Erro ao enviar: " + error.message);
-        } else {
-          input.value = '';
-          await carregarMensagensCliente();
-        }
-      };
-
-      await carregarMensagensCliente();
-    }, 1000);
-  });
+    await carregarChat();
+  }
+  carregarTela();
 </script>
 </body>
 </html>
