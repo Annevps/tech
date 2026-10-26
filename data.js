@@ -12,5 +12,6 @@ window.TE = {
   ETAPAS_LEAD: ["Novo contato","Em negociação","Aguardando resposta","Convertido em cliente","Perdido"],
   DISPOSITIVOS: ["Computador","Notebook","Celular","Tablet","Impressora","Outro"],
   TIPOS_SITE: ["Institucional","Portfólio","Loja virtual","Landing page","Outro"],
+  PRIORIDADES: ["Baixa","Normal","Alta","Urgente"],
   ATENDIMENTO: ["Levar o equipamento até a loja","Atendimento remoto","Atendimento a domicílio"]
 };
