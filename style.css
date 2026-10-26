@@ -110,3 +110,35 @@ tr.go{cursor:pointer}tr.go:hover{background:rgba(180,240,60,.06)}td a{color:var(
 .col{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:16px;padding:10px;min-height:160px}.col.over{outline:2px dashed var(--lime)}.col h4{margin:2px 4px 10px;font-size:13px;display:flex;justify-content:space-between;gap:6px;font-family:var(--head)}
 .kc{background:var(--s2);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px;cursor:grab;font-size:13.5px}.kc:active{cursor:grabbing}.kc a{color:var(--lime);text-decoration:none}.kc small{color:var(--muted);display:block;margin-top:4px}
 @media(max-width:760px){.barra{grid-template-columns:1fr 60px 30px}}
+/* Upgrade do Menu Global */
+#site-header {
+  background: rgba(10, 13, 15, 0.85) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+
+.bar-in {
+  padding: 16px 24px !important;
+  max-width: 1280px;
+}
+
+#nav a:not(.btn) {
+  font-size: 14px !important;
+  letter-spacing: 0.02em;
+  color: #a0aab2;
+}
+
+#nav a:not(.btn):hover, #nav a.on {
+  color: #b4f03c;
+  background: transparent;
+}
+
+.btn.sm.primary {
+  padding: 8px 20px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 8px;
+}
