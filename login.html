@@ -27,5 +27,35 @@
 <script src="supabase-config.js"></script>
 <script src="data.js"></script>
 <script src="script.js"></script>
+
+<!-- SCRIPT DE REDIRECIONAMENTO DO ADMIN -->
+<script>
+  document.getElementById('f-login').addEventListener('submit', async (e) => {
+    e.preventDefault(); // Impede o script.js de fazer o redirecionamento padrão
+    const email = e.target.email.value.trim();
+    const senha = e.target.senha.value;
+    const btn = e.target.querySelector('button');
+    btn.disabled = true;
+    btn.textContent = "Entrando...";
+
+    const sb = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: senha });
+
+    if (error) {
+      btn.disabled = false;
+      btn.textContent = "Entrar";
+      document.getElementById('m-login').textContent = "E-mail ou senha incorretos.";
+      document.getElementById('m-login').className = "msg on err";
+      return;
+    }
+
+    // SE FOR O ADMIN, VAI DIRETO PARA O PAINEL
+    if (email === 'admin@tech.com') {
+      window.location.href = "admin.html";
+    } else {
+      window.location.href = "painel.html";
+    }
+  });
+</script>
 </body>
 </html>
