@@ -28,7 +28,7 @@
 <script src="data.js"></script>
 <script src="script.js"></script>
 
-<!-- SCRIPT DE REDIRECIONAMENTO DO ADMIN -->
+<!-- SCRIPT QUE FORÇA O REDIRECIONAMENTO PARA O ADMIN -->
 <script>
   document.getElementById('f-login').addEventListener('submit', async (e) => {
     e.preventDefault(); // Impede o script.js de fazer o redirecionamento padrão
@@ -39,6 +39,8 @@
     btn.textContent = "Entrando...";
 
     const sb = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
+    
+    // Tenta fazer o login
     const { data, error } = await sb.auth.signInWithPassword({ email, password: senha });
 
     if (error) {
@@ -49,7 +51,7 @@
       return;
     }
 
-    // SE FOR O ADMIN, VAI DIRETO PARA O PAINEL
+    // AQUI ESTÁ A MÁGICA: Se o e-mail for o admin, vai DIRETO para a página admin.
     if (email === 'admin@tech.com') {
       window.location.href = "admin.html";
     } else {
