@@ -10,6 +10,7 @@
   body { background: #06080a !important; margin: 0; font-family: 'Inter', sans-serif; color: #ffffff !important; display: flex; height: 100vh; overflow: hidden; }
   h1, h2, h3, h4, p, span, div, td, th, a { color: #ffffff !important; }
   
+  /* SIDEBAR */
   .sidebar { width: 260px; background: #0a0d0f !important; border-right: 1px solid #222; padding: 24px; display: flex; flex-direction: column; }
   .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: bold; margin-bottom: 40px; }
   .logo i { background: #b4f03c; color: #000 !important; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; font-style: normal; }
@@ -19,6 +20,7 @@
   .sidebar .voltar { color: #97a0a6 !important; margin-bottom: 15px; }
   .sidebar .sair { margin-top: auto; color: #ff7b6b !important; border-top: 1px solid #222; padding-top: 20px; }
 
+  /* MAIN */
   .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
   .topbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid #222; background: #0a0d0f !important; position: sticky; top: 0; z-index: 10; }
   .topbar h1 { margin: 0; font-size: 20px; font-family: 'Space Grotesk', sans-serif; }
@@ -39,6 +41,7 @@
   tr:hover td { background: rgba(255,255,255,0.05); }
   .pill { background: rgba(180,240,60,0.15) !important; color: #b4f03c !important; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: bold; border: 1px solid rgba(180,240,60,0.3); }
 
+  /* CHAT */
   .chat-panel { background: #12161a !important; border: 1px solid #333; border-radius: 12px; display: flex; flex-direction: column; height: 600px; position: sticky; top: 100px; }
   .chat-header { padding: 15px; border-bottom: 1px solid #333; display: flex; align-items: center; gap: 10px; background: #1a1e22 !important; }
   .chat-body { padding: 15px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #0a0d0f !important; }
@@ -49,13 +52,34 @@
   .chat-footer input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #06080a !important; color: #fff !important; outline: none; }
   .chat-footer button { background: #b4f03c !important; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; color: #000 !important; }
 
-  .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; }
-  .modal-content { background: #12161a !important; border: 1px solid #333; border-radius: 12px; padding: 30px; width: 500px; max-width: 90%; }
-  .modal-content h2 { margin-top: 0; color: #b4f03c !important; }
-  .modal-actions { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
-  .btn-modal { padding: 10px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
-  .btn-modal.primary { background: #b4f03c !important; color: #000 !important; }
-  .btn-modal.danger { background: #ff7b6b !important; color: #fff !important; }
+  /* MODAL DE DETALHES - TELA CHEIA */
+  .modal-full { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+  .modal-box { background: #0e1114 !important; border: 1px solid #333; border-radius: 16px; width: 90%; max-width: 1100px; height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+  
+  /* CABEÇALHO DO MODAL */
+  .modal-header { padding: 20px 30px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; background: #12161a; }
+  .modal-header h2 { margin: 0; color: #fff !important; font-size: 22px; }
+  .btn-close { background: none; border: none; color: #fff !important; font-size: 24px; cursor: pointer; }
+  
+  /* CORPO DO MODAL (2 COLUNAS) */
+  .modal-body-grid { display: grid; grid-template-columns: 1fr 1fr; flex: 1; overflow: hidden; }
+  .modal-left { padding: 30px; overflow-y: auto; border-right: 1px solid #333; }
+  .modal-right { display: flex; flex-direction: column; background: #0a0d0f; }
+  
+  /* FORMULÁRIO DE EDIÇÃO */
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 13px; font-weight: bold; color: #b4f03c !important; margin-bottom: 8px; text-transform: uppercase; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; background: #06080a; border: 1px solid #444; border-radius: 8px; color: #fff; font-family: inherit; }
+  .form-group textarea { resize: vertical; min-height: 100px; }
+  
+  /* ARQUIVOS */
+  .anexo-item { background: #1a1e22; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 14px; }
+  .anexo-item a { color: #b4f03c !important; text-decoration: none; font-weight: bold; }
+  
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+  .btn-acao { padding: 12px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+  .btn-acao.salvar { background: #b4f03c !important; color: #000 !important; }
+  .btn-acao.excluir { background: #ff7b6b !important; color: #fff !important; }
 </style>
 </head>
 <body>
@@ -66,7 +90,6 @@
     <a class="active" id="menu-inicio" onclick="mudarAba('inicio')">📊 Visão Geral</a>
     <a id="menu-chamados" onclick="mudarAba('chamados')">🎫 Chamados</a>
     <a id="menu-clientes" onclick="mudarAba('clientes')">👥 Clientes</a>
-    <a id="menu-leads" onclick="mudarAba('leads')">🎯 Leads</a>
     <a href="login.html" id="btn-sair" class="sair">Sair da conta</a>
   </div>
 
@@ -76,20 +99,13 @@
         <h1 id="page-title">Visão Geral</h1>
         <span id="page-subtitle">Acompanhe as métricas da sua empresa júnior.</span>
       </div>
-      <div style="display:flex; align-items:center; gap:10px;">
-        <div style="text-align: right;">
-          <div style="font-weight: bold; font-size: 14px; color: #fff !important;" id="admin-nome">Admin</div>
-          <div style="color: #b4f03c !important; font-size: 12px;">Administrador</div>
-        </div>
-        <div style="width: 40px; height: 40px; border-radius: 50%; background: #b4f03c; color: #000 !important; display: grid; place-items: center; font-weight: bold; font-size: 18px;">A</div>
-      </div>
     </div>
 
     <div class="content">
       <div id="area-principal">
         <div class="kpis" id="admin-kpis"></div>
         <div class="box">
-          <h3 id="titulo-tabela">Últimos Chamados</h3>
+          <h3>Últimos Chamados</h3>
           <div id="tabela-conteudo"></div>
         </div>
       </div>
@@ -113,14 +129,69 @@
     </div>
   </div>
 
-  <div class="modal" id="modal-detalhes">
-    <div class="modal-content">
-      <h2 id="modal-titulo">Detalhes do Chamado</h2>
-      <p id="modal-desc"></p>
-      <p><strong>Status atual:</strong> <span id="modal-status"></span></p>
-      <div class="modal-actions">
-        <button class="btn-modal primary" id="btn-finalizar" onclick="finalizarChamado()">Marcar como Concluído</button>
-        <button class="btn-modal danger" onclick="fecharModal()">Fechar</button>
+  <!-- MODAL DE EDIÇÃO (TELA CHEIA) -->
+  <div class="modal-full" id="modal-full">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 id="modal-titulo">Chamado</h2>
+        <button class="btn-close" onclick="fecharModal()">✕</button>
+      </div>
+      
+      <div class="modal-body-grid">
+        <!-- COLUNA ESQUERDA: EDIÇÃO E ARQUIVOS -->
+        <div class="modal-left">
+          <div class="form-group">
+            <label>Título do Chamado</label>
+            <input type="text" id="edit-titulo">
+          </div>
+          
+          <div class="form-group">
+            <label>Descrição do Cliente</label>
+            <textarea id="edit-descricao" rows="5"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Status do Atendimento</label>
+            <select id="edit-status">
+              <option value="Nova chamada">Nova chamada</option>
+              <option value="Aguardando análise">Aguardando análise</option>
+              <option value="Em andamento">Em andamento</option>
+              <option value="Concluída">Concluída</option>
+              <option value="Cancelada">Cancelada</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Anexos e Arquivos Enviados</label>
+            <div id="modal-anexos">
+              <p style="color:#97a0a6; font-size:14px;">Nenhum anexo encontrado.</p>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button class="btn-acao salvar" onclick="salvarEdicao()">💾 Salvar Alterações</button>
+            <button class="btn-acao excluir" onclick="excluirChamado()">🗑️ Excluir Chamado</button>
+          </div>
+        </div>
+
+        <!-- COLUNA DIREITA: CHAT -->
+        <div class="modal-right">
+          <div class="chat-header" style="border-top: none;">
+            <div style="width: 30px; height: 30px; font-size: 14px; background: #b4f03c; color: #000 !important; border-radius: 50%; display: grid; place-items: center;">👤</div>
+            <div>
+              <h4 style="margin:0;">Conversa com o Cliente</h4>
+            </div>
+          </div>
+          
+          <div class="chat-body" id="chat-modal-mensagens" style="flex: 1;">
+            <p style="text-align:center; margin-top:20px;">Carregando conversa...</p>
+          </div>
+          
+          <form class="chat-footer" id="form-chat-modal" style="display: flex;">
+            <input type="text" id="input-msg-modal" placeholder="Digite sua resposta..." required>
+            <button type="submit" id="btn-enviar-modal">Enviar</button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
@@ -130,7 +201,7 @@
   <script>
     const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
     let idAdmin = null;
-    let chamadoSelecionado = null;
+    let chamadoAbertoId = null;
 
     document.getElementById('btn-sair').addEventListener('click', async (e) => {
       e.preventDefault();
@@ -141,120 +212,131 @@
     async function init() {
       const { data: { session } } = await db.auth.getSession();
       if (session) idAdmin = session.user.id;
-      
-      // Tenta buscar o nome, se não achar usa "Admin"
-      const { data: perfil } = await db.from("usuarios").select("nome").eq("id", idAdmin).single();
-      if (perfil) document.getElementById("admin-nome").textContent = perfil.nome;
-      
-      mudarAba('inicio');
+      carregarChamados();
     }
 
-    function mudarAba(aba) {
-      document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-      const el = document.getElementById(`menu-${aba}`);
-      if(el) el.classList.add('active');
-      
-      const title = document.getElementById('page-title');
-      const subtitle = document.getElementById('page-subtitle');
-      
-      if (aba === 'inicio' || aba === 'chamados') {
-        title.textContent = aba === 'inicio' ? 'Visão Geral' : 'Todos os Chamados';
-        subtitle.textContent = 'Clique em um chamado para ver detalhes e conversar.';
-        document.getElementById('painel-chat').style.display = 'flex';
-        carregarChamados();
-      } else {
-        title.textContent = aba === 'clientes' ? 'Clientes' : 'Leads';
-        document.getElementById('painel-chat').style.display = 'none';
-        document.getElementById('admin-kpis').innerHTML = '';
-        document.getElementById('titulo-tabela').textContent = aba === 'clientes' ? 'Lista de Clientes' : 'Lista de Leads';
-        document.getElementById('tabela-conteudo').innerHTML = '<p>Nenhum dado para exibir no momento.</p>';
-      }
-    }
-
-    // AQUI ESTÁ O SEGREDO PARA MOSTRAR OS CHAMADOS
     async function carregarChamados() {
-      // Busca todos os chamados sem filtro
       const { data: chamados, error } = await db.from("chamados").select("*").order("criado_em", { ascending: false });
       
-      // Se der erro, avisa na tela
       if (error) {
-        document.getElementById("tabela-conteudo").innerHTML = `<p style="color: #ff7b6b !important; font-weight: bold;">ERRO AO LER O BANCO: ${error.message}</p>`;
+        document.getElementById("tabela-conteudo").innerHTML = `<p style="color: red;">Erro: ${error.message}</p>`;
         return;
       }
 
-      const { data: usuarios } = await db.from("usuarios").select("*").eq("is_admin", false);
-
-      // Atualiza os KPIs mesmo se estiver vazio
+      // KPIs
       document.getElementById("admin-kpis").innerHTML = `
         <div class="kpi"><h3>Total Chamados</h3><b>${chamados ? chamados.length : 0}</b></div>
         <div class="kpi"><h3>Novos / Pendentes</h3><b>${chamados ? chamados.filter(c => c.status === 'Nova chamada').length : 0}</b></div>
+        <div class="kpi"><h3>Em Andamento</h3><b>${chamados ? chamados.filter(c => c.status === 'Em andamento').length : 0}</b></div>
         <div class="kpi"><h3>Concluídos</h3><b>${chamados ? chamados.filter(c => c.status === 'Concluída').length : 0}</b></div>
-        <div class="kpi"><h3>Total Clientes</h3><b>${usuarios ? usuarios.length : 0}</b></div>
       `;
 
       if (chamados && chamados.length > 0) {
         let html = `<table><thead><tr><th>Nº</th><th>Título</th><th>Status</th><th>Ação</th></tr></thead><tbody>`;
         chamados.forEach(c => {
-          // Proteção contra caracteres especiais no texto
-          const descSegura = c.descricao ? c.descricao.replace(/'/g, "\\'").replace(/"/g, "&quot;") : "Sem descrição";
-          const tituloSeguro = c.titulo ? c.titulo.replace(/'/g, "\\'").replace(/"/g, "&quot;") : "Sem título";
-          
           html += `<tr>
             <td>TE-${String(c.numero).padStart(6, '0')}</td>
             <td>${c.titulo}</td>
             <td><span class="pill">${c.status}</span></td>
-            <td><button onclick="abrirChamado('${c.id}', '${tituloSeguro}', '${descSegura}', '${c.status}')" style="background:#b4f03c; color:#000 !important; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;">Abrir</button></td>
+            <td><button onclick="abrirChamado('${c.id}')" style="background:#b4f03c; color:#000 !important; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;">Gerenciar</button></td>
           </tr>`;
         });
         html += `</tbody></table>`;
         document.getElementById("tabela-conteudo").innerHTML = html;
       } else {
-        // Se não tiver chamados, avisa.
-        document.getElementById("tabela-conteudo").innerHTML = `
-          <div style="padding: 20px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-            <p style="margin:0; color: #b4f03c !important;">O banco de dados está vazio.</p>
-            <p style="margin: 5px 0 0 0; font-size: 12px;">Se você já criou chamados, o RLS do Supabase está bloqueando. Rode o SQL de liberação no painel do Supabase.</p>
-          </div>
-        `;
+        document.getElementById("tabela-conteudo").innerHTML = "<p>Nenhum chamado encontrado.</p>";
       }
     }
 
-    async function abrirChamado(id, titulo, descricao, status) {
-      chamadoSelecionado = id;
-      document.getElementById('modal-titulo').textContent = titulo;
-      document.getElementById('modal-desc').textContent = descricao;
-      document.getElementById('modal-status').textContent = status;
-      document.getElementById('modal-detalhes').style.display = 'flex';
-
-      document.getElementById('chat-titulo').textContent = titulo;
-      document.getElementById('chat-status').textContent = status;
-      document.getElementById('form-chat').style.display = 'flex';
+    async function abrirChamado(id) {
+      chamadoAbertoId = id;
+      const { data: c, error } = await db.from("chamados").select("*").eq("id", id).single();
       
+      if (!c || error) return alert("Erro ao carregar chamado.");
+
+      document.getElementById('modal-titulo').textContent = `Chamado TE-${String(c.numero).padStart(6, '0')}`;
+      document.getElementById('edit-titulo').value = c.titulo;
+      document.getElementById('edit-descricao').value = c.descricao;
+      document.getElementById('edit-status').value = c.status;
+      
+      document.getElementById('modal-full').style.display = 'flex';
+      
+      await carregarAnexos(id);
       await carregarMensagens(id);
     }
 
     function fecharModal() {
-      document.getElementById('modal-detalhes').style.display = 'none';
+      document.getElementById('modal-full').style.display = 'none';
+      chamadoAbertoId = null;
     }
 
-    async function finalizarChamado() {
-      if (!chamadoSelecionado) return;
-      const { error } = await db.from("chamados").update({ status: "Concluída" }).eq("id", chamadoSelecionado);
+    async function salvarEdicao() {
+      if (!chamadoAbertoId) return;
+      const novoTitulo = document.getElementById('edit-titulo').value;
+      const novaDesc = document.getElementById('edit-descricao').value;
+      const novoStatus = document.getElementById('edit-status').value;
+
+      const { error } = await db.from("chamados").update({ 
+        titulo: novoTitulo, 
+        descricao: novaDesc, 
+        status: novoStatus 
+      }).eq("id", chamadoAbertoId);
+
       if (!error) {
-        alert("Chamado finalizado com sucesso!");
-        fecharModal();
+        alert("Chamado atualizado com sucesso!");
         carregarChamados();
       } else {
-        alert("Erro ao finalizar: " + error.message);
+        alert("Erro ao salvar: " + error.message);
       }
     }
 
+    async function excluirChamado() {
+      if (!chamadoAbertoId) return;
+      if (!confirm("Tem certeza que deseja EXCLUIR este chamado? Isso apagará todas as mensagens e arquivos.")) return;
+      
+      const { error } = await db.from("chamados").delete().eq("id", chamadoAbertoId);
+      if (!error) {
+        alert("Chamado excluído.");
+        fecharModal();
+        carregarChamados();
+      } else {
+        alert("Erro ao excluir: " + error.message);
+      }
+    }
+
+    // SISTEMA DE ANEXOS
+    async function carregarAnexos(chamadoId) {
+      const div = document.getElementById('modal-anexos');
+      const { data, error } = await db.from("arquivos_chamados").select("*").eq("chamado_id", chamadoId);
+      
+      if (!data || data.length === 0) {
+        div.innerHTML = "<p style='color:#97a0a6; font-size:14px;'>Nenhum arquivo anexado pelo cliente.</p>";
+        return;
+      }
+
+      div.innerHTML = "Carregando arquivos...";
+      
+      let html = "";
+      for (const arq of data) {
+        // Gera um link temporário (válido por 1 hora) para o arquivo no Storage
+        const { data: urlData } = await db.storage.from('anexos').createSignedUrl(arq.caminho_storage, 3600);
+        if (urlData) {
+          html += `<div class="anexo-item">
+            <span>📎</span>
+            <a href="${urlData.signedUrl}" target="_blank">${arq.nome_original}</a>
+          </div>`;
+        }
+      }
+      div.innerHTML = html || "<p>Nenhum arquivo válido.</p>";
+    }
+
+    // SISTEMA DE CHAT (CORRIGIDO)
     async function carregarMensagens(chamadoId) {
-      const chatBody = document.getElementById('chat-mensagens');
+      const chatBody = document.getElementById('chat-modal-mensagens');
       const { data, error } = await db.from('mensagens').select('*').eq('chamado_id', chamadoId).order('criado_em', { ascending: true });
 
       if (error || !data || data.length === 0) {
-        chatBody.innerHTML = `<p style="text-align:center;">Nenhuma mensagem neste chamado ainda.</p>`;
+        chatBody.innerHTML = `<p style="text-align:center; color:#97a0a6;">Nenhuma mensagem ainda.</p>`;
         return;
       }
 
@@ -267,23 +349,23 @@
       chatBody.scrollTop = chatBody.scrollHeight;
     }
 
-    document.getElementById('form-chat').onsubmit = async (e) => {
+    document.getElementById('form-chat-modal').onsubmit = async (e) => {
       e.preventDefault();
-      if (!chamadoSelecionado) return alert("Selecione um chamado na tabela primeiro.");
+      if (!chamadoAbertoId) return;
 
-      const input = document.getElementById('input-msg');
-      const btn = document.getElementById('btn-enviar');
+      const input = document.getElementById('input-msg-modal');
+      const btn = document.getElementById('btn-enviar-modal');
       const texto = input.value.trim();
       if (!texto) return;
 
       btn.disabled = true;
       btn.textContent = "...";
 
+      // CORREÇÃO AQUI: Removemos a coluna 'interno' que estava dando erro
       const { error } = await db.from('mensagens').insert({
-        chamado_id: chamadoSelecionado,
+        chamado_id: chamadoAbertoId,
         remetente_id: idAdmin,
-        conteudo: texto,
-        interno: false
+        conteudo: texto
       });
 
       btn.disabled = false;
@@ -293,7 +375,7 @@
         alert("Erro ao enviar mensagem: " + error.message);
       } else {
         input.value = '';
-        await carregarMensagens(chamadoSelecionado);
+        await carregarMensagens(chamadoAbertoId);
       }
     };
 
