@@ -3,198 +3,180 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#07090b">
 <title>Painel Administrativo — TechEmpire</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
-  body { background: #06080a; overflow-x: hidden; }
-  .admin-layout { display: flex; min-height: 100vh; }
-  .admin-sidebar { width: 260px; background: #0a0d0f; border-right: 1px solid var(--line); padding: 24px; display: flex; flex-direction: column; position: fixed; height: 100vh; overflow-y: auto; z-index: 10; }
-  .admin-sidebar .logo { margin-bottom: 40px; display: flex; align-items: center; gap: 11px; font-family: var(--head); font-weight: 700; font-size: 21px; text-decoration: none; color: white; }
-  .admin-sidebar .logo i { font-style: normal; background: var(--lime); color: #0a0d05; width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; font-size: 16px; }
-  .admin-sidebar .logo b { color: var(--lime); }
-  .admin-sidebar nav { display: flex; flex-direction: column; gap: 6px; }
-  .admin-sidebar a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; text-decoration: none; color: var(--muted); font-weight: 500; transition: 0.2s; font-size: 15px; cursor: pointer; }
-  .admin-sidebar a:hover { background: rgba(255,255,255,0.05); color: white; }
-  .admin-sidebar a.active { background: var(--tint); color: var(--lime); }
-  .admin-sidebar a.sair { color: var(--err); margin-top: auto; }
-  .admin-main { flex: 1; margin-left: 260px; display: flex; flex-direction: column; min-height: 100vh; }
-  .admin-topbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid var(--line); background: #0a0d0f; position: sticky; top: 0; z-index: 5; }
-  .admin-topbar h1 { font-size: 20px; margin: 0; font-family: var(--head); }
-  .admin-topbar p { margin: 0; color: var(--muted); font-size: 13px; }
-  .admin-content { padding: 40px; display: grid; grid-template-columns: 1fr 400px; gap: 30px; align-items: start; }
-  .admin-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
-  .admin-kpi { background: #0e1114; border: 1px solid var(--line); padding: 24px; border-radius: 16px; position: relative; }
-  .admin-kpi h3 { font-size: 12px; color: var(--muted); font-weight: 600; margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 0.05em; }
-  .admin-kpi b { font-family: var(--head); font-size: 36px; color: white; line-height: 1; display: block; }
-  .admin-kpi .icon { position: absolute; right: 24px; top: 24px; font-size: 20px; opacity: 0.5; }
-  .admin-table-box { background: #0e1114; border: 1px solid var(--line); border-radius: 16px; padding: 24px; }
-  .admin-table-box h3 { margin: 0 0 20px 0; font-size: 18px; }
-  .admin-table-box table { width: 100%; border-collapse: collapse; }
-  .admin-table-box th { text-align: left; padding: 12px; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--line); }
-  .admin-table-box td { padding: 16px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 14px; }
-  .admin-table-box tr:hover td { background: rgba(255,255,255,0.02); }
-  .chat-panel { background: #0e1114; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; height: calc(100vh - 180px); position: sticky; top: 100px; }
-  .chat-header { padding: 20px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 12px; background: #12161a; }
-  .chat-header .avatar { width: 40px; height: 40px; border-radius: 10px; background: var(--tint); color: var(--lime); display: grid; place-items: center; }
-  .chat-header h4 { margin: 0; font-size: 15px; }
-  .chat-header span { color: var(--lime); font-size: 12px; display: flex; align-items: center; gap: 4px; }
-  .chat-header span::before { content: ""; width: 6px; height: 6px; background: var(--lime); border-radius: 50%; }
-  .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; background: #0a0d0f; }
-  .chat-footer { padding: 16px; border-top: 1px solid var(--line); display: flex; gap: 10px; background: #12161a; }
-  .chat-footer input { border-radius: 999px; background: #0a0d0f; border: 1px solid var(--line); padding: 12px 16px; flex: 1; color: white; }
-  .chat-footer button { background: var(--lime); border: none; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; color: #000; transition: 0.2s; }
-  .chat-footer button:hover { transform: scale(1.05); }
+  body { background: #06080a; margin: 0; font-family: 'Inter', sans-serif; color: white; display: flex; height: 100vh; overflow: hidden; }
+  
+  /* Sidebar */
+  .sidebar { width: 250px; background: #0a0d0f; border-right: 1px solid rgba(255,255,255,0.1); padding: 24px; display: flex; flex-direction: column; }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: white; font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: bold; margin-bottom: 40px; }
+  .logo i { background: #b4f03c; color: #000; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; font-style: normal; }
+  .logo b { color: #b4f03c; }
+  .sidebar a { display: block; padding: 12px 16px; color: #97a0a6; text-decoration: none; border-radius: 8px; font-weight: 500; margin-bottom: 6px; transition: 0.2s; }
+  .sidebar a:hover, .sidebar a.active { background: rgba(180,240,60,0.1); color: #b4f03c; }
+  .sidebar .sair { margin-top: auto; color: #ff7b6b; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
+
+  /* Main */
+  .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid rgba(255,255,255,0.1); background: #0a0d0f; position: sticky; top: 0; z-index: 10; }
+  .topbar h1 { margin: 0; font-size: 20px; font-family: 'Space Grotesk', sans-serif; }
+  .user-info { display: flex; align-items: center; gap: 15px; }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; background: #b4f03c; color: #000; display: grid; place-items: center; font-weight: bold; font-size: 18px; }
+
+  /* Content */
+  .content { padding: 40px; display: grid; grid-template-columns: 1fr 350px; gap: 30px; align-items: start; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+  .kpi { background: #0e1114; border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; }
+  .kpi h3 { margin: 0 0 10px 0; font-size: 12px; color: #97a0a6; text-transform: uppercase; letter-spacing: 1px; }
+  .kpi b { font-size: 32px; font-family: 'Space Grotesk', sans-serif; color: #b4f03c; display: block; line-height: 1; }
+  
+  .box { background: #0e1114; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 24px; }
+  .box h3 { margin: 0 0 20px 0; font-size: 18px; }
+  
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: 12px; font-size: 12px; color: #97a0a6; border-bottom: 1px solid rgba(255,255,255,0.1); text-transform: uppercase; }
+  td { padding: 15px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+  .pill { background: rgba(180,240,60,0.1); color: #b4f03c; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: bold; }
+
+  /* Chat */
+  .chat-panel { background: #0e1114; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: flex; flex-direction: column; height: 500px; }
+  .chat-header { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
+  .chat-header span { color: #b4f03c; font-size: 12px; }
+  .chat-body { padding: 15px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+  .chat-msg { background: #1a1e22; padding: 10px 15px; border-radius: 12px; font-size: 14px; max-width: 90%; }
+  .chat-msg.me { background: #b4f03c; color: #000; align-self: flex-end; }
+  .chat-footer { padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 10px; }
+  .chat-footer input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #06080a; color: white; }
+  .chat-footer button { background: #b4f03c; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 </style>
 </head>
-<body data-page="adminPage" data-auth="client">
-  <header id="site-header" style="display:none;"></header>
-  <footer id="site-footer" style="display:none;"></footer>
+<body>
 
-  <div class="admin-layout">
-    <aside class="admin-sidebar">
-      <a href="index.html" class="logo"><i>TE</i><span>Tech<b>Empire</b></span></a>
-      <nav>
-        <a href="#" class="active" id="nav-inicio">📊 Visão Geral</a>
-        <a href="#" id="nav-chamados">🎫 Chamados</a>
-        <a href="#" id="nav-clientes">👥 Clientes</a>
-        <a href="#" id="nav-leads">🎯 Leads</a>
-        <a href="#" id="nav-usuarios">🛡️ Admins</a>
-      </nav>
-      <a href="index.html" class="sair" style="margin-top: auto; border-top: 1px solid var(--line); padding-top: 20px;">← Voltar ao site</a>
-      <a href="#" data-act="sair" class="sair" style="color: var(--err);">Sair da conta</a>
-    </aside>
-
-    <main class="admin-main">
-      <header class="admin-topbar">
-        <div>
-          <h1 id="page-title">Visão Geral</h1>
-          <p id="page-subtitle">Acompanhe as métricas da sua empresa júnior.</p>
-        </div>
-        <div style="display: flex; align-items: center; gap: 16px;">
-          <div style="text-align: right;">
-            <div style="font-weight: 600; font-size: 14px; color: white;" id="admin-nome">Admin</div>
-            <div style="color: var(--lime); font-size: 12px;">Administrador</div>
-          </div>
-          <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--lime); color: #000; display: grid; place-items: center; font-weight: 800; font-size: 18px;">A</div>
-        </div>
-      </header>
-
-      <div class="admin-content" id="view-dashboard">
-        <div>
-          <div class="admin-kpis" id="admin-kpis"></div>
-          <div class="admin-table-box">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-              <h3>Últimos Chamados</h3>
-              <a href="#" class="btn sm" id="btn-ver-todos" style="font-size: 12px;">Ver todos</a>
-            </div>
-            <div id="ultimos-chamados"></div>
-          </div>
-        </div>
-        <div class="chat-panel">
-          <div class="chat-header">
-            <div class="avatar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
-            <div><h4>Chat do Cliente</h4><span>Online agora</span></div>
-          </div>
-          <div class="chat-body">
-            <div class="b ou"><small>Cliente · 08:24</small><div>Olá! Gostaria de saber o status do meu notebook.</div></div>
-            <div class="b me"><small>Você · 08:25</small><div>Olá! Pode me informar o número do chamado ou o modelo do seu notebook?</div></div>
-            <div class="b ou"><small>Cliente · 08:27</small><div>É o chamado #1245. É um Dell.</div></div>
-            <div class="b me"><small>Você · 08:28</small><div>Perfeito! Já vou verificar aqui no sistema.</div></div>
-          </div>
-          <form class="chat-footer" onsubmit="event.preventDefault(); alert('Chat demonstrativo.');">
-            <input type="text" placeholder="Digite sua mensagem...">
-            <button type="submit"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button>
-          </form>
-        </div>
-      </div>
-
-      <div class="admin-content" id="area-admin-dinamica" style="display: none; grid-template-columns: 1fr;">
-        <div class="admin-table-box"><div id="conteudo-admin"></div></div>
-      </div>
-    </main>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <a href="index.html" class="logo"><i>TE</i><span>Tech<b>Empire</b></span></a>
+    <a href="#" class="active">📊 Visão Geral</a>
+    <a href="#">🎫 Chamados</a>
+    <a href="#">👥 Clientes</a>
+    <a href="#">🎯 Leads</a>
+    <a href="index.html" class="sair">← Voltar ao site</a>
+    <a href="login.html" class="sair" style="margin-top: 0; border: none;">Sair da conta</a>
   </div>
 
-  <!-- Importa as bibliotecas básicas do seu site -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <!-- CONTEÚDO PRINCIPAL -->
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <h1>Visão Geral</h1>
+        <span style="color: #97a0a6; font-size: 14px;">Acompanhe as métricas da sua empresa júnior.</span>
+      </div>
+      <div class="user-info">
+        <div style="text-align: right;">
+          <div style="font-weight: bold; font-size: 14px;" id="admin-nome">Carregando...</div>
+          <div style="color: #b4f03c; font-size: 12px;">Administrador</div>
+        </div>
+        <div class="avatar">A</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div>
+        <div class="kpis" id="admin-kpis">
+          <p style="color: #97a0a6;">Conectando ao banco de dados...</p>
+        </div>
+        <div class="box">
+          <h3>Últimos Chamados</h3>
+          <div id="tabela-chamados">
+            <p style="color: #97a0a6;">Buscando dados...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHAT -->
+      <div class="chat-panel">
+        <div class="chat-header">
+          <div class="avatar" style="width: 30px; height: 30px; font-size: 14px;">👤</div>
+          <div>
+            <div style="font-weight: bold; font-size: 14px;">Chat do Cliente</div>
+            <span>Online agora</span>
+          </div>
+        </div>
+        <div class="chat-body">
+          <div class="chat-msg">Olá! Preciso de ajuda com meu notebook.</div>
+          <div class="chat-msg me">Olá! Pode me informar o número do chamado?</div>
+          <div class="chat-msg">É o chamado TE-0001245.</div>
+        </div>
+        <form class="chat-footer" onsubmit="event.preventDefault(); alert('Chat demonstrativo para a apresentação.');">
+          <input type="text" placeholder="Digite uma mensagem...">
+          <button type="submit">Enviar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS INDEPENDENTES -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="data.js"></script>
-  <script src="script.js"></script>
-
-  <!-- A LÓGICA DO PAINEL AQUI DENTRO (NÃO DEPENDE DO SCRIPT.JS) -->
   <script>
-    // Aguarda 1 segundo para o Supabase e o menu carregarem
-    setTimeout(async () => {
-      if (!window.supabase || !window.App || !window.App.session) {
-        alert("Erro: Você precisa estar logado para acessar o painel.");
-        window.location.href = "login.html";
-        return;
-      }
+    // Inicia a conexão direta com o Supabase
+    const url = window.SUPABASE_CONFIG.url;
+    const key = window.SUPABASE_CONFIG.anonKey;
+    const db = supabase.createClient(url, key);
 
-      // Pega o nome do admin logado
-      document.querySelector("#admin-nome").textContent = window.App.perfil?.nome || "Admin";
-      const sb = window.supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
+    async function carregarPainel() {
+      try {
+        // Verifica se o usuário está logado
+        const { data: { user }, error: userError } = await db.auth.getUser();
+        
+        if (userError || !user) {
+          alert("Você não está logado. Redirecionando para o login.");
+          window.location.href = "login.html";
+          return;
+        }
 
-      // Carrega os dados (KPIs e Tabela)
-      async function carregarDados() {
-        try {
-          const { data: chamados } = await sb.from("chamados").select("*").order("criado_em", { ascending: false });
-          const { data: usuarios } = await sb.from("usuarios").select("*").eq("is_admin", false);
+        // Busca o nome do admin
+        const { data: perfil } = await db.from("usuarios").select("nome").eq("id", user.id).single();
+        if (perfil) document.getElementById("admin-nome").textContent = perfil.nome;
 
-          // KPIs
-          document.querySelector("#admin-kpis").innerHTML = `
-            <div class="admin-kpi"><h3>Total de Chamados</h3><b>${chamados?.length || 0}</b><i>📋</i></div>
-            <div class="admin-kpi"><h3>Em Aberto</h3><b style="color: var(--lime);">${chamados?.filter(c => !['Concluída', 'Cancelada'].includes(c.status)).length || 0}</b><i>⚡</i></div>
-            <div class="admin-kpi"><h3>Finalizados</h3><b>${chamados?.filter(c => c.status === 'Concluída').length || 0}</b><i>✅</i></div>
-            <div class="admin-kpi"><h3>Total de Clientes</h3><b>${usuarios?.length || 0}</b><i>👥</i></div>
+        // Busca os chamados e os clientes
+        const { data: chamados } = await db.from("chamados").select("*").order("criado_em", { ascending: false });
+        const { data: usuarios } = await db.from("usuarios").select("*").eq("is_admin", false);
+
+        // Preenche os KPIs
+        if (chamados && usuarios) {
+          document.getElementById("admin-kpis").innerHTML = `
+            <div class="kpi"><h3>Chamados Ativos</h3><b>${chamados.length}</b></div>
+            <div class="kpi"><h3>Novos / Pendentes</h3><b>${chamados.filter(c => c.status === 'Nova chamada').length}</b></div>
+            <div class="kpi"><h3>Concluídos</h3><b>${chamados.filter(c => c.status === 'Concluída').length}</b></div>
+            <div class="kpi"><h3>Total Clientes</h3><b>${usuarios.length}</b></div>
           `;
 
-          // Tabela
-          if (chamados && chamados.length > 0) {
-            let html = '<table><thead><tr><th>Nº</th><th>Título</th><th>Status</th><th>Ação</th></tr></thead><tbody>';
+          // Preenche a tabela
+          if (chamados.length > 0) {
+            let html = `<table><thead><tr><th>Nº</th><th>Título</th><th>Status</th></tr></thead><tbody>`;
             chamados.slice(0, 5).forEach(c => {
               html += `<tr>
                 <td>TE-${String(c.numero).padStart(6, '0')}</td>
                 <td>${c.titulo}</td>
                 <td><span class="pill">${c.status}</span></td>
-                <td><a href="admin-chamado.html?id=${c.id}" class="btn sm" style="padding: 4px 10px; font-size: 12px;">Abrir</a></td>
               </tr>`;
             });
-            html += '</tbody></table>';
-            document.querySelector("#ultimos-chamados").innerHTML = html;
+            html += `</tbody></table>`;
+            document.getElementById("tabela-chamados").innerHTML = html;
           } else {
-            document.querySelector("#ultimos-chamados").innerHTML = '<p class="empty">Nenhum chamado cadastrado ainda.</p>';
+            document.getElementById("tabela-chamados").innerHTML = "<p style='color: #97a0a6;'>Nenhum chamado encontrado no banco.</p>";
           }
-        } catch (err) {
-          console.error(err);
-          document.querySelector("#admin-kpis").innerHTML = '<p class="empty">Erro ao conectar com o banco.</p>';
         }
+      } catch (err) {
+        console.error("Erro crítico:", err);
+        document.getElementById("admin-kpis").innerHTML = "<p style='color: #ff7b6b;'>Erro ao conectar com o Supabase. Verifique o console.</p>";
       }
+    }
 
-      // Menu lateral (Apenas visual para a apresentação)
-      const menuBotoes = ['nav-inicio', 'nav-chamados', 'nav-clientes', 'nav-leads', 'nav-usuarios'];
-      menuBotoes.forEach(id => {
-        document.getElementById(id).addEventListener('click', (e) => {
-          e.preventDefault();
-          menuBotoes.forEach(b => document.getElementById(b).classList.remove('active'));
-          document.getElementById(id).classList.add('active');
-          
-          if(id === 'nav-inicio') {
-             document.querySelector("#view-dashboard").style.display = 'grid';
-             document.querySelector("#area-admin-dinamica").style.display = 'none';
-          } else {
-             document.querySelector("#view-dashboard").style.display = 'none';
-             document.querySelector("#area-admin-dinamica").style.display = 'block';
-             document.querySelector("#conteudo-admin").innerHTML = `<h3>${e.target.textContent}</h3><p class="empty">Módulo em construção para o MVP.</p>`;
-          }
-        });
-      });
-
-      carregarDados();
-    }, 1000); // Espera 1 segundo para garantir que o login foi verificado
+    // Roda a função assim que a página carregar
+    carregarPainel();
   </script>
 </body>
 </html>
