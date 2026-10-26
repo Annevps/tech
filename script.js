@@ -629,3 +629,11 @@ function inscreverRealtimeMensagens(chamadoId) {
     )
     .subscribe();
 }
+// Dentro do script.js, na função que cuida da página admin:
+if (document.body.dataset.page === 'admin') {
+  const containerAdmin = document.getElementById('conteudo-admin');
+  if (containerAdmin) {
+    // Aqui você garante que o painel administrativo carrega a tabela e o chat correto
+    carregarServicosAdmin();
+  }
+}
