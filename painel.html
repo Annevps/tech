@@ -3,25 +3,166 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#07090b">
-<title>Meu painel — TechEmpire</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<title>Meu Painel — TechEmpire</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<style>
+  /* Estilos para a área do cliente */
+  .client-grid { display: grid; grid-template-columns: 1fr; gap: 20px; max-width: 1200px; margin: 0 auto; }
+  .welcome { margin-bottom: 10px; }
+  .welcome h1 { font-size: clamp(32px, 5vw, 48px); font-family: var(--head); margin: 0; }
+  .welcome p { color: var(--muted); font-size: 16px; margin-top: 5px; }
+
+  .client-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+  .client-kpi { background: var(--s2); border: 1px solid var(--line); border-radius: 16px; padding: 20px; position: relative; overflow: hidden; }
+  .client-kpi::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--lime); border-radius: 16px 16px 0 0; }
+  .client-kpi h3 { margin: 0; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+  .client-kpi b { display: block; font-size: 36px; font-family: var(--head); color: var(--ink); margin-top: 8px; line-height: 1; }
+
+  .client-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
+  .client-filters { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+  .client-filters input, .client-filters select { padding: 10px 14px; border-radius: 8px; border: 1px solid var(--line2); background: var(--s1); color: var(--ink); outline: none; }
+  
+  .client-table { width: 100%; border-collapse: collapse; background: var(--s2); border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+  .client-table th { background: var(--s1); color: var(--muted); font-size: 12px; text-transform: uppercase; padding: 15px; text-align: left; border-bottom: 1px solid var(--line); }
+  .client-table td { padding: 15px; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .client-table tr:last-child td { border-bottom: none; }
+  .client-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .client-table a { color: var(--lime); font-weight: bold; text-decoration: none; }
+</style>
 </head>
 <body data-page="painel" data-auth="client">
 <header id="site-header"></header>
 <main class="wrap-main">
-<h2>Meus chamados</h2><p class="sub" id="ola"></p>
-<div class="kpis" id="kpis"></div>
-<div class="row" style="margin-bottom:18px"><a class="btn primary sm" href="novo-chamado.html?tipo=manutencao">+ Solicitar manutenção</a><a class="btn sm" href="novo-chamado.html?tipo=site">+ Solicitar site</a></div>
-<div id="lista"><p class="empty">Carregando…</p></div>
+  <div class="client-grid">
+    
+    <div class="welcome">
+      <h1 id="ola">Carregando...</h1>
+      <p>Bem-vindo de volta ao seu portal de atendimento.</p>
+    </div>
+
+    <div class="client-kpis" id="kpis">
+      <!-- Injetado via JS -->
+    </div>
+
+    <div class="client-actions">
+      <a class="btn primary" href="novo-chamado.html?tipo=manutencao">+ Novo Atendimento</a>
+      <a class="btn" href="perfil.html">Editar Perfil</a>
+    </div>
+
+    <div class="box" style="margin-top: 20px;">
+      <h3 style="margin-top: 0; font-family: var(--head);">Meus Atendimentos</h3>
+      
+      <div class="client-filters">
+        <input type="text" id="busca" placeholder="Buscar por título ou número...">
+        <select id="filtro-status">
+          <option value="">Todos os status</option>
+          <option value="Nova chamada">Nova chamada</option>
+          <option value="Em andamento">Em andamento</option>
+          <option value="Concluída">Concluída</option>
+          <option value="Cancelada">Cancelada</option>
+        </select>
+      </div>
+
+      <div id="lista-chamados">
+        <p class="empty">Carregando chamados...</p>
+      </div>
+    </div>
+
+  </div>
 </main>
 <footer id="site-footer"></footer>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="supabase-config.js"></script>
 <script src="data.js"></script>
 <script src="script.js"></script>
+
+<script>
+  // Script exclusivo do painel do cliente para carregar os dados
+  document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(async () => {
+      if (!window.App || !window.App.session) { window.location.href = "login.html"; return; }
+      
+      const db = window.supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
+      const idCliente = window.App.session.user.id;
+      
+      // Saudação
+      const nome = window.App.perfil?.nome || "Cliente";
+      document.getElementById('ola').textContent = `Olá, ${nome.split(' ')[0]}.`;
+
+      let chamadosGlobais = [];
+
+      async function carregarDados() {
+        const { data, error } = await db.from("chamados").select("*").eq("cliente_id", idCliente).order("criado_em", { ascending: false });
+        
+        if (error) {
+          document.getElementById('lista-chamados').innerHTML = "<p>Erro ao carregar chamados.</p>";
+          return;
+        }
+
+        chamadosGlobais = data || [];
+
+        // Calcula os KPIs
+        const abertos = chamadosGlobais.filter(c => c.status !== 'Concluída' && c.status !== 'Cancelada').length;
+        const andamento = chamadosGlobais.filter(c => c.status === 'Em andamento').length;
+        const concluidos = chamadosGlobais.filter(c => c.status === 'Concluída').length;
+        const pagPendentes = chamadosGlobais.filter(c => c.status_pagamento === 'Pendente' || !c.status_pagamento).length;
+
+        document.getElementById('kpis').innerHTML = `
+          <div class="client-kpi"><h3>Chamados Abertos</h3><b>${abertos}</b></div>
+          <div class="client-kpi"><h3>Em Andamento</h3><b>${andamento}</b></div>
+          <div class="client-kpi"><h3>Concluídos</h3><b>${concluidos}</b></div>
+          <div class="client-kpi"><h3>Pagamentos Pendentes</h3><b>${pagPendentes}</b></div>
+        `;
+
+        renderizarTabela();
+      }
+
+      function renderizarTabela() {
+        const busca = document.getElementById('busca').value.toLowerCase();
+        const statusFiltro = document.getElementById('filtro-status').value;
+
+        let filtrados = chamadosGlobais.filter(c => {
+          const matchBusca = c.titulo.toLowerCase().includes(busca) || String(c.numero).includes(busca);
+          const matchStatus = statusFiltro === "" || c.status === statusFiltro;
+          return matchBusca && matchStatus;
+        });
+
+        if (filtrados.length === 0) {
+          document.getElementById('lista-chamados').innerHTML = "<p class='empty'>Nenhum chamado encontrado com esses filtros.</p>";
+          return;
+        }
+
+        let html = `<table class="client-table"><thead><tr>
+          <th>Nº</th><th>Serviço</th><th>Data</th><th>Status</th><th>Pagamento</th><th>Ação</th>
+        </tr></thead><tbody>`;
+
+        filtrados.forEach(c => {
+          const dataFormatada = new Date(c.criado_em).toLocaleDateString('pt-BR');
+          const statusPag = c.status_pagamento || 'Pendente';
+          
+          html += `<tr>
+            <td><b>TE-${String(c.numero).padStart(6, '0')}</b></td>
+            <td>${c.titulo}</td>
+            <td>${dataFormatada}</td>
+            <td><span class="pill">${c.status}</span></td>
+            <td>${statusPag}</td>
+            <td><a href="chamado.html?id=${c.id}">Abrir →</a></td>
+          </tr>`;
+        });
+
+        html += `</tbody></table>`;
+        document.getElementById('lista-chamados').innerHTML = html;
+      }
+
+      // Eventos de filtro
+      document.getElementById('busca').addEventListener('input', renderizarTabela);
+      document.getElementById('filtro-status').addEventListener('change', renderizarTabela);
+
+      await carregarDados();
+    }, 1000); // Aguarda a autenticação
+  });
+</script>
 </body>
 </html>
