@@ -123,6 +123,42 @@ async function desenharArquivos(el, chamadoId) {
   el.innerHTML = '<div class="files">' + data.map((a, i) => { const u = urls[i].data?.signedUrl; if (!u) return ""; const t = a.tipo_arquivo || "";
     return `<figure class="file">${t.startsWith("image/") ? `<img src="${esc(u)}" alt="${esc(a.nome_original)}" loading="lazy">` : t.startsWith("video/") ? `<video src="${esc(u)}" controls preload="metadata"></video>` : ""}<figcaption><a href="${esc(u)}" target="_blank" rel="noopener">${esc(a.nome_original)}</a></figcaption></figure>`; }).join("") + "</div>";
 }
+const horaCurta = d => { const t = new Date(d); return t.toDateString() === new Date().toDateString() ? t.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : t.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }); };
+function pararChats() { if (iniciarChat.parar) iniciarChat.parar(); if (inbox.parar) inbox.parar(); }
+async function conversas(admin) { // uma conversa por chamado, com a última mensagem e as não lidas
+  const me = App.session.user.id;
+  const { data: ms } = await sb.from("mensagens").select("chamado_id,remetente_id,conteudo,interna,lida,criado_em").order("criado_em", { ascending: false }).limit(500);
+  const g = {}; (ms || []).forEach(m => { const x = g[m.chamado_id] = g[m.chamado_id] || { ult: m, nl: 0 }; if (!m.lida && !m.interna && m.remetente_id !== me) x.nl++; });
+  const ids = Object.keys(g); let chs = [];
+  if (admin) { if (ids.length) chs = (await sb.from("chamados").select("id,numero,titulo,cliente_id,status").in("id", ids)).data || []; chs = await comClientes(chs); }
+  else chs = (await sb.from("chamados").select("id,numero,titulo,cliente_id,status").eq("cliente_id", me).order("criado_em", { ascending: false })).data || [];
+  const L = chs.map(c => ({ c, ult: g[c.id]?.ult || null, nl: g[c.id]?.nl || 0 }));
+  L.sort((a, b) => (b.ult ? new Date(b.ult.criado_em) : 0) - (a.ult ? new Date(a.ult.criado_em) : 0)); return L;
+}
+function waItem(x, admin, tag, sel) {
+  const me = App.session.user.id, nome = admin ? (x.c.cliente?.nome || "Cliente") : "TechEmpire", u = x.ult;
+  const prev = u ? (u.interna ? "📝 Nota: " : u.remetente_id === me ? "Você: " : "") + String(u.conteudo).replace(/\s+/g, " ").slice(0, 60) : "Nenhuma mensagem ainda";
+  const attr = tag === "a" ? `href="#/mensagens?c=${x.c.id}"` : `type="button" data-act="waAbrir" data-id="${x.c.id}"`;
+  return `<${tag} class="wa-item ${sel ? "on" : ""}" ${attr}><span class="av">${esc(nome.trim()[0] || "?").toUpperCase()}</span><span class="wa-t"><b>${esc(nome)}</b><small>${num(x.c.numero)} · ${esc(x.c.titulo)}</small><em>${esc(prev)}</em></span><span class="wa-m"><time>${u ? horaCurta(u.criado_em) : ""}</time>${x.nl ? `<i class="wa-nl">${x.nl}</i>` : ""}</span></${tag}>`;
+}
+async function inbox(el, admin, abrirId) {
+  if (inbox.parar) inbox.parar();
+  let L = await conversas(admin), sel = null, filtro = "";
+  el.innerHTML = `<div class="wa"><aside class="wa-list"><div class="wa-search"><input type="search" placeholder="Buscar conversa" aria-label="Buscar conversa"></div><div class="wa-items"></div></aside>
+    <section class="wa-chat"><div class="wa-empty"><span class="kic g"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></span><h3>Suas conversas</h3><p>Escolha uma conversa ao lado para ver as mensagens.</p></div></section></div>`;
+  const wa = $(".wa", el), itens = $(".wa-items", el), painel = $(".wa-chat", el);
+  const desenhar = () => { const q = filtro.toLowerCase(); const l = L.filter(x => !q || `${x.c.cliente?.nome || ""} ${x.c.titulo} ${num(x.c.numero)}`.toLowerCase().includes(q));
+    itens.innerHTML = l.length ? l.map(x => waItem(x, admin, "button", x.c.id === sel)).join("") : `<p class="empty" style="padding:18px">${admin ? "Nenhuma conversa ainda. Quando um cliente mandar mensagem, ela aparece aqui." : "Você ainda não tem chamados. Abra um para conversar com a equipe."}</p>`; };
+  $(".wa-search input", el).oninput = e => { filtro = e.target.value; desenhar(); };
+  async function abrir(id) { const x = L.find(y => y.c.id === id); if (!x) return; sel = id; x.nl = 0; wa.classList.add("open"); desenhar();
+    const nome = admin ? (x.c.cliente?.nome || "Cliente") : "TechEmpire";
+    painel.innerHTML = `<div class="wa-head"><button type="button" class="btn sm wa-back" data-act="waVoltar" aria-label="Voltar às conversas">‹</button><span class="av">${esc(nome.trim()[0] || "?").toUpperCase()}</span><div><b>${esc(nome)}</b><small>${num(x.c.numero)} · ${esc(x.c.titulo)}</small></div><a class="btn sm" href="${admin ? "admin-chamado.html" : "chamado.html"}?id=${id}">Ver chamado</a></div><div id="wa-body"></div>`;
+    await iniciarChat($("#wa-body", painel), id, admin); }
+  Act.waAbrir = d => abrir(d.id); Act.waVoltar = () => wa.classList.remove("open");
+  const canal = sb.channel("wa-list").on("postgres_changes", { event: "INSERT", schema: "public", table: "mensagens" }, async () => { const n = await conversas(admin); n.forEach(y => { if (y.c.id === sel) y.nl = 0; }); L = n; desenhar(); }).subscribe();
+  inbox.parar = () => sb.removeChannel(canal); desenhar();
+  if (abrirId) abrir(abrirId); else if (!matchMedia("(max-width:860px)").matches && L[0]) abrir(L[0].c.id);
+}
 function iniciarChat(el, chamadoId, admin) {
   if (iniciarChat.parar) iniciarChat.parar();
   el.innerHTML = `<div class="chat"><div class="chat-log" aria-live="polite"><p class="empty">Carregando conversa…</p></div>
@@ -132,15 +168,12 @@ function iniciarChat(el, chamadoId, admin) {
   const log = $(".chat-log", el), form = $(".chat-form", el); let busy = false, primeira = true;
   async function carregar() {
     if (busy) return; busy = true;
-    const { data } = await sb.from("mensagens").select("*").eq("chamado_id", chamadoId).order("criado_em");
-    const ids = [...new Set((data || []).map(m => m.remetente_id))]; const us = ids.length ? (await sb.from("usuarios").select("id,nome,is_admin").in("id", ids)).data || [] : [];
-    const nomes = Object.fromEntries(us.map(x => [x.id, x])); const meu = App.session.user.id;
-    const perto = primeira || log.scrollHeight - log.scrollTop - log.clientHeight < 90;
-    log.innerHTML = (data || []).map(m => { const r = nomes[m.remetente_id] || {}, eu = m.remetente_id === meu;
-      const quem = eu ? "Você" : (r.is_admin ? "TechEmpire" : r.nome || "Cliente");
-      return `<div class="b ${eu ? "me" : "ou"} ${m.interna ? "int" : ""}"><small>${esc(quem)} · ${fmtData(m.criado_em)}${m.interna ? " · NOTA INTERNA" : ""}</small><div>${esc(m.conteudo)}</div></div>`; }).join("") || '<p class="empty">Nenhuma mensagem ainda. Mande a primeira!</p>';
+    const { data } = await sb.from("mensagens").select("*").eq("chamado_id", chamadoId).order("criado_em"); const meu = App.session.user.id;
+    const perto = primeira || log.scrollHeight - log.scrollTop - log.clientHeight < 90; let dia = "";
+    log.innerHTML = (data || []).map(m => { const eu = m.remetente_id === meu, d = new Date(m.criado_em).toLocaleDateString("pt-BR"); let sep = ""; if (d !== dia) { dia = d; sep = `<div class="dia">${d === new Date().toLocaleDateString("pt-BR") ? "Hoje" : d}</div>`; }
+      return `${sep}<div class="b ${eu ? "me" : "ou"} ${m.interna ? "int" : ""}">${m.interna ? "<small>NOTA INTERNA · o cliente não vê</small>" : ""}<div>${esc(m.conteudo)}</div><span class="tm">${new Date(m.criado_em).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}${eu && !m.interna ? (m.lida ? ' <i class="ok">✓✓</i>' : " ✓") : ""}</span></div>`; }).join("") || '<p class="empty">Nenhuma mensagem ainda. Mande a primeira!</p>';
     if (perto) log.scrollTop = log.scrollHeight; primeira = false;
-    const nao = (data || []).filter(m => !m.lida && m.remetente_id !== meu && (admin || !m.interna)).map(m => m.id);
+    const nao = (data || []).filterm => !m.lida && m.remetente_id !== meu && (admin || !m.interna)).map(m => m.id);
     if (nao.length) sb.from("mensagens").update({ lida: true }).in("id", nao).then(() => {});
     busy = false;
   }
@@ -273,76 +306,233 @@ Pages.painel = async () => {
       const d = () => { const q = $("#bq").value.trim().toLowerCase(), st = $("#bs").value; const l = chs.filter(c => (!st || c.status === st) && (!q || `${c.titulo} ${num(c.numero)}`.toLowerCase().includes(q)));
         $("#tb").innerHTML = l.length ? l.map(svc).join("") : '<p class="empty">Nenhum serviço encontrado.</p>'; }; $("#bq").oninput = d; $("#bs").oninput = d; d();
     },
-    async tickets() {
-      const { chs, nl } = await dados(), ids = chs.map(c => c.id); const mapa = Object.fromEntries(chs.map(c => [c.id, c]));
-      const { data: ms } = ids.length ? await sb.from("mensagens").select("chamado_id,conteudo,criado_em,remetente_id").in("chamado_id", ids).eq("interna", false).order("criado_em", { ascending: false }).limit(300) : { data: [] };
-      const ult = {}; (ms || []).forEach(m => { if (!ult[m.chamado_id]) ult[m.chamado_id] = m; });
-      const l = Object.keys(ult).sort((a, b) => (nl[b] || 0) - (nl[a] || 0) || new Date(ult[b].criado_em) - new Date(ult[a].criado_em));
-      app.innerHTML = `<h2>Meus tickets</h2><p class="sub">Suas conversas com a equipe. As com mensagens novas aparecem primeiro.</p>` + (l.length ? l.map(id => `<a class="rowlink" href="chamado.html?id=${id}"><span><b>${num(mapa[id].numero)}</b> · ${esc(mapa[id].titulo)}<small>${fmtData(ult[id].criado_em)} · ${ult[id].remetente_id === me ? "Você: " : ""}${esc(String(ult[id].conteudo).slice(0, 110))}</small></span>${badge2(nl[id])}</a>`).join("") : '<p class="empty">Nenhuma conversa ainda. Abra um chamado para falar com a equipe.</p>');
-    },
+    async tickets(param) { app.innerHTML = '<h2>Meus tickets</h2><p class="sub">Converse com a equipe da TechEmpire sobre cada chamado.</p><div id="inbox"></div>'; await inbox($("#inbox"), false, new URLSearchParams(param || "").get("c")); },
     async faturas() {
       const { chs, pgs } = await dados(), mapa = Object.fromEntries(chs.map(c => [c.id, c])), soma = f => pgs.filter(f).reduce((t, p) => t + Number(p.valor || 0), 0);
       app.innerHTML = `<h2>Faturas</h2><p class="sub">Orçamentos e pagamentos dos seus serviços.</p><div class="kpis"><div class="k"><b>${brl(soma(p => ["Pendente", "Aguardando pagamento"].includes(p.status)))}</b><span>Pendente</span></div><div class="k"><b>${brl(soma(p => p.status === "Pago"))}</b><span>Pago</span></div></div>
         ${tabela(["Chamado", "Valor", "Forma", "Status", "Data"], pgs.map(p => `<tr><td><a href="chamado.html?id=${p.chamado_id}">${mapa[p.chamado_id] ? num(mapa[p.chamado_id].numero) : "—"}</a></td><td>${brl(p.valor)}</td><td>${esc(p.forma)}</td><td>${pill(p.status)}</td><td>${fmtData(p.pago_em || p.criado_em)}</td></tr>`))}`;
+    },
+    async contato() {
+      app.innerHTML = `<h2>Contato</h2><p class="sub">Atendimento de Segunda a Sábado, das 8h às 19h.</p><div class="cards"><div class="card"><h3>Conversar com a equipe</h3><p>Use o chat da página inicial: ele fica ligado ao seu chamado.</p><p style="margin-top:14px"><a class="btn primary sm" href="painel.html">Abrir o chat</a></p></div>
+        <div class="card"><h3>Novo chamado de manutenção</h3><p>Descreva o problema e envie fotos do equipamento.</p><p style="margin-top:14px"><a class="btn sm" href="novo-chamado.html?tipo=manutencao">Solicitar manutenção</a></p></div>
+        <div class="card"><h3>Criação de site</h3><p>Conte sua ideia e receba um orçamento.</p><p style="margin-top:14px"><a class="btn sm" href="novo-chamado.html?tipo=site">Solicitar site</a></p></div></div>`;
     }
   };
-  const h = (location.hash || "#/inicio").replace("#/", "");
-  if (R[h]) await R[h](); else await R.inicio();
-  window.addEventListener("hashchange", async () => { const h2 = (location.hash || "#/inicio").replace("#/", ""); if (R[h2]) await R[h2](); });
+  async function rota() { pararChats(); marcarMenu(); const [r, param] = (location.hash.replace("#/", "") || "inicio").split("?"); try { await (R[r] || R.inicio)(param); } catch (e) { console.error(e); app.innerHTML = '<p class="empty">Não foi possível carregar. Tente novamente.</p>'; } }
+  window.addEventListener("hashchange", rota); await rota();
+  sb.channel("cli-live").on("postgres_changes", { event: "UPDATE", schema: "public", table: "chamados" }, () => { toast("Seu chamado foi atualizado"); rota(); }).subscribe();
 };
 
-/* ---------- Painel Administrativo TechEmpire ---------- */
-Pages.admin = async () => {
-  const container = document.getElementById("conteudo-admin");
-  if (!container) return;
-
-  const nomeAdmin = App.perfil?.nome || "Administrador";
-
-  container.innerHTML = `
-    <div style="margin-bottom:20px">
-      <p class="sub" style="margin:0">Bem-vinda, ${esc(nomeAdmin)}!</p>
-      <h2 style="font-size:28px;margin:4px 0">Painel administrativo</h2>
-      <p class="sub">Acompanhe os chamados do sistema em tempo real.</p>
-    </div>
-    <div class="kpis" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-bottom:24px;" id="admin-stats">
-      <div class="k"><b>0</b><span>Chamados</span></div>
-      <div class="k"><b>0</b><span>Em andamento</span></div>
-      <div class="k"><b>0</b><span>Concluídos</span></div>
-    </div>
-    <div class="box">
-      <h3 style="margin-bottom:12px">Lista de Chamados</h3>
-      <div id="admin-tabela-servicos"><p class="empty">Carregando chamados...</p></div>
-    </div>
-  `;
-
-  try {
-    const { data: chamados } = await sb.from("chamados").select("*").order("criado_em", { ascending: false });
-    const listaChs = chamados || [];
-
-    const statsEl = document.getElementById("admin-stats");
-    if (statsEl) {
-      statsEl.innerHTML = `
-        <div class="k"><b>${listaChs.length}</b><span>Chamados</span></div>
-        <div class="k"><b>${listaChs.filter(c => c.status === "Em andamento").length}</b><span>Em andamento</span></div>
-        <div class="k"><b>${listaChs.filter(c => c.status === "Concluída").length}</b><span>Concluídos</span></div>
-      `;
-    }
-
-    const tabelaEl = document.getElementById("admin-tabela-servicos");
-    if (tabelaEl) {
-      tabelaEl.innerHTML = tabela(
-        ["Data", "Título", "Categoria", "Status"],
-        listaChs.map(c => `
-          <tr>
-            <td>${fmtData(c.criado_em)}</td>
-            <td><b>${esc(c.titulo)}</b></td>
-            <td>${esc(c.categoria)}</td>
-            <td>${stPill(c.status)}</td>
-          </tr>
-        `)
-      );
-    }
-  } catch (err) {
-    console.error("Erro ao carregar dados do admin:", err);
+Pages.novoChamado = () => {
+  let tipo = qs("tipo") === "site" ? "site" : "manutencao";
+  const sel = () => { $$("[data-tipo]").forEach(b => b.classList.toggle("act", b.dataset.tipo === tipo)); $("#f-manutencao").hidden = tipo !== "manutencao"; $("#f-site").hidden = tipo !== "site"; };
+  Act.tipo = d => { tipo = d.tipo; sel(); }; sel();
+  $("#sel-disp").innerHTML = '<option value="">Selecione</option>' + opts(DISPOSITIVOS); $("#sel-atend").innerHTML = opts(ATENDIMENTO);
+  $("#sel-tsite").innerHTML = '<option value="">Selecione</option>' + opts(TIPOS_SITE);
+  $$(".sel-pag").forEach(s => s.innerHTML = opts(FORMAS));
+  async function criar(f, cat, titulo, descricao, tabela, detalhe, idMsg) {
+    ocupado(f, true);
+    const { data: ch, error } = await sb.from("chamados").insert({ cliente_id: App.session.user.id, categoria: cat, titulo, descricao }).select("id,numero").single();
+    if (error) { ocupado(f, false); return msg(idMsg, "Não foi possível registrar o chamado: " + error.message); }
+    const e2 = (await sb.from(tabela).insert({ chamado_id: ch.id, ...detalhe })).error;
+    const falhas = await enviarArquivos(ch.id, [...(f.querySelector("input[type=file]")?.files || [])]);
+    ocupado(f, false);
+    location.href = `chamado.html?id=${ch.id}&novo=1${e2 ? "&det=0" : ""}${falhas ? "&anexos=" + falhas : ""}`;
   }
+  $("#f-manutencao").addEventListener("submit", e => { e.preventDefault(); const d = Object.fromEntries(new FormData(e.target));
+    if (!d.tipo_dispositivo || !d.titulo.trim() || !d.descricao.trim()) return msg("m-manutencao", "Preencha tipo de dispositivo, título e descrição.");
+    const desc = `${d.descricao.trim()}\n\nSintomas/informações extras: ${d.extras.trim() || "—"}\nTipo de atendimento: ${d.atendimento}\nPagamento desejado: ${d.pagamento}`;
+    criar(e.target, "manutencao", d.titulo.trim(), desc, "detalhes_manutencao", { tipo_dispositivo: d.tipo_dispositivo, marca: d.marca.trim() || null, modelo: d.modelo.trim() || null, problema_inicio: d.descricao.trim() }, "m-manutencao"); });
+  $("#f-site").addEventListener("submit", e => { e.preventDefault(); const d = Object.fromEntries(new FormData(e.target));
+    if (!d.nome_projeto.trim() || !d.tipo_site || !d.descricao.trim() || !d.objetivo.trim()) return msg("m-site", "Preencha nome do projeto, tipo, descrição e objetivo.");
+    const desc = `${d.descricao.trim()}\n\nEmpresa/marca: ${d.empresa.trim() || "—"}\nReferências: ${d.referencias.trim() || "—"}\nPagamento desejado: ${d.pagamento}`;
+    criar(e.target, "site", "Site: " + d.nome_projeto.trim(), desc, "detalhes_projetos", { nome_projeto: d.nome_projeto.trim(), tipo_site: d.tipo_site, objetivo: d.objetivo.trim(), funcionalidades: d.funcionalidades.trim() || null, estilo_visual: d.estilo_visual.trim() || null, cores_referencias: d.cores.trim() || null, prazo_desejado: d.prazo.trim() || null, orcamento_estimado: d.orcamento ? +d.orcamento : null }, "m-site"); });
 };
+
+Pages.chamado = async () => {
+  const id = qs("id"); const { data: c } = await sb.from("chamados").select("*").eq("id", id).maybeSingle();
+  if (!c) { $("#conteudo").innerHTML = '<p class="empty">Chamado não encontrado.</p>'; return; }
+  if (qs("novo")) msg("m-topo", `Chamado ${num(c.numero)} registrado com sucesso! Você acompanha tudo por aqui.` + (qs("det") === "0" ? " (Alguns detalhes técnicos não foram salvos; informe-os por mensagem.)" : "") + (qs("anexos") ? ` ${qs("anexos")} arquivo(s) não puderam ser enviados (limite de 50 MB; imagens, vídeos e PDF).` : ""), !qs("anexos"));
+  const m = c.categoria !== "site"; const dt = (await sb.from(m ? "detalhes_manutencao" : "detalhes_projetos").select("*").eq("chamado_id", id).maybeSingle()).data || {};
+  $("#conteudo").innerHTML = `<p><a href="painel.html">← Meus chamados</a></p><h2>${num(c.numero)} · ${esc(c.titulo)}</h2><p>${pill(c.status)} <span class="sub">Aberto em ${fmtData(c.criado_em)}</span></p>
+  <div class="box"><h3>Sua solicitação</h3><p style="white-space:pre-wrap">${esc(c.descricao)}</p>${m ? `<p>${esc(dt.tipo_dispositivo)} ${esc(dt.marca)} ${esc(dt.modelo)}</p>` : `<p>Tipo: ${esc(dt.tipo_site)} · Prazo desejado: ${esc(dt.prazo_desejado) || "—"}</p>`}</div>
+  ${m && dt.solucao && c.status === "Concluída" ? `<div class="box"><h3>Solução aplicada</h3><p style="white-space:pre-wrap">${esc(dt.solucao)}</p><p class="sub">Concluído em ${fmtData(c.concluido_em)}</p></div>` : ""}
+  ${!m && dt.proposta ? `<div class="box"><h3>Atualizações do projeto</h3><p style="white-space:pre-wrap">${esc(dt.proposta)}</p>${dt.prazo_estimado ? `<p>Prazo estimado: ${esc(dt.prazo_estimado)}</p>` : ""}</div>` : ""}
+  <div class="box"><h3>Orçamento e pagamento</h3><div id="pg"></div></div>
+  <div class="box"><h3>Andamento</h3><div id="hist"></div></div>
+  <div class="box"><h3>Arquivos e vídeos</h3><div id="arq"></div></div>
+  <div class="box"><h3>💬 Conversa com a TechEmpire</h3><div id="chat"></div></div>`;
+  const atualizar = () => Promise.all([desenharPagamentos($("#pg"), id), desenharHistorico($("#hist"), id), desenharArquivos($("#arq"), id)]);
+  await atualizar(); document.addEventListener("chat-arquivos", atualizar); iniciarChat($("#chat"), id, false);
+};
+
+Pages.perfil = () => {
+  const p = App.perfil || {}, en = p.endereco || {};
+  const campos = { nome: p.nome, telefone: p.telefone, rua: en.rua, numero: en.numero, bairro: en.bairro, cidade: en.cidade, estado: en.estado };
+  const f = $("#f-perfil"); Object.entries(campos).forEach(([k, v]) => { if (f[k]) f[k].value = v || ""; }); f.email.value = p.email || App.session.user.email; f.cpf.value = p.cpf || "";
+  f.addEventListener("submit", async e => { e.preventDefault(); const d = Object.fromEntries(new FormData(f)); if (!d.nome.trim()) return msg("m-perfil", "Informe seu nome."); ocupado(f, true);
+    const { error } = await sb.from("usuarios").update({ nome: d.nome.trim(), telefone: digitos(d.telefone), endereco: { rua: d.rua.trim(), numero: d.numero.trim(), bairro: d.bairro.trim(), cidade: d.cidade.trim(), estado: d.estado.trim().toUpperCase() } }).eq("id", App.session.user.id);
+    ocupado(f, false); msg("m-perfil", error ? "Não foi possível salvar." : "Dados atualizados.", !error); });
+  $("#f-senha").addEventListener("submit", async e => { e.preventDefault(); const f2 = e.target, d = Object.fromEntries(new FormData(f2));
+    if (d.senha.length < 8) return msg("m-senha", "A senha precisa ter pelo menos 8 caracteres."); if (d.senha !== d.senha2) return msg("m-senha", "As senhas não coincidem.");
+    ocupado(f2, true); const { error } = await sb.auth.updateUser({ password: d.senha }); ocupado(f2, false); msg("m-senha", error ? "Não foi possível alterar: " + error.message : "Senha alterada.", !error); if (!error) f2.reset(); });
+};
+
+/* ---------- ADMIN: painel (início, chamados, clientes, leads, usuários) ---------- */
+Pages.admin = async () => {
+  const badge = n => n ? `<span class="pill" title="Mensagens não lidas">💬 ${n}</span>` : "";
+  async function carregarChamados(cli) { let q = sb.from("chamados").select("id,numero,cliente_id,categoria,titulo,status,prioridade,criado_em").order("criado_em", { ascending: false }).limit(500); if (cli) q = q.eq("cliente_id", cli); const { data, error } = await q; if (error) throw error; return comClientes(data || []); }
+  async function mapaNaoLidas() { const { data } = await sb.from("mensagens").select("chamado_id").eq("lida", false).eq("interna", false).neq("remetente_id", App.session.user.id); const m = {}; (data || []).forEach(x => m[x.chamado_id] = (m[x.chamado_id] || 0) + 1); return m; }
+  async function mapaPagamentos() { const { data } = await sb.from("pagamentos").select("chamado_id,status,valor,criado_em").order("criado_em"); const m = {}; (data || []).forEach(p => m[p.chamado_id] = p); return m; }
+  async function mudarStatus(id, de, para) { const { error } = await sb.from("chamados").update({ status: para, atualizado_em: new Date().toISOString() }).eq("id", id); if (!error) await sb.from("historico_status").insert({ chamado_id: id, status_anterior: de, status_novo: para, responsavel_id: App.session.user.id }); return !error; }
+  Chg.rapido = async (d, el) => { const ok = await mudarStatus(d.id, d.de, el.value); toast(ok ? "Status atualizado" : "Erro ao mudar o status"); rota(); };
+  const Rotas = {
+    async inicio() {
+      const c = async (t, fn) => { let q = sb.from(t).select("*", { count: "exact", head: true }); if (fn) q = fn(q); return (await q).count ?? 0; };
+      const [nCli, nSite, nLead, nPP, nPG] = await Promise.all([c("usuarios", q => q.eq("is_admin", false)), c("chamados", q => q.eq("categoria", "site")), c("forleads"), c("pagamentos", q => q.in("status", ["Pendente", "Aguardando pagamento"])), c("pagamentos", q => q.eq("status", "Pago"))]);
+      const [lista, nl] = await Promise.all([carregarChamados(), mapaNaoLidas()]);
+      const ESPERA = ["Nova chamada", "Aguardando análise", "Aprovada"], espera = lista.filter(x => ESPERA.includes(x.status)), andando = lista.filter(x => x.status === "Em andamento").length, feitos = lista.filter(x => x.status === "Concluída").length, nMsg = Object.values(nl).reduce((t, n) => t + n, 0);
+      const fila = espera.slice().sort((a, b) => new Date(a.criado_em) - new Date(b.criado_em)).slice(0, 5), ultimos = lista.slice(0, 7);
+      const kp = (href, cls, svg, n, l, sub) => `<a class="kpc" href="${href}"><span class="kic ${cls}"><svg viewBox="0 0 24 24">${svg}</svg></span><span class="arr">›</span><b>${n}</b><span class="kl">${l}</span><small>${sub}</small></a>`;
+      const filaItem = c => `<div class="rowlink"><a href="admin-chamado.html?id=${c.id}" style="text-decoration:none;flex:1"><b>${num(c.numero)}</b> · ${esc(c.titulo)}<small>${esc(c.cliente?.nome)} · ${c.categoria === "site" ? "Site" : "Manutenção"} · ${fmtData(c.criado_em)}</small></a>${badge(nl[c.id])}<button class="btn primary sm" data-act="atender" data-id="${c.id}" data-de="${esc(c.status)}">Atender</button></div>`;
+      const cv = (await conversas(true)).filter(x => x.ult).slice(0, 7);
+      const nome = (App.perfil?.nome || "").split(" ")[0] || "admin";
+      $("#conteudo-admin").innerHTML = `<div class="home-grid"><div class="home-main">
+        <p class="hello">Bem-vindo, ${esc(nome)}!</p><h2 class="big">Painel de atendimento</h2><p class="sub">Aqui você atende os chamados, acompanha os serviços e conversa com os clientes.</p>
+        <div class="kp">${kp("#/chamados", "g", '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>', lista.length, "Chamados", espera.length ? espera.length + " aguardando atendimento" : "Nenhum chamado pendente")}
+          ${kp("#/chamados", "b", '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.2-.6-.6-2.2z"/>', andando, "Em andamento", andando ? "Serviços sendo executados" : "Nenhum serviço em andamento")}
+          ${kp("#/chamados", "p", '<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>', feitos, "Finalizados", feitos ? "Serviços concluídos" : "Nenhum serviço finalizado")}
+          ${kp("#/mensagens", "m", '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>', nMsg, "Mensagens novas", nMsg ? "Clientes aguardando resposta" : "Nenhuma mensagem nova")}</div>
+        <div class="box"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h3 style="margin:0">⚡ Fila de atendimento</h3><span class="sub" style="margin:0">Do mais antigo para o mais novo</span></div>${fila.length ? fila.map(filaItem).join("") : '<p class="empty">Nenhum chamado esperando. Tudo em dia!</p>'}</div>
+        <div class="box"><div class="row" style="justify-content:space-between;margin-bottom:10px"><div><h3 style="margin:0">🕒 Últimos chamados</h3><span class="sub" style="margin:0">Acompanhe os atendimentos mais recentes.</span></div><a class="btn sm" href="#/chamados">Ver todos ›</a></div>
+          ${tabela(["Data", "Cliente", "Chamado", "Status", ""], ultimos.map(x => `<tr><td>${new Date(x.criado_em).toLocaleDateString("pt-BR")}</td><td>${esc(x.cliente?.nome)}</td><td>${esc(x.titulo)}<br><small style="color:var(--muted)">${num(x.numero)} · ${x.categoria === "site" ? "Site" : "Manutenção"}</small></td><td>${stPill(x.status)}</td><td><a class="btn sm" href="admin-chamado.html?id=${x.id}">Abrir</a></td></tr>`))}</div>
+        <div class="mini-stats"><div><b>${nCli}</b><span>Clientes</span></div><div><b>${nSite}</b><span>Projetos de site</span></div><div><b>${nLead}</b><span>Leads</span></div><div><b>${nPP}</b><span>Pgtos pendentes</span></div><div><b>${nPG}</b><span>Pgtos confirmados</span></div></div>
+      </div>
+      <aside class="chat-card"><div class="chat-head"><span class="kic g"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></span><div><h3 style="margin:0">Conversas</h3><small>Quem mandou mensagem</small></div><a class="btn sm" style="margin-left:auto" href="#/mensagens">Abrir chat</a></div>
+        <div class="wa-items" style="max-height:520px;overflow:auto">${cv.length ? cv.map(x => waItem(x, true, "a")).join("") : '<p class="empty">Quando um cliente mandar mensagem, ela aparece aqui.</p>'}</div></aside></div>`;
+    },
+    async chamados(param) {
+      const pr0 = new URLSearchParams(param || ""), cli = pr0.get("c"); let modo = Rotas._modo || "lista", chip = "";
+      const [todos, nl, pg] = await Promise.all([carregarChamados(cli), mapaNaoLidas(), mapaPagamentos()]);
+      $("#conteudo-admin").innerHTML = `<div class="row" style="justify-content:space-between;margin-bottom:12px"><h2 style="margin:0">Chamados${cli ? " do cliente" : ""}</h2><div class="row"><button class="btn sm" data-act="modo" data-m="lista">☰ Lista</button><button class="btn sm" data-act="modo" data-m="quadro">▦ Quadro</button></div></div>
+        <div class="chips" id="chips"></div>
+        <div class="bar"><input id="bq" placeholder="Buscar por título, nº ou cliente"><select id="bc"><option value="">Todas as categorias</option><option value="manutencao">Manutenção</option><option value="site">Site</option></select><select id="bp"><option value="">Qualquer prioridade</option>${opts(PRIORIDADES)}</select><select id="bo"><option value="desc">Mais recentes</option><option value="asc">Mais antigos</option></select></div><div id="tb"></div>`;
+      const desenhar = () => {
+        const q = $("#bq").value.trim().toLowerCase(), cat = $("#bc").value, pr = $("#bp").value, asc = $("#bo").value === "asc";
+        let l = todos.filter(c => (!cat || c.categoria === cat) && (!pr || c.prioridade === pr) && (!q || `${c.titulo} ${num(c.numero)} ${c.numero} ${c.cliente?.nome || ""}`.toLowerCase().includes(q)));
+        const cont = {}; l.forEach(c => cont[c.status] = (cont[c.status] || 0) + 1);
+        $("#chips").innerHTML = `<button class="chip ${!chip ? "on" : ""}" data-act="chip" data-s="">Todos <b>${l.length}</b></button>` + STATUS.map(s => `<button class="chip ${chip === s ? "on" : ""}" data-act="chip" data-s="${esc(s)}">${esc(s)} <b>${cont[s] || 0}</b></button>`).join("");
+        $$("[data-act=modo]").forEach(b => b.classList.toggle("primary", b.dataset.m === modo));
+        if (modo === "lista") {
+          if (chip) l = l.filter(c => c.status === chip); l.sort((a, b) => asc ? new Date(a.criado_em) - new Date(b.criado_em) : new Date(b.criado_em) - new Date(a.criado_em));
+          $("#tb").innerHTML = tabela(["Nº", "Cliente", "Serviço", "Título", "Prioridade", "Status", "Pagamento", "", "Data", ""], l.map(c => `<tr><td><a href="admin-chamado.html?id=${c.id}">${num(c.numero)}</a></td><td>${esc(c.cliente?.nome)}</td><td>${c.categoria === "site" ? "Site" : "Manutenção"}</td><td><a href="admin-chamado.html?id=${c.id}">${esc(c.titulo)}</a></td><td>${c.prioridade ? pill(c.prioridade, true) : "—"}</td><td><select class="mini" data-chg="rapido" data-id="${c.id}" data-de="${esc(c.status)}" aria-label="Alterar status">${opts(STATUS, c.status)}</select></td><td>${pg[c.id] ? pill(pg[c.id].status, true) : "—"}</td><td>${badge(nl[c.id])}</td><td>${fmtData(c.criado_em)}</td><td>${["Nova chamada", "Aguardando análise", "Aprovada"].includes(c.status) ? `<button class="btn primary sm" data-act="atender" data-id="${c.id}" data-de="${esc(c.status)}">Atender</button>` : ""}</td></tr>`));
+        } else {
+          l.sort((a, b) => new Date(b.criado_em) - new Date(a.criado_em));
+          $("#tb").innerHTML = `<p class="sub">Arraste os cartões entre as colunas para mudar o status (no celular, use a Lista).</p><div class="kanban">${STATUS.map(s => { const col = l.filter(c => c.status === s);
+            return `<div class="col" data-s="${esc(s)}"><h4>${esc(s)} <span class="pill gray">${col.length}</span></h4>${col.map(c => `<div class="kc" draggable="true" data-id="${c.id}" data-de="${esc(s)}"><a href="admin-chamado.html?id=${c.id}"><b>${num(c.numero)}</b></a> ${badge(nl[c.id])}${c.prioridade ? " " + pill(c.prioridade, true) : ""}<div>${esc(c.titulo)}</div><small>${esc(c.cliente?.nome)} · ${c.categoria === "site" ? "Site" : "Manutenção"} · ${new Date(c.criado_em).toLocaleDateString("pt-BR")}</small></div>`).join("") || '<p class="empty" style="padding:6px">Vazio</p>'}</div>`; }).join("")}</div>`;
+          $$(".kc").forEach(k => k.addEventListener("dragstart", e => e.dataTransfer.setData("text/plain", JSON.stringify({ id: k.dataset.id, de: k.dataset.de }))));
+          $$(".col").forEach(col => { col.addEventListener("dragover", e => { e.preventDefault(); col.classList.add("over"); }); col.addEventListener("dragleave", () => col.classList.remove("over"));
+            col.addEventListener("drop", async e => { e.preventDefault(); col.classList.remove("over"); let d; try { d = JSON.parse(e.dataTransfer.getData("text/plain")); } catch { return; }
+              if (d.de === col.dataset.s) return; const ok = await mudarStatus(d.id, d.de, col.dataset.s); toast(ok ? "Status atualizado" : "Erro ao mudar o status"); Rotas.chamados(param); }); });
+        }
+      };
+      Act.modo = d => { modo = d.m; Rotas._modo = modo; desenhar(); }; Act.chip = d => { chip = d.s; desenhar(); };
+      ["bq", "bc", "bp", "bo"].forEach(i => $("#" + i).oninput = desenhar); if (pr0.get("q")) $("#bq").value = pr0.get("q"); desenhar();
+    },
+    async mensagens(param) { $("#conteudo-admin").innerHTML = '<h2>Mensagens</h2><p class="sub">Conversas com os clientes, como no WhatsApp.</p><div id="inbox"></div>'; await inbox($("#inbox"), true, new URLSearchParams(param || "").get("c")); },
+    async pagamentos() {
+      const { data } = await sb.from("pagamentos").select("*").order("criado_em", { ascending: false }).limit(300);
+      const ids = [...new Set((data || []).map(p => p.chamado_id))]; const { data: chs } = ids.length ? await sb.from("chamados").select("id,numero,cliente_id").in("id", ids) : { data: [] };
+      const cm = Object.fromEntries((await comClientes(chs || [])).map(c => [c.id, c])); const soma = f => (data || []).filter(f).reduce((t, p) => t + Number(p.valor || 0), 0);
+      $("#conteudo-admin").innerHTML = `<h2>Pagamentos</h2><div class="kpis"><div class="k"><b>${brl(soma(p => p.status === "Pago"))}</b><span>Recebido</span></div><div class="k"><b>${brl(soma(p => ["Pendente", "Aguardando pagamento"].includes(p.status)))}</b><span>A receber</span></div><div class="k"><b>${brl(soma(p => p.status === "Parcialmente pago"))}</b><span>Parcialmente pago</span></div></div>
+      <div class="bar"><select id="pf"><option value="">Todos os status</option>${opts(PAGAMENTO_STATUS)}</select></div><div id="tb"></div>`;
+      const d = () => { const f = $("#pf").value; $("#tb").innerHTML = tabela(["Chamado", "Cliente", "Valor", "Forma", "Status", "Origem", "Data"], (data || []).filter(p => !f || p.status === f).map(p => { const c = cm[p.chamado_id] || {}; return `<tr><td><a href="admin-chamado.html?id=${p.chamado_id}">${c.numero ? num(c.numero) : "—"}</a></td><td>${esc(c.cliente?.nome)}</td><td>${brl(p.valor)}</td><td>${esc(p.forma)}</td><td>${pill(p.status)}</td><td>${p.manual ? "Registro manual" : "Online"}</td><td>${fmtData(p.pago_em || p.criado_em)}</td></tr>`; })); };
+      $("#pf").oninput = d; d();
+    },
+    async clientes() {
+      $("#conteudo-admin").innerHTML = `<h2>Clientes</h2><div class="bar"><input id="bq" placeholder="Nome, CPF, telefone ou e-mail"></div><div id="ed"></div><div id="tb"></div>`;
+      const carregar = async () => {
+        let q = sb.from("usuarios").select("*").eq("is_admin", false).order("criado_em", { ascending: false }); const t = $("#bq").value.trim().replace(/[,()%]/g, " ");
+        if (t) q = q.or(`nome.ilike.%${t}%,cpf.ilike.%${digitos(t) || "@@"}%,telefone.ilike.%${t}%,email.ilike.%${t}%`);
+        const { data } = await q; Rotas._clientes = data || [];
+        $("#tb").innerHTML = tabela(["Nome", "E-mail", "Telefone", "CPF", "Ativo", ""], (data || []).map(u => `<tr><td>${esc(u.nome)}</td><td>${esc(u.email)}</td><td>${esc(u.telefone)}</td><td>${esc(u.cpf)}</td><td>${u.ativo === false ? "Não" : "Sim"}</td><td><a class="btn sm" href="#/chamados?c=${u.id}">Chamados</a> <button class="btn sm" data-act="editarCli" data-id="${u.id}">Editar</button> <button class="btn sm" data-act="ativarCli" data-id="${u.id}" data-v="${u.ativo === false}">${u.ativo === false ? "Ativar" : "Desativar"}</button></td></tr>`));
+      };
+      Rotas._recarregar = carregar; $("#bq").oninput = carregar; carregar();
+    },
+    async leads() {
+      const { data, error } = await sb.from("forleads").select("*").order("criado_em", { ascending: false });
+      if (error) return $("#conteudo-admin").innerHTML = '<p class="empty">Erro ao carregar leads. Rode o SQL 2-pagamentos-leads.sql.</p>';
+      $("#conteudo-admin").innerHTML = `<h2>Leads</h2><div class="box"><h3>Novo lead</h3><form id="f-lead"><div class="two"><label>Nome<input name="nome" required></label><label>Telefone<input name="telefone"></label><label>E-mail<input name="email" type="email"></label><label>Origem<input name="origem" placeholder="Instagram, indicação…"></label></div><label>Serviço de interesse<input name="servico"></label><label>Observações comerciais<textarea name="obs"></textarea></label><button class="btn primary" type="submit">Cadastrar lead</button></form></div>
+      ${tabela(["Nome", "Contato", "Origem", "Interesse", "Etapa", ""], data.map(l => `<tr><td>${esc(l.nome)}<br><small>${esc(l.observacoes)}</small></td><td>${esc(l.telefone)}<br>${esc(l.email)}</td><td>${esc(l.origem)}</td><td>${esc(l.servico_interesse)}</td><td><select data-chg="etapa" data-id="${l.id}">${opts(ETAPAS_LEAD, l.etapa)}</select></td><td><button class="btn sm" data-act="converter" data-id="${l.id}" data-email="${esc(l.email)}">Converter</button> <button class="btn sm danger" data-act="delLead" data-id="${l.id}">Excluir</button></td></tr>`))}`;
+      $("#f-lead").addEventListener("submit", async e => { e.preventDefault(); const d = Object.fromEntries(new FormData(e.target)); const n = v => v.trim() || null;
+        const { error } = await sb.from("forleads").insert({ nome: d.nome.trim(), telefone: n(d.telefone), email: n(d.email), origem: n(d.origem), servico_interesse: n(d.servico), observacoes: n(d.obs) }); toast(error ? "Erro ao cadastrar" : "Lead cadastrado"); if (!error) Rotas.leads(); });
+    },
+    async usuarios() {
+      const { data } = await sb.from("usuarios").select("*").eq("is_admin", true);
+      $("#conteudo-admin").innerHTML = `<h2>Administradores</h2>${tabela(["Nome", "E-mail", "Ativo", ""], (data || []).map(u => `<tr><td>${esc(u.nome)}</td><td>${esc(u.email)}</td><td>${u.ativo === false ? "Não" : "Sim"}</td><td>${u.id === App.session.user.id ? "" : `<button class="btn sm" data-act="admin" data-id="${u.id}" data-v="false">Remover admin</button> <button class="btn sm" data-act="ativarCli" data-id="${u.id}" data-v="${u.ativo === false}">${u.ativo === false ? "Ativar" : "Desativar"}</button>`}</td></tr>`))}
+      <div class="box" style="margin-top:16px"><h3>Promover cliente a administrador</h3><div class="bar"><input id="ae" type="email" placeholder="E-mail de um cliente já cadastrado"><button class="btn primary" data-act="promover">Promover</button></div></div>`;
+    }
+  };
+  Act.atender = async d => { const t = new Date().toISOString(); const { error } = await sb.from("chamados").update({ status: "Em andamento", assumido_em: t, admin_id: App.session.user.id, atualizado_em: t }).eq("id", d.id);
+    if (error) return toast("Não foi possível iniciar o atendimento.");
+    await sb.from("historico_status").insert({ chamado_id: d.id, status_anterior: d.de, status_novo: "Em andamento", responsavel_id: App.session.user.id }); location.href = "admin-chamado.html?id=" + d.id; };
+  Act.abrirAdm = d => location.href = "admin-chamado.html?id=" + d.id;
+  Act.editarCli = d => { const u = Rotas._clientes.find(x => x.id === d.id); $("#ed").innerHTML = `<form class="box" id="f-ed"><h3>Editar cliente</h3><div class="two"><label>Nome<input name="nome" value="${esc(u.nome)}" required></label><label>Telefone<input name="telefone" value="${esc(u.telefone)}"></label></div><div class="row"><button class="btn primary" type="submit">Salvar</button><button class="btn" type="button" data-act="cancelarEd">Cancelar</button></div></form>`;
+    $("#f-ed").addEventListener("submit", async e => { e.preventDefault(); const f = e.target; const { error } = await sb.from("usuarios").update({ nome: f.nome.value.trim(), telefone: digitos(f.telefone.value) }).eq("id", d.id); toast(error ? "Erro ao salvar" : "Cliente atualizado"); $("#ed").innerHTML = ""; Rotas._recarregar(); }); };
+  Act.cancelarEd = () => $("#ed").innerHTML = "";
+  Act.ativarCli = async d => { const a = d.v === "true"; if (!confirm(a ? "Ativar este cadastro?" : "Desativar este cadastro? O usuário não conseguirá mais entrar.")) return; await sb.from("usuarios").update({ ativo: a }).eq("id", d.id); rota(); };
+  Act.admin = async d => { if (!confirm("Remover a permissão de administrador?")) return; await sb.from("usuarios").update({ is_admin: false }).eq("id", d.id); rota(); };
+  Act.promover = async () => { const e = $("#ae").value.trim().toLowerCase(); if (!e || !confirm("Dar acesso administrativo a " + e + "?")) return; const { data, error } = await sb.from("usuarios").update({ is_admin: true }).eq("email", e).select(); toast(error || !data?.length ? "Usuário não encontrado" : "Promovido a administrador"); rota(); };
+  Chg.etapa = async d => { const el = $(`[data-chg=etapa][data-id="${d.id}"]`); const { error } = await sb.from("forleads").update({ etapa: el.value }).eq("id", d.id); toast(error ? "Erro" : "Etapa atualizada"); };
+  Act.delLead = async d => { if (!confirm("Excluir este lead?")) return; await sb.from("forleads").delete().eq("id", d.id); Rotas.leads(); };
+  Act.converter = async d => { if (!d.email) return toast("O lead precisa ter e-mail para converter."); const { data: u } = await sb.from("usuarios").select("id").eq("email", d.email.toLowerCase()).maybeSingle();
+    if (!u) return toast("Este contato ainda não criou conta. Peça que se cadastre com este e-mail e converta depois.");
+    const { error } = await sb.from("forleads").update({ cliente_id: u.id, etapa: "Convertido em cliente" }).eq("id", d.id); toast(error ? "Erro" : "Lead vinculado ao cliente existente"); Rotas.leads(); };
+  async function rota() { pararChats(); const [p, param] = (location.hash.replace("#/", "") || "inicio").split("?"); const nome = Rotas[p] && !p.startsWith("_") ? p : "inicio";
+    $$(".side a").forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#/" + (nome === "inicio" ? "" : nome) || (nome === "inicio" && a.getAttribute("href") === "#/")));
+    try { await Rotas[nome](param); } catch (e) { $("#conteudo-admin").innerHTML = '<p class="empty">Erro ao carregar.</p>'; } }
+  window.addEventListener("hashchange", rota); rota();
+  sb.channel("chamados-live").on("postgres_changes", { event: "*", schema: "public", table: "chamados" }, () => { toast("Chamados atualizados"); const p = location.hash.replace("#/", ""); if (!p || p.startsWith("chamados")) rota(); }).subscribe();
+  sb.channel("msgs-live").on("postgres_changes", { event: "INSERT", schema: "public", table: "mensagens" }, p => { if (p.new.remetente_id !== App.session.user.id && !p.new.interna) { toast("💬 Nova mensagem de cliente"); if (!location.hash.replace("#/", "")) rota(); } }).subscribe();
+  setInterval(() => { if (!location.hash.replace("#/", "")) rota(); }, 60000);
+};
+
+/* ---------- ADMIN: detalhe e execução do chamado ---------- */
+Pages.adminChamado = async () => {
+  const id = qs("id"); const { data: c } = await sb.from("chamados").select("*").eq("id", id).maybeSingle();
+  if (!c) { $("#conteudo").innerHTML = '<p class="empty">Chamado não encontrado.</p>'; return; }
+  const m = c.categoria !== "site"; const dt = (await sb.from(m ? "detalhes_manutencao" : "detalhes_projetos").select("*").eq("chamado_id", id).maybeSingle()).data || {};
+  const u = (await sb.from("usuarios").select("nome,email,telefone,cpf,endereco").eq("id", c.cliente_id).maybeSingle()).data || {};
+  const fim = c.status === "Concluída";
+  $("#conteudo").innerHTML = `<p><a href="admin.html#/chamados">← Chamados</a></p><h2>${num(c.numero)} · ${esc(c.titulo)}</h2>
+  <div class="box"><h3>Cliente</h3>${esc(u.nome)} · ${esc(u.email)} · ${esc(u.telefone)}<br>CPF ${esc(u.cpf)}<br>${u.endereco ? esc(Object.values(u.endereco).join(", ")) : ""}<p class="row" style="margin-top:10px"><a class="btn sm" href="admin.html#/chamados?c=${c.cliente_id}">Todos os chamados deste cliente</a>${digitos(u.telefone).length >= 10 ? `<a class="btn sm" target="_blank" rel="noopener" href="https://wa.me/${digitos(u.telefone).length <= 11 ? "55" : ""}${digitos(u.telefone)}">WhatsApp</a>` : ""}</p></div>
+  <div class="box"><h3>Solicitação</h3><p style="white-space:pre-wrap">${esc(c.descricao)}</p><p>Criado: ${fmtData(c.criado_em)} · Início: ${fmtData(c.assumido_em)} · Conclusão: ${fmtData(c.concluido_em)}</p>
+  <div class="two" style="max-width:560px"><label>Status<select id="st">${opts(STATUS, c.status)}</select></label><label>Prioridade<select id="pri"><option value="">—</option>${opts(PRIORIDADES, c.prioridade)}</select></label></div>
+  <div class="row" style="margin-top:12px">${!c.assumido_em && !fim ? '<button class="btn primary" data-act="iniciar">Iniciar atendimento</button>' : ""}<button class="btn" data-act="salvar">Salvar</button>${fim ? "" : '<button class="btn primary" data-act="concluir">Concluir chamada</button>'}<button class="btn danger" data-act="excluir">Excluir</button></div><div class="msg" id="m-top"></div></div>
+  <div class="box"><h3>${m ? "Execução técnica" : "Projeto do site"}</h3>
+  ${m ? `<p>${esc(dt.tipo_dispositivo)} ${esc(dt.marca)} ${esc(dt.modelo)}</p><label>Diagnóstico técnico<textarea id="dg">${esc(dt.diagnostico)}</textarea></label><label>Solução aplicada / resumo do serviço (visível ao cliente ao concluir)<textarea id="sl">${esc(dt.solucao)}</textarea></label>`
+  : `<p>Tipo: ${esc(dt.tipo_site)} · Objetivo: ${esc(dt.objetivo)}<br>Funcionalidades: ${esc(dt.funcionalidades)}<br>Estilo/cores: ${esc(dt.estilo_visual)} ${esc(dt.cores_referencias)}<br>Prazo desejado: ${esc(dt.prazo_desejado)} · Orçamento do cliente: ${dt.orcamento_estimado != null ? brl(dt.orcamento_estimado) : "—"}</p><label>Atualizações, links de demonstração e endereço final (visível ao cliente)<textarea id="sl">${esc(dt.proposta)}</textarea></label><label>Prazo estimado<input id="pe" value="${esc(dt.prazo_estimado)}"></label>`}</div>
+  <div class="box"><h3>Pagamentos</h3><div id="pg"></div><form id="f-pg" style="margin-top:12px"><div class="two"><label>Valor (R$)<input name="valor" type="number" step="0.01" min="0" required></label><label>Forma<select name="forma">${opts(FORMAS)}</select></label></div><label style="max-width:300px">Status<select name="status">${opts(PAGAMENTO_STATUS)}</select></label><button class="btn" type="submit">Registrar pagamento (manual)</button></form></div>
+  <div class="box"><h3>Arquivos e vídeos</h3><div id="arq"></div><form id="f-arq" style="margin-top:12px"><label>Anexar fotos/vídeos da execução (visíveis ao cliente)<input type="file" name="f" multiple accept="image/*,video/*,.pdf,.txt" required></label><button class="btn" type="submit">Enviar</button></form></div>
+  <div class="box"><h3>💬 Conversa com o cliente</h3><div id="chat"></div></div>
+  <div class="box"><h3>Histórico de status</h3><div id="hist"></div></div>`;
+  const atualizar = () => Promise.all([desenharPagamentos($("#pg"), id), desenharArquivos($("#arq"), id), desenharHistorico($("#hist"), id)]);
+  await atualizar(); document.addEventListener("chat-arquivos", atualizar); iniciarChat($("#chat"), id, true);
+  async function salvar(extra = {}) {
+    const novo = extra.status || $("#st").value; let e = (await sb.from("chamados").update({ status: novo, atualizado_em: new Date().toISOString(), ...extra }).eq("id", id)).error;
+    if (!e && novo !== c.status) { await sb.from("historico_status").insert({ chamado_id: id, status_anterior: c.status, status_novo: novo, responsavel_id: App.session.user.id }); c.status = novo; }
+    const np = $("#pri").value || null; if (!e && np !== (c.prioridade || null)) { const e3 = (await sb.from("chamados").update({ prioridade: np }).eq("id", id)).error; if (e3) toast("Prioridade não salva (valor não aceito pelo banco)."); else c.prioridade = np; }
+    if (!e) e = (await sb.from(m ? "detalhes_manutencao" : "detalhes_projetos").update(m ? { diagnostico: $("#dg").value, solucao: $("#sl").value } : { proposta: $("#sl").value, prazo_estimado: $("#pe").value }).eq("chamado_id", id)).error;
+    return e;
+  }
+  const refaz = () => Pages.adminChamado();
+  Act.salvar = async () => { const e = await salvar(); toast(e ? "Erro ao salvar" : "Alterações salvas"); if (!e) refaz(); };
+  Act.iniciar = async () => { const e = await salvar({ status: "Em andamento", assumido_em: new Date().toISOString(), admin_id: App.session.user.id }); toast(e ? "Erro" : "Atendimento iniciado"); if (!e) refaz(); };
+  Act.concluir = async () => { if (!$("#sl").value.trim()) return msg("m-top", "Registre a solução/resumo do serviço antes de concluir."); const e = await salvar({ status: "Concluída", concluido_em: new Date().toISOString() }); toast(e ? "Erro" : "Chamado concluído"); if (!e) refaz(); };
+  Act.excluir = async () => { if (!confirm("Excluir este chamado definitivamente? Isso não pode ser desfeito.")) return; const { error } = await sb.from("chamados").delete().eq("id", id); if (error) return toast("Erro ao excluir"); location.href = "admin.html#/chamados"; };
+  $("#f-pg").addEventListener("submit", async e => { e.preventDefault(); const d = Object.fromEntries(new FormData(e.target));
+    const { error } = await sb.from("pagamentos").insert({ chamado_id: id, valor: +d.valor, forma: d.forma, status: d.status, manual: true, pago_em: d.status === "Pago" ? new Date().toISOString() : null, registrado_por: App.session.user.id }); toast(error ? "Erro ao registrar" : "Pagamento registrado"); if (!error) { e.target.reset(); atualizar(); } });
+  $("#f-arq").addEventListener("submit", async e => { e.preventDefault(); const f = e.target; ocupado(f, true); const falhas = await enviarArquivos(id, [...f.f.files]); ocupado(f, false); toast(falhas ? falhas + " arquivo(s) falharam (máx. 50 MB)" : "Arquivos enviados"); f.reset(); atualizar(); });
+};
+
+document.addEventListener("DOMContentLoaded", boot);
