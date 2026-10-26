@@ -517,3 +517,115 @@ Pages.adminChamado = async () => {
 };
 
 document.addEventListener("DOMContentLoaded", boot);
+// Variável para armazenar o chamado selecionado no chat
+let chamadoAtivoId = null;
+
+// Função para carregar os serviços na tabela do Admin
+async function carregarServicosAdmin() {
+  const { data: chamados, error } = await supabaseClient
+    .from('chamados')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Erro ao buscar chamados:', error);
+    return;
+  }
+
+  const tbody = document.getElementById('tbl-servicos');
+  if (!tbody) return;
+
+  tbody.innerHTML = chamados.map(item => `
+    <tr onclick="selecionarChamadoParaChat('${item.id}')" style="cursor:pointer;">
+      <td>${new Date(item.created_at).toLocaleDateString('pt-BR')}</td>
+      <td>${esc(item.cliente_nome)} (${esc(item.equipamento)})</td>
+      <td>${esc(item.servico)}</td>
+      <td><span class="badge ${item.status.toLowerCase().replace(/\s+/g, '-')}">${esc(item.status)}</span></td>
+      <td>...</td>
+    </tr>
+  `).join('');
+
+  // Atualiza os contadores
+  if (document.getElementById('cnt-chamados')) {
+    document.getElementById('cnt-chamados').innerText = chamados.length;
+    document.getElementById('cnt-em-aberto').innerText = chamados.filter(c => c.status === 'Em andamento').length;
+    document.getElementById('cnt-finalizados').innerText = chamados.filter(c => c.status === 'Finalizados' || c.status === 'Concluída').length;
+  }
+}
+
+// Selecionar o chamado e carregar o histórico de mensagens
+async function selecionarChamadoParaChat(chamadoId) {
+  chamadoAtivoId = chamadoId;
+  carregarMensagens(chamadoId);
+  inscreverRealtimeMensagens(chamadoId);
+}
+
+// Carregar histórico do chat
+async function carregarMensagens(chamadoId) {
+  const { data: msgs, error } = await supabaseClient
+    .from('mensagens')
+    .select('*')
+    .eq('chamado_id', chamadoId)
+    .order('created_at', { ascending: true });
+
+  if (error) return;
+
+  const chatContainer = document.getElementById('chat-messages');
+  chatContainer.innerHTML = msgs.map(m => `
+    <div class="msg-bubble ${m.sender_role === 'admin' ? 'outgoing' : 'incoming'}">
+      <p>${esc(m.conteudo)}</p>
+      <span class="time">${new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+    </div>
+  `).join('');
+
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+// Enviar nova mensagem
+const formChat = document.getElementById('form-chat');
+if (formChat) {
+  formChat.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const input = formChat.querySelector('input[name="mensagem"]');
+    const texto = input.value.trim();
+
+    if (!texto || !chamadoAtivoId) return;
+
+    const { error } = await supabaseClient
+      .from('mensagens')
+      .insert([
+        {
+          chamado_id: chamadoAtivoId,
+          sender_role: 'admin', // Ou 'client' no painel do cliente
+          conteudo: texto
+        }
+      ]);
+
+    if (!error) {
+      input.value = '';
+    }
+  });
+}
+
+// Atualização em Tempo Real (Supabase Realtime)
+let canalChat = null;
+function inscreverRealtimeMensagens(chamadoId) {
+  if (canalChat) supabaseClient.removeChannel(canalChat);
+
+  canalChat = supabaseClient
+    .channel('chat-chamado')
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'mensagens',
+        filter: `chamado_id=eq.${chamadoId}`
+      },
+      (payload) => {
+        // Quando uma nova mensagem chegar, recarrega o chat
+        carregarMensagens(chamadoId);
+      }
+    )
+    .subscribe();
+}
