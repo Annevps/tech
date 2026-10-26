@@ -138,3 +138,112 @@ tr.go{cursor:pointer}tr.go:hover{background:rgba(180,240,60,.06)}td a{color:var(
 .chat-card .chat-log{height:400px}
 @media(max-width:1180px){.home-grid{grid-template-columns:1fr}.chat-card{position:static}}
 @media(max-width:860px){.shell{grid-template-columns:1fr}.side{position:static;display:flex;overflow-x:auto}.side a{white-space:nowrap}.side-card{display:none}.search{display:none}.un{display:none}}
+/* Layout Geral do Admin */
+.admin-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr 340px;
+  gap: 20px;
+  padding: 20px;
+  min-height: calc(100vh - 70px);
+  background-color: #07090b;
+  color: #e0e6ed;
+}
+
+/* Sidebar */
+.sidebar-admin {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.side-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.side-nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  color: #a0aec0;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 500;
+}
+.side-nav a.active, .side-nav a:hover {
+  background: #11181f;
+  color: #b4f03c;
+}
+
+/* Cards de Métricas */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 20px;
+}
+.stat-card {
+  background: #0d1117;
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Tabela */
+.table-container {
+  background: #0d1117;
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 14px;
+}
+.data-table th, .data-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #1f2937;
+  font-size: 14px;
+}
+
+/* Chat Lateral */
+.chat-panel {
+  background: #0d1117;
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.chat-messages {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.msg-bubble {
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.msg-bubble.incoming {
+  align-self: flex-start;
+  background: #161b22;
+  border: 1px solid #30363d;
+  color: #e6edf3;
+}
+.msg-bubble.outgoing {
+  align-self: flex-end;
+  background: #b4f03c;
+  color: #000;
+}
