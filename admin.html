@@ -8,64 +8,71 @@
 <link rel="stylesheet" href="style.css">
 <style>
   /* Forçando cores claras para o painel admin */
-  body { background: #06080a; margin: 0; font-family: 'Inter', sans-serif; color: #ffffff !important; display: flex; height: 100vh; overflow: hidden; }
-  .sidebar { width: 260px; background: #0a0d0f; border-right: 1px solid rgba(255,255,255,0.1); padding: 24px; display: flex; flex-direction: column; }
-  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #ffffff; font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: bold; margin-bottom: 40px; }
+  body { background: #06080a !important; margin: 0; font-family: 'Inter', sans-serif; color: #ffffff !important; display: flex; height: 100vh; overflow: hidden; }
+  
+  /* Sidebar */
+  .sidebar { width: 260px; background: #0a0d0f !important; border-right: 1px solid rgba(255,255,255,0.1); padding: 24px; display: flex; flex-direction: column; }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #ffffff !important; font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: bold; margin-bottom: 40px; }
   .logo i { background: #b4f03c; color: #000; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; font-style: normal; }
   .logo b { color: #b4f03c; }
-  .sidebar a { display: block; padding: 12px 16px; color: #d1d5db; text-decoration: none; border-radius: 8px; font-weight: 500; margin-bottom: 6px; transition: 0.2s; cursor: pointer; }
-  .sidebar a:hover, .sidebar a.active { background: rgba(180,240,60,0.1); color: #b4f03c; }
-  .sidebar .sair { margin-top: auto; color: #ff7b6b; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
+  .sidebar a { display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: #d1d5db !important; text-decoration: none; border-radius: 8px; font-weight: 500; margin-bottom: 6px; transition: 0.2s; cursor: pointer; font-size: 15px; }
+  .sidebar a:hover, .sidebar a.active { background: rgba(180,240,60,0.1) !important; color: #b4f03c !important; }
+  .sidebar .sair { margin-top: auto; color: #ff7b6b !important; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
+  .sidebar .voltar { color: #97a0a6 !important; margin-bottom: 15px; }
 
+  /* Main */
   .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
-  .topbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid rgba(255,255,255,0.1); background: #0a0d0f; position: sticky; top: 0; z-index: 10; }
-  .topbar h1 { margin: 0; font-size: 20px; font-family: 'Space Grotesk', sans-serif; color: #ffffff; }
-  .topbar span { color: #d1d5db; font-size: 14px; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid rgba(255,255,255,0.1); background: #0a0d0f !important; position: sticky; top: 0; z-index: 10; }
+  .topbar h1 { margin: 0; font-size: 20px; font-family: 'Space Grotesk', sans-serif; color: #ffffff !important; }
+  .topbar span { color: #d1d5db !important; font-size: 14px; }
   
   .content { padding: 40px; display: grid; grid-template-columns: 1fr 380px; gap: 30px; align-items: start; }
   .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
-  .kpi { background: #12161a; border: 1px solid rgba(255,255,255,0.15); padding: 20px; border-radius: 12px; }
-  .kpi h3 { margin: 0 0 10px 0; font-size: 12px; color: #d1d5db; text-transform: uppercase; letter-spacing: 1px; }
-  .kpi b { font-size: 32px; font-family: 'Space Grotesk', sans-serif; color: #b4f03c; display: block; line-height: 1; }
+  .kpi { background: #12161a !important; border: 1px solid rgba(255,255,255,0.15); padding: 20px; border-radius: 12px; }
+  .kpi h3 { margin: 0 0 10px 0; font-size: 12px; color: #d1d5db !important; text-transform: uppercase; letter-spacing: 1px; }
+  .kpi b { font-size: 32px; font-family: 'Space Grotesk', sans-serif; color: #b4f03c !important; display: block; line-height: 1; }
   
-  .box { background: #12161a; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 24px; }
-  .box h3 { margin: 0 0 20px 0; font-size: 18px; color: #ffffff; }
+  .box { background: #12161a !important; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 24px; }
+  .box h3 { margin: 0 0 20px 0; font-size: 18px; color: #ffffff !important; }
   
   table { width: 100%; border-collapse: collapse; }
-  th { text-align: left; padding: 12px; font-size: 12px; color: #b4f03c; border-bottom: 1px solid rgba(255,255,255,0.1); text-transform: uppercase; }
-  td { padding: 15px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; color: #ffffff; cursor: pointer; }
+  th { text-align: left; padding: 12px; font-size: 12px; color: #b4f03c !important; border-bottom: 1px solid rgba(255,255,255,0.1); text-transform: uppercase; }
+  td { padding: 15px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; color: #ffffff !important; cursor: pointer; }
   tr:hover td { background: rgba(255,255,255,0.05); }
-  .pill { background: rgba(180,240,60,0.15); color: #b4f03c; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: bold; border: 1px solid rgba(180,240,60,0.3); }
+  .pill { background: rgba(180,240,60,0.15); color: #b4f03c !important; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: bold; border: 1px solid rgba(180,240,60,0.3); }
 
-  /* Painel do Chat */
-  .chat-panel { background: #12161a; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; display: flex; flex-direction: column; height: 600px; position: sticky; top: 100px; }
-  .chat-header { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; background: #1a1e22; }
-  .chat-header h4 { margin: 0; color: #ffffff; }
-  .chat-header span { color: #b4f03c; font-size: 12px; }
-  .chat-body { padding: 15px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #0a0d0f; }
-  .chat-msg { background: #1a1e22; padding: 10px 15px; border-radius: 12px; font-size: 14px; max-width: 90%; border-bottom-left-radius: 2px; color: #ffffff; }
-  .chat-msg.me { background: #b4f03c; color: #000; align-self: flex-end; border-bottom-left-radius: 12px; border-bottom-right-radius: 2px; }
+  /* Chat */
+  .chat-panel { background: #12161a !important; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; display: flex; flex-direction: column; height: 600px; position: sticky; top: 100px; }
+  .chat-header { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; background: #1a1e22 !important; }
+  .chat-header h4 { margin: 0; color: #ffffff !important; }
+  .chat-header span { color: #b4f03c !important; font-size: 12px; }
+  .chat-body { padding: 15px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #0a0d0f !important; }
+  .chat-msg { background: #1a1e22 !important; padding: 10px 15px; border-radius: 12px; font-size: 14px; max-width: 90%; border-bottom-left-radius: 2px; color: #ffffff !important; }
+  .chat-msg.me { background: #b4f03c !important; color: #000 !important; align-self: flex-end; border-bottom-left-radius: 12px; border-bottom-right-radius: 2px; }
   .chat-msg small { display: block; font-size: 10px; opacity: 0.8; margin-bottom: 4px; color: inherit; }
-  .chat-footer { padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 10px; background: #1a1e22; }
-  .chat-footer input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: #06080a; color: #ffffff; outline: none; }
-  .chat-footer button { background: #b4f03c; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; color: #000; }
+  .chat-footer { padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 10px; background: #1a1e22 !important; }
+  .chat-footer input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: #06080a !important; color: #ffffff !important; outline: none; }
+  .chat-footer button { background: #b4f03c !important; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; color: #000 !important; }
 
-  /* Modal de Detalhes */
+  /* Modal */
   .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; }
-  .modal-content { background: #12161a; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 30px; width: 500px; max-width: 90%; }
-  .modal-content h2 { margin-top: 0; color: #b4f03c; }
-  .modal-content p { color: #d1d5db; line-height: 1.6; }
-  .modal-content strong { color: #ffffff; }
+  .modal-content { background: #12161a !important; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 30px; width: 500px; max-width: 90%; }
+  .modal-content h2 { margin-top: 0; color: #b4f03c !important; }
+  .modal-content p { color: #d1d5db !important; line-height: 1.6; }
+  .modal-content strong { color: #ffffff !important; }
   .modal-actions { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
   .btn-modal { padding: 10px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
-  .btn-modal.primary { background: #b4f03c; color: #000; }
-  .btn-modal.danger { background: #ff7b6b; color: #fff; }
+  .btn-modal.primary { background: #b4f03c !important; color: #000 !important; }
+  .btn-modal.danger { background: #ff7b6b !important; color: #fff !important; }
 </style>
 </head>
 <body>
 
   <div class="sidebar">
     <a href="index.html" class="logo"><i>TE</i><span>Tech<b>Empire</b></span></a>
+    
+    <a href="index.html" class="voltar">← Voltar ao site</a>
+    
     <a class="active" id="menu-inicio" onclick="mudarAba('inicio')">📊 Visão Geral</a>
     <a id="menu-chamados" onclick="mudarAba('chamados')">🎫 Chamados</a>
     <a id="menu-clientes" onclick="mudarAba('clientes')">👥 Clientes</a>
@@ -81,8 +88,8 @@
       </div>
       <div class="user-info">
         <div style="text-align: right;">
-          <div style="font-weight: bold; font-size: 14px; color: #fff;" id="admin-nome">Admin TechEmpire</div>
-          <div style="color: #b4f03c; font-size: 12px;">Administrador</div>
+          <div style="font-weight: bold; font-size: 14px; color: #fff !important;" id="admin-nome">Admin TechEmpire</div>
+          <div style="color: #b4f03c !important; font-size: 12px;">Administrador</div>
         </div>
         <div class="avatar" style="width: 40px; height: 40px; border-radius: 50%; background: #b4f03c; color: #000; display: grid; place-items: center; font-weight: bold; font-size: 18px;">A</div>
       </div>
@@ -147,13 +154,13 @@
       const { data: perfil } = await db.from("usuarios").select("nome").eq("id", idAdmin).single();
       if (perfil) document.getElementById("admin-nome").textContent = perfil.nome;
       
-      // INICIA SEMPRE NA VISÃO GERAL CARREGANDO OS CHAMADOS
       mudarAba('inicio');
     }
 
     function mudarAba(aba) {
       document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-      document.getElementById(`menu-${aba}`).classList.add('active');
+      const el = document.getElementById(`menu-${aba}`);
+      if(el) el.classList.add('active');
       
       const title = document.getElementById('page-title');
       const subtitle = document.getElementById('page-subtitle');
@@ -193,9 +200,8 @@
         if (chamados.length > 0) {
           let html = `<table><thead><tr><th>Nº</th><th>Título</th><th>Status</th><th>Ação</th></tr></thead><tbody>`;
           chamados.forEach(c => {
-            // Escapa aspas simples na descrição para não quebrar o HTML
-            const descSegura = c.descricao ? c.descricao.replace(/'/g, "\\'") : "";
-            const tituloSeguro = c.titulo ? c.titulo.replace(/'/g, "\\'") : "";
+            const descSegura = c.descricao ? c.descricao.replace(/'/g, "\\'").replace(/"/g, "&quot;") : "";
+            const tituloSeguro = c.titulo ? c.titulo.replace(/'/g, "\\'").replace(/"/g, "&quot;") : "";
             
             html += `<tr>
               <td>TE-${String(c.numero).padStart(6, '0')}</td>
