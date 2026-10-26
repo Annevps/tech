@@ -636,4 +636,108 @@ if (document.body.dataset.page === 'admin') {
     // Aqui você garante que o painel administrativo carrega a tabela e o chat correto
     carregarServicosAdmin();
   }
-}
+
+/* ---------- Painel Administrativo ---------- */
+Pages.admin = async () => {
+  const container = $("#admin-container");
+  const nomeAdmin = App.perfil?.nome || "Administrador";
+
+  // Renderiza a estrutura de 3 colunas (Sidebar, Painel Central e Chat)
+  container.innerHTML = `
+    <div class="admin-grid-layout" style="display:grid; grid-template-columns: 220px 1fr 340px; gap: 20px; align-items: start;">
+      
+      <!-- 1. Menu Lateral do Admin -->
+      <nav class="side" aria-label="Menu do painel">
+        <a href="admin.html" class="on"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Início</a>
+        <a href="#/servicos"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.2-.6-.6-2.2z"/></svg>Serviços</a>
+        <a href="manutencao.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Manutenção</a>
+        <a href="sobre.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>Sobre</a>
+        <a href="contato.html"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Contato</a>
+        <div class="side-card" style="margin-top:20px"><b>Seu equipamento em boas mãos!</b><span>Tecnologia que funciona.</span></div>
+      </nav>
+
+      <!-- 2. Área Central do Painel -->
+      <section class="admin-content">
+        <div class="welcome-box" style="margin-bottom:20px">
+          <p class="sub" style="margin:0">Bem-vinda, ${esc(nomeAdmin)}!</p>
+          <h2 style="font-size:28px;margin:4px 0">Meu painel</h2>
+          <p class="sub">Aqui você acompanha o status dos serviços, manutenções e pode falar diretamente com os clientes.</p>
+        </div>
+
+        <!-- 4 Cards de Métricas / Indicadores -->
+        <div class="kpis" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; margin-bottom:24px;" id="admin-stats">
+          <div class="k"><b>0</b><span>Chamados</span></div>
+          <div class="k"><b>0</b><span>Em aberto</span></div>
+          <div class="k"><b>0</b><span>Finalizados</span></div>
+          <div class="k"><b>0</b><span>Mensagens novas</span></div>
+        </div>
+
+        <!-- Tabela de Últimos Serviços -->
+        <div class="box">
+          <div class="row" style="justify-content:space-between;margin-bottom:12px">
+            <div>
+              <h3 style="margin:0">Últimos serviços</h3>
+              <span class="sub" style="margin:0">Acompanhe os atendimentos mais recentes.</span>
+            </div>
+          </div>
+          <div id="admin-tabela-servicos"><p class="empty">Carregando serviços…</p></div>
+        </div>
+      </section>
+
+      <!-- 3. Coluna Direita: Chat do Cliente -->
+      <aside class="chat-card" style="background:#0d1117;border:1px solid #1f2937;border-radius:12px;padding:16px;height:calc(100vh - 120px);display:flex;flex-direction:column;">
+        <div class="chat-head" style="margin-bottom:12px">
+          <h3 style="margin:0;font-size:16px">Chat do Cliente</h3>
+          <small style="color:#b4f03c">● Online</small>
+        </div>
+        <div id="admin-chat-container" style="flex:1;overflow-y:auto;">
+          <p class="empty">Selecione um chamado na tabela ao lado para conversar com o cliente.</p>
+        </div>
+      </aside>
+
+    </div>
+  `;
+
+  // Buscar dados reais do Supabase
+  const { data: chamados } = await sb.from("chamados").select("*").order("criado_em", { ascending: false });
+  const listaChs = chamados || [];
+
+  // Atualizar contadores dos KPIs
+  const total = listaChs.length;
+  const emAberto = listaChs.filter(c => c.status === "Em andamento").length;
+  const finalizados = listaChs.filter(c => c.status === "Concluída").length;
+  
+  const statsEl = $("#admin-stats");
+  if (statsEl) {
+    statsEl.innerHTML = `
+      <div class="k"><b>${total}</b><span>Chamados</span></div>
+      <div class="k"><b>${emAberto}</b><span>Em aberto</span></div>
+      <div class="k"><b>${finalizados}</b><span>Finalizados</span></div>
+      <div class="k"><b>${listaChs.filter(c => c.status === "Nova chamada").length}</b><span>Novas</span></div>
+    `;
+  }
+
+  // Preencher a tabela de serviços com os chamados do banco
+  const tabelaEl = $("#admin-tabela-servicos");
+  if (tabelaEl) {
+    tabelaEl.innerHTML = tabela(
+      ["Data", "Equipamento", "Serviço", "Status"],
+      listaChs.map(c => `
+        <tr style="cursor:pointer;" onclick="abrirChatAdmin('${c.id}')">
+          <td>${fmtData(c.criado_em)}</td>
+          <td><b>${esc(c.titulo)}</b></td>
+          <td>${esc(c.categoria)}</td>
+          <td>${stPill(c.status)}</td>
+        </tr>
+      `)
+    );
+  }
+
+  // Se houver chamados, já abre o chat do primeiro por padrão
+  if (listaChs.length > 0) {
+    window.abrirChatAdmin = (id) => {
+      iniciarChat($("#admin-chat-container"), id, true);
+    };
+    abrirChatAdmin(listaChs[0].id);
+  }
+};
