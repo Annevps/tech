@@ -39,7 +39,6 @@ function desenharChrome() {
   const adm = App.perfil?.is_admin, logado = !!App.session, atual = location.pathname.split("/").pop() || "index.html";
   const l = (href, txt) => `<a href="${href}" class="${atual === href ? "on" : ""}">${txt}</a>`;
   
-  // Renderiza o cabeçalho global em todas as páginas (exceto se for a tela de admin, que tem layout próprio)
   const headerEl = $("#site-header");
   if (headerEl && document.body.dataset.page !== 'admin') {
     headerEl.innerHTML = `<div class="bar-in"><a class="logo" href="index.html" aria-label="TechEmpire — início"><i>TE</i><span>Tech<b>Empire</b></span></a>
@@ -50,7 +49,6 @@ function desenharChrome() {
     $(".menu").onclick = e => { const n = $("#nav").classList.toggle("open"); e.currentTarget.setAttribute("aria-expanded", n); };
   }
 
-  // Renderiza o rodapé
   const footerEl = $("#site-footer");
   if (footerEl && document.body.dataset.page !== 'admin') {
     footerEl.innerHTML = `<div class="foot"><div><a class="logo" href="index.html"><i>TE</i><span>Tech<b>Empire</b></span></a><p>Manutenção de dispositivos, suporte técnico e criação de sites. Tecnologia que funciona.</p></div>
@@ -233,7 +231,6 @@ Pages.perfil = () => {
 
 /* ====================== ADMIN (DASHBOARD) ====================== */
 Pages.admin = async () => {
-  // Configura os cliques do menu lateral
   const menuItems = {
     'nav-inicio': 'inicio', 'nav-chamados': 'chamados', 'nav-clientes': 'clientes', 
     'nav-leads': 'leads', 'nav-usuarios': 'usuarios'
@@ -248,7 +245,6 @@ Pages.admin = async () => {
     });
   });
 
-  // Botão "Ver Todos" na dashboard
   $('#btn-ver-todos').addEventListener('click', (e) => {
     e.preventDefault();
     $('#nav-chamados').click();
@@ -256,7 +252,6 @@ Pages.admin = async () => {
 
   document.querySelector("#admin-nome").textContent = App.perfil?.nome || "Admin";
 
-  // Função principal que renderiza a aba
   async function carregarAba(aba) {
     const dashView = $('#view-dashboard');
     const dynamicView = $('#area-admin-dinamica');
@@ -316,8 +311,6 @@ Pages.admin = async () => {
   }
 
   Act.abrirAdm = d => location.href = "admin-chamado.html?id=" + d.id;
-  
-  // Inicializa mostrando a aba Início
   await carregarAba('inicio');
 };
 
