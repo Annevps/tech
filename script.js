@@ -192,18 +192,36 @@ Pages.novoChamado = () => {
   $("#sel-disp").innerHTML = '<option value="">Selecione</option>' + opts(DISPOSITIVOS); $("#sel-atend").innerHTML = opts(ATENDIMENTO);
   $("#sel-tsite").innerHTML = '<option value="">Selecione</option>' + opts(TIPOS_SITE);
   $$(".sel-pag").forEach(s => s.innerHTML = opts(FORMAS));
-  async function criar(f, cat, titulo, descricao, tabela, detalhe, idMsg) {
+  
+  async function criar(f, cat, titulo, descricao, tabelaDetalhe, detalhe, idMsg) {
     ocupado(f, true);
+    // 1. Salva o chamado principal (A CATEGORIA VAI EXATAMENTE COMO O BANCO ESPERA: 'manutencao' OU 'site')
     const { data: ch, error } = await sb.from("chamados").insert({ cliente_id: App.session.user.id, categoria: cat, titulo, descricao }).select("id,numero").single();
-    if (error) { ocupado(f, false); return msg(idMsg, "Erro: " + error.message); }
-    await sb.from(tabela).insert({ chamado_id: ch.id, ...detalhe });
+    
+    if (error) { 
+        ocupado(f, false); 
+        console.error(error);
+        return msg(idMsg, "Erro ao criar chamado: " + error.message); 
+    }
+
+    // 2. Tenta salvar os detalhes (se falhar, o chamado principal já foi salvo e o usuário não trava)
+    try {
+        await sb.from(tabelaDetalhe).insert({ chamado_id: ch.id, ...detalhe });
+    } catch (e) {
+        console.warn("Aviso: Detalhes não salvos, mas o chamado foi criado.");
+    }
+
+    // 3. Faz upload de arquivos
     await enviarArquivos(ch.id, [...(f.querySelector("input[type=file]")?.files || [])]);
+    
     ocupado(f, false);
     location.href = `chamado.html?id=${ch.id}&novo=1`;
   }
+
   $("#f-manutencao").addEventListener("submit", e => { e.preventDefault(); const d = Object.fromEntries(new FormData(e.target));
     if (!d.tipo_dispositivo || !d.titulo.trim() || !d.descricao.trim()) return msg("m-manutencao", "Preencha os campos obrigatórios.");
     criar(e.target, "manutencao", d.titulo.trim(), d.descricao.trim(), "detalhes_manutencao", { tipo_dispositivo: d.tipo_dispositivo, marca: d.marca.trim() || null, modelo: d.modelo.trim() || null }, "m-manutencao"); });
+  
   $("#f-site").addEventListener("submit", e => { e.preventDefault(); const d = Object.fromEntries(new FormData(e.target));
     if (!d.nome_projeto.trim() || !d.tipo_site || !d.descricao.trim()) return msg("m-site", "Preencha os campos obrigatórios.");
     criar(e.target, "site", "Site: " + d.nome_projeto.trim(), d.descricao.trim(), "detalhes_projetos", { nome_projeto: d.nome_projeto.trim(), tipo_site: d.tipo_site, objetivo: d.objetivo.trim() }, "m-site"); });
