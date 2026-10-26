@@ -177,4 +177,148 @@ Pages.painel = async () => {
   const carregar = async () => {
     const { data, error } = await sb.from("chamados").select("id,numero,categoria,titulo,status,criado_em").eq("cliente_id", App.session.user.id).order("criado_em", { ascending: false });
     if (error) { $("#lista").innerHTML = '<p class="empty">Erro ao carregar.</p>'; return; }
-    const naoLidas = (await sb.from("mensagens").select("*", { count: "exact", head: true }).eq("lida", false).eq("interno", false).neq("remetente
+    const naoLidas = (await sb.from("mensagens").select("*", { count: "exact", head: true }).eq("lida", false).eq("interno", false).neq("remetente_id", App.session.user.id)).count ?? 0;
+    const abertos = data.filter(c => !["Concluída", "Cancelada"].includes(c.status)).length;
+    $("#kpis").innerHTML = [[data.length, "Chamados"], [abertos, "Em aberto"], [data.length - abertos, "Finalizados"], [naoLidas, "Novas msgs"]].map(([n, l]) => `<div class="k"><b>${n}</b><span>${l}</span></div>`).join("");
+    $("#lista").innerHTML = data.length ? tabela(["Nº", "Serviço", "Título", "Status", "Data"], data.map(c => `<tr class="go" data-act="abrir" data-id="${c.id}"><td><a href="chamado.html?id=${c.id}">${num(c.numero)}</a></td><td>${c.categoria === "site" ? "Site" : "Manutenção"}</td><td>${esc(c.titulo)}</td><td>${pill(c.status)}</td><td>${fmtData(c.criado_em)}</td></tr>`))
+      : '<p class="empty">Você ainda não tem chamados.</p>';
+  };
+  Act.abrir = d => location.href = "chamado.html?id=" + d.id;
+  await carregar(); setInterval(carregar, 30000);
+};
+
+Pages.novoChamado = () => {
+  let tipo = qs("tipo") === "site" ? "site" : "manutencao";
+  const sel = () => { $$("[data-tipo]").forEach(b => b.classList.toggle("act", b.dataset.tipo === tipo)); $("#f-manutencao").hidden = tipo !== "manutencao"; $("#f-site").hidden = tipo !== "site"; };
+  Act.tipo = d => { tipo = d.tipo; sel(); }; sel();
+  $("#sel-disp").innerHTML = '<option value="">Selecione</option>' + opts(DISPOSITIVOS); $("#sel-atend").innerHTML = opts(ATENDIMENTO);
+  $("#sel-tsite").innerHTML = '<option value="">Selecione</option>' + opts(TIPOS_SITE);
+  $$(".sel-pag").forEach(s => s.innerHTML = opts(FORMAS));
+  async function criar(f, cat, titulo, descricao, tabela, detalhe, idMsg) {
+    ocupado(f, true);
+    const { data: ch, error } = await sb.from("chamados").insert({ cliente_id: App.session.user.id, categoria: cat, titulo, descricao }).select("id,numero").single();
+    if (error) { ocupado(f, false); return msg(idMsg, "Erro: " + error.message); }
+    await sb.from(tabela).insert({ chamado_id: ch.id, ...detalhe });
+    await enviarArquivos(ch.id, [...(f.querySelector("input[type=file]")?.files || [])]);
+    ocupado(f, false);
+    location.href = `chamado.html?id=${ch.id}&novo=1`;
+  }
+  $("#f-manutencao").addEventListener("submit", e => { e.preventDefault(); const d = Object.fromEntries(new FormData(e.target));
+    if (!d.tipo_dispositivo || !d.titulo.trim() || !d.descricao.trim()) return msg("m-manutencao", "Preencha os campos obrigatórios.");
+    criar(e.target, "manutencao", d.titulo.trim(), d.descricao.trim(), "detalhes_manutencao", { tipo_dispositivo: d.tipo_dispositivo, marca: d.marca.trim() || null, modelo: d.modelo.trim() || null }, "m-manutencao"); });
+  $("#f-site").addEventListener("submit", e => { e.preventDefault(); const d = Object.fromEntries(new FormData(e.target));
+    if (!d.nome_projeto.trim() || !d.tipo_site || !d.descricao.trim()) return msg("m-site", "Preencha os campos obrigatórios.");
+    criar(e.target, "site", "Site: " + d.nome_projeto.trim(), d.descricao.trim(), "detalhes_projetos", { nome_projeto: d.nome_projeto.trim(), tipo_site: d.tipo_site, objetivo: d.objetivo.trim() }, "m-site"); });
+};
+
+Pages.chamado = async () => {
+  const id = qs("id"); const { data: c } = await sb.from("chamados").select("*").eq("id", id).maybeSingle();
+  if (!c) { $("#conteudo").innerHTML = '<p class="empty">Chamado não encontrado.</p>'; return; }
+  if (qs("novo")) msg("m-topo", `Chamado ${num(c.numero)} registrado!`, true);
+  const m = c.categoria !== "site"; const dt = (await sb.from(m ? "detalhes_manutencao" : "detalhes_projetos").select("*").eq("chamado_id", id).maybeSingle()).data || {};
+  $("#conteudo").innerHTML = `<p><a href="painel.html">← Voltar</a></p><h2>${num(c.numero)} · ${esc(c.titulo)}</h2><p>${pill(c.status)} <span class="sub">Aberto em ${fmtData(c.criado_em)}</span></p>
+  <div class="box"><h3>Sua solicitação</h3><p style="white-space:pre-wrap">${esc(c.descricao)}</p></div>
+  <div class="box"><h3>💬 Conversa com a TechEmpire</h3><div id="chat"></div></div>`;
+  iniciarChat($("#chat"), id, false);
+};
+
+Pages.perfil = () => {
+  const p = App.perfil || {}, en = p.endereco || {};
+  const campos = { nome: p.nome, telefone: p.telefone, rua: en.rua, numero: en.numero, bairro: en.bairro, cidade: en.cidade, estado: en.estado };
+  const f = $("#f-perfil"); Object.entries(campos).forEach(([k, v]) => { if (f[k]) f[k].value = v || ""; }); f.email.value = p.email || App.session.user.email; f.cpf.value = p.cpf || "";
+  f.addEventListener("submit", async e => { e.preventDefault(); const d = Object.fromEntries(new FormData(f)); if (!d.nome.trim()) return msg("m-perfil", "Informe seu nome."); ocupado(f, true);
+    const { error } = await sb.from("usuarios").update({ nome: d.nome.trim(), telefone: digitos(d.telefone) }).eq("id", App.session.user.id);
+    ocupado(f, false); msg("m-perfil", error ? "Erro ao salvar." : "Dados atualizados.", !error); });
+};
+
+/* ====================== ADMIN (DASHBOARD) ====================== */
+Pages.admin = async () => {
+  // Configura os cliques do menu lateral
+  const menuItems = {
+    'nav-inicio': 'inicio', 'nav-chamados': 'chamados', 'nav-clientes': 'clientes', 
+    'nav-leads': 'leads', 'nav-usuarios': 'usuarios'
+  };
+  
+  Object.keys(menuItems).forEach(id => {
+    $(`#${id}`).addEventListener('click', (e) => {
+      e.preventDefault();
+      $$('.admin-sidebar nav a').forEach(a => a.classList.remove('active'));
+      $(`#${id}`).classList.add('active');
+      carregarAba(menuItems[id]);
+    });
+  });
+
+  // Botão "Ver Todos" na dashboard
+  $('#btn-ver-todos').addEventListener('click', (e) => {
+    e.preventDefault();
+    $('#nav-chamados').click();
+  });
+
+  document.querySelector("#admin-nome").textContent = App.perfil?.nome || "Admin";
+
+  // Função principal que renderiza a aba
+  async function carregarAba(aba) {
+    const dashView = $('#view-dashboard');
+    const dynamicView = $('#area-admin-dinamica');
+    const titulo = $('#page-title');
+    const subtitulo = $('#page-subtitle');
+
+    if (aba === 'inicio') {
+      dashView.style.display = 'grid';
+      dynamicView.style.display = 'none';
+      titulo.textContent = 'Visão Geral';
+      subtitulo.textContent = 'Acompanhe as métricas da sua empresa júnior.';
+      
+      const c = async (t, fn) => { let q = sb.from(t).select("*", { count: "exact", head: true }); if (fn) q = fn(q); return (await q).count ?? 0; };
+      const r = await Promise.all([
+        c("usuarios", q => q.eq("is_admin", false)), c("chamados"), 
+        c("chamados", q => q.in("status", ["Nova chamada", "Aguardando análise"])), 
+        c("chamados", q => q.eq("status", "Em andamento"))
+      ]);
+      const { data: ultimos } = await sb.from("chamados").select("id,numero,categoria,titulo,status,criado_em,cliente_id").order("criado_em", { ascending: false }).limit(5);
+      const L = await comClientes(ultimos || []);
+
+      $("#admin-kpis").innerHTML = `
+        <div class="admin-kpi"><h3>Chamados Ativos</h3><b>${r[1] - r[3]}</b><i>📋</i></div>
+        <div class="admin-kpi"><h3>Novos / Pendentes</h3><b style="color: var(--lime);">${r[2]}</b><i>⚡</i></div>
+        <div class="admin-kpi"><h3>Em Andamento</h3><b>${r[3]}</b><i>🔧</i></div>
+        <div class="admin-kpi"><h3>Total Clientes</h3><b>${r[0]}</b><i>👥</i></div>
+      `;
+      $("#ultimos-chamados").innerHTML = tabela(["Nº", "Cliente", "Serviço", "Status"], L.map(c => `<tr class="go" data-act="abrirAdm" data-id="${c.id}"><td><a href="admin-chamado.html?id=${c.id}">${num(c.numero)}</a></td><td>${esc(c.cliente?.nome || '—')}</td><td>${esc(c.titulo)}</td><td>${pill(c.status)}</td></tr>`));
+    
+    } else {
+      dashView.style.display = 'none';
+      dynamicView.style.display = 'block';
+      $('#conteudo-admin').innerHTML = '<p class="empty">Carregando dados...</p>';
+
+      if (aba === 'chamados') {
+        titulo.textContent = 'Gestão de Chamados'; subtitulo.textContent = 'Gerencie todos os tickets abertos.';
+        let q = sb.from("chamados").select("id,numero,cliente_id,categoria,titulo,status,criado_em").order("criado_em", { ascending: false });
+        const { data } = await q; const L = await comClientes(data || []);
+        $('#conteudo-admin').innerHTML = tabela(["Nº", "Cliente", "Título", "Status", "Data"], L.map(c => `<tr class="go" data-act="abrirAdm" data-id="${c.id}"><td><a href="admin-chamado.html?id=${c.id}">${num(c.numero)}</a></td><td>${esc(c.cliente?.nome)}</td><td>${esc(c.titulo)}</td><td>${pill(c.status)}</td><td>${fmtData(c.criado_em)}</td></tr>`));
+      
+      } else if (aba === 'clientes') {
+        titulo.textContent = 'Base de Clientes'; subtitulo.textContent = 'Todos os usuários cadastrados.';
+        const { data } = await sb.from("usuarios").select("*").eq("is_admin", false).order("nome");
+        $('#conteudo-admin').innerHTML = tabela(["Nome", "E-mail", "Telefone"], (data || []).map(u => `<tr><td>${esc(u.nome)}</td><td>${esc(u.email)}</td><td>${esc(u.telefone)}</td></tr>`));
+
+      } else if (aba === 'leads') {
+        titulo.textContent = 'Oportunidades (Leads)'; subtitulo.textContent = 'Contatos recebidos pelo site.';
+        const { data } = await sb.from("formleads").select("*").order("criado_em", { ascending: false });
+        $('#conteudo-admin').innerHTML = tabela(["Nome", "Contato", "Origem", "Interesse", "Mensagem"], (data || []).map(l => `<tr><td>${esc(l.nome)}</td><td>${esc(l.email || l.telefone)}</td><td>${esc(l.origem)}</td><td>${esc(l.servico_interesse)}</td><td>${esc(l.observacoes)}</td></tr>`));
+      
+      } else if (aba === 'usuarios') {
+        titulo.textContent = 'Administradores'; subtitulo.textContent = 'Pessoas com acesso total ao sistema.';
+        const { data } = await sb.from("usuarios").select("*").eq("is_admin", true);
+        $('#conteudo-admin').innerHTML = tabela(["Nome", "E-mail"], (data || []).map(u => `<tr><td>${esc(u.nome)}</td><td>${esc(u.email)}</td></tr>`));
+      }
+    }
+  }
+
+  Act.abrirAdm = d => location.href = "admin-chamado.html?id=" + d.id;
+  
+  // Inicializa mostrando a aba Início
+  await carregarAba('inicio');
+};
+
+document.addEventListener("DOMContentLoaded", boot);
