@@ -16,6 +16,7 @@ const num = n => "TE-" + String(n ?? "").padStart(6, "0");
 const digitos = v => String(v || "").replace(/\D/g, "");
 const qs = k => new URLSearchParams(location.search).get(k);
 const opts = (arr, sel) => arr.map(x => `<option ${x === sel ? "selected" : ""}>${esc(x)}</option>`).join("");
+const badge2 = n => n ? `<span class="pill" title="Mensagens não lidas">💬 ${n}</span>` : "";
 const stPill = s => { const m = { "Em andamento": "run", "Concluída": "done", "Cancelada": "off", "Nova chamada": "new" }; return `<span class="st ${m[s] || "wait"}">${esc(s)}</span>`; };
 const pill = (t, cinza) => `<span class="pill ${cinza ? "gray" : ""}">${esc(t)}</span>`;
 const tabela = (cab, linhas) => linhas.length ? `<div class="tw"><table><thead><tr>${cab.map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody>${linhas.join("")}</tbody></table></div>` : `<p class="empty">Nada por aqui ainda.</p>`;
@@ -36,18 +37,39 @@ document.addEventListener("click", e => { const b = e.target.closest("[data-act]
 document.addEventListener("change", e => { const b = e.target.closest("[data-chg]"); if (b && Chg[b.dataset.chg]) Chg[b.dataset.chg](b.dataset, b); });
 
 /* ---------- Cabeçalho, rodapé e guarda de acesso ---------- */
+function topoApp(o) {
+  const nome = App.perfil?.nome || o.papel, ini = esc(nome.trim()[0] || "A").toUpperCase();
+  $("#site-header").innerHTML = `<div class="bar-in wide"><a class="logo" href="${o.home}" aria-label="TechEmpire"><i>TE</i><span>Tech<b>Empire</b></span></a>
+    <form class="search" id="busca-global" role="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input name="q" type="search" placeholder="${o.busca}" aria-label="Buscar"></form>
+    <div class="top-r"><a class="bell" href="${o.sino}" aria-label="Mensagens novas"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8M10 21a2 2 0 0 0 4 0"/></svg><i></i></a>
+    <div class="user"><span class="av">${ini}</span><span class="un"><b>${esc(nome)}</b><small>${o.papel}</small></span></div><button class="btn sm" data-act="sair">Sair</button></div></div>`;
+  $("#busca-global").onsubmit = e => { e.preventDefault(); const v = e.target.q.value.trim(); location.href = o.buscaHref + (v ? "?q=" + encodeURIComponent(v) : ""); };
+  sb.from("mensagens").select("*", { count: "exact", head: true }).eq("lida", false).eq("interna", false).neq("remetente_id", App.session.user.id).then(r => { if (r.count) $(".bell")?.classList.add("on"); });
+  $("#site-footer").innerHTML = `<div class="copy" style="margin:0 auto">© ${new Date().getFullYear()} TechEmpire · ${o.rodape}</div>`;
+}
+const MENU_CLIENTE = [
+  ["painel.html", "Início", '<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>'],
+  ["painel.html#/servicos", "Meus Serviços", '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.2-.6-.6-2.2z"/>'],
+  ["painel.html#/tickets", "Meus Tickets", '<path d="M3 9a2 2 0 0 0 0 6v3h18v-3a2 2 0 0 1 0-6V6H3z"/><path d="M13 6v12" stroke-dasharray="2 3"/>'],
+  ["perfil.html", "Perfil", '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>'],
+  ["painel.html#/faturas", "Faturas", '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>'],
+  ["painel.html#/contato", "Contato", '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>']
+];
+function marcarMenu() {
+  const f = location.pathname.split("/").pop() || "index.html", h = (location.hash || "").split("?")[0]; let alvo;
+  if (f === "painel.html") alvo = "painel.html" + (h && h !== "#/" ? h : ""); else if (f === "perfil.html") alvo = "perfil.html"; else alvo = "painel.html#/servicos";
+  $$(".side a").forEach(a => a.classList.toggle("on", a.getAttribute("href") === alvo));
+}
+function envolverCliente() {
+  const main = $("main.wrap-main"); if (!main) return; main.classList.add("wide");
+  const shell = document.createElement("div"); shell.className = "shell"; const side = document.createElement("nav"); side.className = "side"; side.setAttribute("aria-label", "Menu do cliente");
+  side.innerHTML = MENU_CLIENTE.map(([h, t, p]) => `<a href="${h}"><svg viewBox="0 0 24 24">${p}</svg>${t}</a>`).join("") + '<div class="side-card"><b>Seu equipamento em boas mãos!</b><span>Tecnologia que funciona.</span></div>';
+  const box = document.createElement("div"); box.id = "conteudo-cli"; while (main.firstChild) box.append(main.firstChild); shell.append(side, box); main.append(shell); marcarMenu();
+}
 function desenharChrome() {
   const adm = App.perfil?.is_admin, logado = !!App.session, atual = location.pathname.split("/").pop() || "index.html";
-  if (adm) {
-    const nome = App.perfil?.nome || "Administrador", ini = esc(nome.trim()[0] || "A").toUpperCase();
-    $("#site-header").innerHTML = `<div class="bar-in wide"><a class="logo" href="admin.html" aria-label="TechEmpire — painel"><i>TE</i><span>Tech<b>Empire</b></span></a>
-      <form class="search" id="busca-global" role="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input name="q" type="search" placeholder="Buscar chamados ou clientes…" aria-label="Buscar chamados ou clientes"></form>
-      <div class="top-r"><a class="bell" href="admin.html#/mensagens" aria-label="Mensagens novas"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8M10 21a2 2 0 0 0 4 0"/></svg><i></i></a>
-      <div class="user"><span class="av">${ini}</span><span class="un"><b>${esc(nome)}</b><small>Administrador</small></span></div><button class="btn sm" data-act="sair">Sair</button></div></div>`;
-    $("#busca-global").onsubmit = e => { e.preventDefault(); const v = e.target.q.value.trim(); location.href = "admin.html#/chamados" + (v ? "?q=" + encodeURIComponent(v) : ""); };
-    sb.from("mensagens").select("*", { count: "exact", head: true }).eq("lida", false).eq("interna", false).neq("remetente_id", App.session.user.id).then(r => { if (r.count) $(".bell")?.classList.add("on"); });
-    $("#site-footer").innerHTML = `<div class="copy" style="margin:0 auto">© ${new Date().getFullYear()} TechEmpire · Painel administrativo</div>`; return;
-  }
+  if (adm) { topoApp({ home: "admin.html", papel: "Administrador", busca: "Buscar chamados ou clientes…", buscaHref: "admin.html#/chamados", sino: "admin.html#/mensagens", rodape: "Painel administrativo" }); return; }
+  if (logado && document.body.dataset.auth === "client") { topoApp({ home: "painel.html", papel: "Cliente", busca: "Buscar serviços, tickets ou informações…", buscaHref: "painel.html#/servicos", sino: "painel.html#/tickets", rodape: "Tecnologia que funciona." }); return; }
   const l = (href, txt) => `<a href="${href}" class="${atual === href ? "on" : ""}">${txt}</a>`;
   $("#site-header").innerHTML = `<div class="bar-in"><a class="logo" href="index.html" aria-label="TechEmpire — início"><i>TE</i><span>Tech<b>Empire</b></span></a>
    <button class="menu" aria-expanded="false" aria-label="Abrir menu">☰</button>
@@ -74,9 +96,9 @@ async function boot() {
   if (need === "admin" && !App.perfil?.is_admin) { location.href = "painel.html"; return; }
   if (need === "client" && App.perfil?.is_admin) { location.href = "admin.html"; return; }
   if (need === "guest" && App.session && !location.hash.includes("type=recovery")) { location.href = App.perfil?.is_admin ? "admin.html" : "painel.html"; return; }
-  desenharChrome();
+  desenharChrome(); if (need === "client") envolverCliente();
   const fn = Pages[document.body.dataset.page];
-  if (fn) { if (!sb && need !== "public") return; try { await fn(); } catch (e) { console.error(e); toast("Ocorreu um erro ao carregar a página."); } }
+  if (fn) { if (!sb && need !== "public") return; try { await fn(); } catch (e) { console.error(e); toast("Ocorreu um erro ao carregar a página."); $$(".empty").forEach(p => { if (p.textContent.startsWith("Carregando")) p.textContent = "Não foi possível carregar: " + (e.message || e) + ". Confira se o script.js e o style.css foram atualizados e aperte Ctrl+F5."; }); } }
   const io = new IntersectionObserver(es => es.forEach(x => { if (x.isIntersecting) { x.target.classList.add("in"); io.unobserve(x.target); } }), { threshold: .1 }); $$(".reveal").forEach(e => io.observe(e));
 }
 
@@ -209,18 +231,69 @@ Pages.recuperar = () => {
 };
 
 Pages.painel = async () => {
-  $("#ola").textContent = App.perfil?.nome ? "Olá, " + App.perfil.nome.split(" ")[0] + "." : "";
-  const carregar = async () => {
-    const { data, error } = await sb.from("chamados").select("id,numero,categoria,titulo,status,criado_em").eq("cliente_id", App.session.user.id).order("criado_em", { ascending: false });
-    if (error) { $("#lista").innerHTML = '<p class="empty">Não foi possível carregar seus chamados.</p>'; return; }
-    const naoLidas = (await sb.from("mensagens").select("*", { count: "exact", head: true }).eq("lida", false).eq("interna", false).neq("remetente_id", App.session.user.id)).count ?? 0;
-    const abertos = data.filter(c => !["Concluída", "Cancelada"].includes(c.status)).length;
-    $("#kpis").innerHTML = [[data.length, "Chamados"], [abertos, "Em aberto"], [data.length - abertos, "Finalizados"], [naoLidas, "Mensagens novas"]].map(([n, l]) => `<div class="k"><b>${n}</b><span>${l}</span></div>`).join("");
-    $("#lista").innerHTML = data.length ? tabela(["Nº", "Serviço", "Título", "Status", "Data"], data.map(c => `<tr class="go" data-act="abrir" data-id="${c.id}"><td><a href="chamado.html?id=${c.id}">${num(c.numero)}</a></td><td>${c.categoria === "site" ? "Site" : "Manutenção"}</td><td>${esc(c.titulo)}</td><td>${pill(c.status)}</td><td>${fmtData(c.criado_em)}</td></tr>`))
-      : '<p class="empty">Você ainda não tem chamados. Use os botões acima para abrir o primeiro.</p>';
+  const me = App.session.user.id, nome = App.perfil?.nome || "";
+  const PCT = { "Nova chamada": 10, "Aguardando análise": 25, "Aguardando aprovação do orçamento": 35, "Aguardando pagamento": 45, "Aprovada": 55, "Aguardando informações do cliente": 60, "Em andamento": 75, "Concluída": 100, "Cancelada": 0 };
+  const SV = '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>', app = $("#cli-app");
+  async function dados() {
+    const { data: chs } = await sb.from("chamados").select("id,numero,categoria,titulo,status,criado_em").eq("cliente_id", me).order("criado_em", { ascending: false });
+    const { data: nm } = await sb.from("mensagens").select("chamado_id").eq("lida", false).eq("interna", false).neq("remetente_id", me);
+    const nl = {}; (nm || []).forEach(x => nl[x.chamado_id] = (nl[x.chamado_id] || 0) + 1);
+    const { data: pgs } = await sb.from("pagamentos").select("*").order("criado_em", { ascending: false });
+    return { chs: chs || [], nl, pgs: pgs || [] };
+  }
+  const svc = c => { const p = PCT[c.status] ?? 0; return `<a class="svc" href="chamado.html?id=${c.id}"><span class="thumb">${SV}</span><div class="svc-i"><b>${esc(c.titulo)}</b><small>${num(c.numero)}</small><small>${c.categoria === "site" ? "Criação de site" : "Manutenção"}</small></div><div class="svc-p">${stPill(c.status)}<small>${new Date(c.criado_em).toLocaleDateString("pt-BR")}</small><div class="bar-p" title="Etapa do atendimento"><i style="width:${p}%"></i></div></div><span class="arr">›</span></a>`; };
+  const kc = (href, cls, svg, t, big, sub) => `<a class="kpc" href="${href}"><span class="kic ${cls}"><svg viewBox="0 0 24 24">${svg}</svg></span><span class="arr">›</span><span class="kl" style="margin-top:12px">${t}</span>${big}<small>${sub}</small></a>`;
+  const R = {
+    async inicio() {
+      const { chs, nl, pgs } = await dados(), ids = chs.map(c => c.id), mapa = Object.fromEntries(chs.map(c => [c.id, c]));
+      const { data: hs } = ids.length ? await sb.from("historico_status").select("chamado_id,status_novo,criado_em").in("chamado_id", ids).order("criado_em", { ascending: false }).limit(4) : { data: [] };
+      const andando = chs.filter(c => c.status === "Em andamento").length, espera = chs.filter(c => ["Aguardando informações do cliente", "Aguardando aprovação do orçamento"].includes(c.status)).length, pend = pgs.filter(p => ["Pendente", "Aguardando pagamento"].includes(p.status)).length;
+      const lista = chs.filter(c => !["Concluída", "Cancelada"].includes(c.status)).concat(chs.filter(c => ["Concluída", "Cancelada"].includes(c.status))).slice(0, 3);
+      const conv = chs.slice().sort((a, b) => (nl[b.id] || 0) - (nl[a.id] || 0)).slice(0, 30);
+      app.innerHTML = `<div class="home-grid"><div class="home-main">
+        <section class="hero-cli"><svg class="lap" viewBox="0 0 320 200" aria-hidden="true"><rect x="60" y="20" width="200" height="130" rx="10"/><rect x="72" y="32" width="176" height="106" rx="4"/><path d="M20 165h280l-18 15H38z"/></svg>
+          <p class="hello"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg> Olá, ${esc(nome)}!</p><h2 class="big">Que bom te ver de volta!</h2><p class="sub" style="max-width:520px;margin:0">Aqui você acompanha o andamento dos seus serviços, tickets e tem acesso a todas as informações da sua conta.</p></section>
+        <div class="kp">${kc("#/servicos", "g", '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.2-.6-.6-2.2z"/>', "Meus serviços", `<b>${andando}</b>`, "Em andamento")}
+          ${kc("#/tickets", "b", '<path d="M3 9a2 2 0 0 0 0 6v3h18v-3a2 2 0 0 1 0-6V6H3z"/>', "Meus tickets", `<b>${espera}</b>`, "Aguardando sua resposta")}
+          ${kc("#/faturas", "p", '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>', "Faturas", `<b>${pend}</b>`, "Pendentes")}
+          ${kc("#/contato", "m", '<path d="M4 14v-2a8 8 0 0 1 16 0v2M4 14h3v5H4zM20 14h-3v5h3zM17 19c0 2-2 2-5 2"/>', "Suporte", '<b style="font-size:19px;line-height:1.3;margin-top:10px">Sempre disponível</b>', "Segunda a Sábado · 8h às 19h")}</div>
+        <div class="box"><div class="row" style="justify-content:space-between;margin-bottom:12px"><div><h3 style="margin:0">Meus serviços</h3><span class="sub" style="margin:0">Acompanhe o status dos seus equipamentos.</span></div><a class="btn sm" href="#/servicos">Ver todos ›</a></div>
+          ${lista.length ? lista.map(svc).join("") : '<p class="empty">Você ainda não tem serviços. Que tal solicitar o primeiro?</p><div class="row"><a class="btn primary sm" href="novo-chamado.html?tipo=manutencao">+ Solicitar manutenção</a><a class="btn sm" href="novo-chamado.html?tipo=site">+ Solicitar site</a></div>'}</div>
+        <div class="box"><div class="row" style="justify-content:space-between;margin-bottom:12px"><div><h3 style="margin:0">Últimos avisos</h3><span class="sub" style="margin:0">Fique por dentro das atualizações importantes.</span></div><a class="btn sm" href="#/tickets">Ver todos ›</a></div>
+          ${(hs || []).length ? hs.map(h => `<a class="aviso" href="chamado.html?id=${h.chamado_id}"><span class="kic g"><svg viewBox="0 0 24 24"><path d="M4 10v4h3l6 4V6L7 10zM17 9a4 4 0 0 1 0 6"/></svg></span><span><b>${num(mapa[h.chamado_id]?.numero)} · ${esc(h.status_novo)}</b><small>${esc(mapa[h.chamado_id]?.titulo)}</small></span><small>${new Date(h.criado_em).toLocaleDateString("pt-BR")}</small></a>`).join("") : '<p class="empty">Nenhum aviso por enquanto.</p>'}</div>
+      </div>
+      <aside class="chat-card"><div class="chat-head"><span class="kic g"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></span><div><h3 style="margin:0">Chat com o administrador</h3><small>Tire suas dúvidas, envie mensagens e acompanhe seu atendimento.</small></div></div>
+        ${conv.length ? `<select id="chat-sel" class="mini" style="width:100%;margin-bottom:10px" aria-label="Escolher chamado">${conv.map(x => `<option value="${x.id}">${nl[x.id] ? "💬 " + nl[x.id] + " · " : ""}${num(x.numero)} · ${esc(x.titulo)}</option>`).join("")}</select><div id="chat-home"></div>` : '<p class="empty">Abra um chamado para conversar com a equipe da TechEmpire.</p><a class="btn primary sm" href="novo-chamado.html?tipo=manutencao">+ Solicitar manutenção</a>'}</aside></div>`;
+      if (conv.length) { iniciarChat($("#chat-home"), conv[0].id, false); $("#chat-sel").onchange = e => iniciarChat($("#chat-home"), e.target.value, false); }
+    },
+    async servicos(param) {
+      const { chs, nl } = await dados(), q0 = new URLSearchParams(param || "").get("q") || "";
+      app.innerHTML = `<div class="row" style="justify-content:space-between;margin-bottom:14px"><h2 style="margin:0">Meus serviços</h2><div class="row"><a class="btn primary sm" href="novo-chamado.html?tipo=manutencao">+ Solicitar manutenção</a><a class="btn sm" href="novo-chamado.html?tipo=site">+ Solicitar site</a></div></div>
+        <div class="bar"><input id="bq" placeholder="Buscar por título ou nº" value="${esc(q0)}"><select id="bs"><option value="">Todos os status</option>${opts(STATUS)}</select></div><div id="tb"></div>`;
+      const d = () => { const q = $("#bq").value.trim().toLowerCase(), st = $("#bs").value; const l = chs.filter(c => (!st || c.status === st) && (!q || `${c.titulo} ${num(c.numero)}`.toLowerCase().includes(q)));
+        $("#tb").innerHTML = l.length ? l.map(svc).join("") : '<p class="empty">Nenhum serviço encontrado.</p>'; }; $("#bq").oninput = d; $("#bs").oninput = d; d();
+    },
+    async tickets() {
+      const { chs, nl } = await dados(), ids = chs.map(c => c.id); const mapa = Object.fromEntries(chs.map(c => [c.id, c]));
+      const { data: ms } = ids.length ? await sb.from("mensagens").select("chamado_id,conteudo,criado_em,remetente_id").in("chamado_id", ids).eq("interna", false).order("criado_em", { ascending: false }).limit(300) : { data: [] };
+      const ult = {}; (ms || []).forEach(m => { if (!ult[m.chamado_id]) ult[m.chamado_id] = m; });
+      const l = Object.keys(ult).sort((a, b) => (nl[b] || 0) - (nl[a] || 0) || new Date(ult[b].criado_em) - new Date(ult[a].criado_em));
+      app.innerHTML = `<h2>Meus tickets</h2><p class="sub">Suas conversas com a equipe. As com mensagens novas aparecem primeiro.</p>` + (l.length ? l.map(id => `<a class="rowlink" href="chamado.html?id=${id}"><span><b>${num(mapa[id].numero)}</b> · ${esc(mapa[id].titulo)}<small>${fmtData(ult[id].criado_em)} · ${ult[id].remetente_id === me ? "Você: " : ""}${esc(String(ult[id].conteudo).slice(0, 110))}</small></span>${badge2(nl[id])}</a>`).join("") : '<p class="empty">Nenhuma conversa ainda. Abra um chamado para falar com a equipe.</p>');
+    },
+    async faturas() {
+      const { chs, pgs } = await dados(), mapa = Object.fromEntries(chs.map(c => [c.id, c])), soma = f => pgs.filter(f).reduce((t, p) => t + Number(p.valor || 0), 0);
+      app.innerHTML = `<h2>Faturas</h2><p class="sub">Orçamentos e pagamentos dos seus serviços.</p><div class="kpis"><div class="k"><b>${brl(soma(p => ["Pendente", "Aguardando pagamento"].includes(p.status)))}</b><span>Pendente</span></div><div class="k"><b>${brl(soma(p => p.status === "Pago"))}</b><span>Pago</span></div></div>
+        ${tabela(["Chamado", "Valor", "Forma", "Status", "Data"], pgs.map(p => `<tr><td><a href="chamado.html?id=${p.chamado_id}">${mapa[p.chamado_id] ? num(mapa[p.chamado_id].numero) : "—"}</a></td><td>${brl(p.valor)}</td><td>${esc(p.forma)}</td><td>${pill(p.status)}</td><td>${fmtData(p.pago_em || p.criado_em)}</td></tr>`))}`;
+    },
+    async contato() {
+      app.innerHTML = `<h2>Contato</h2><p class="sub">Atendimento de Segunda a Sábado, das 8h às 19h.</p><div class="cards"><div class="card"><h3>Conversar com a equipe</h3><p>Use o chat da página inicial: ele fica ligado ao seu chamado.</p><p style="margin-top:14px"><a class="btn primary sm" href="painel.html">Abrir o chat</a></p></div>
+        <div class="card"><h3>Novo chamado de manutenção</h3><p>Descreva o problema e envie fotos do equipamento.</p><p style="margin-top:14px"><a class="btn sm" href="novo-chamado.html?tipo=manutencao">Solicitar manutenção</a></p></div>
+        <div class="card"><h3>Criação de site</h3><p>Conte sua ideia e receba um orçamento.</p><p style="margin-top:14px"><a class="btn sm" href="novo-chamado.html?tipo=site">Solicitar site</a></p></div></div>`;
+    }
   };
-  Act.abrir = d => location.href = "chamado.html?id=" + d.id;
-  await carregar(); setInterval(carregar, 30000);
+  async function rota() { if (iniciarChat.parar) iniciarChat.parar(); marcarMenu(); const [r, param] = (location.hash.replace("#/", "") || "inicio").split("?"); try { await (R[r] || R.inicio)(param); } catch (e) { console.error(e); app.innerHTML = '<p class="empty">Não foi possível carregar. Tente novamente.</p>'; } }
+  window.addEventListener("hashchange", rota); await rota();
+  sb.channel("cli-live").on("postgres_changes", { event: "UPDATE", schema: "public", table: "chamados" }, () => { toast("Seu chamado foi atualizado"); rota(); }).subscribe();
 };
 
 Pages.novoChamado = () => {
