@@ -741,3 +741,59 @@ Pages.admin = async () => {
     abrirChatAdmin(listaChs[0].id);
   }
 };
+/* ---------- Painel Administrativo ---------- */
+Pages.admin = async () => {
+  const container = $("#conteudo-admin");
+  if (!container) return;
+
+  const nomeAdmin = App.perfil?.nome || "Administrador";
+
+  container.innerHTML = `
+    <div class="welcome-box" style="margin-bottom:20px">
+      <p class="sub" style="margin:0">Bem-vinda, ${esc(nomeAdmin)}!</p>
+      <h2 style="font-size:28px;margin:4px 0">Painel administrativo</h2>
+      <p class="sub">Acompanhe os chamados, clientes e conversas em tempo real.</p>
+    </div>
+
+    <div class="kpis" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-bottom:24px;" id="admin-stats">
+      <div class="k"><b>0</b><span>Chamados</span></div>
+      <div class="k"><b>0</b><span>Em andamento</span></div>
+      <div class="k"><b>0</b><span>Concluídos</span></div>
+    </div>
+
+    <div class="box">
+      <h3 style="margin-bottom:12px">Lista de Chamados</h3>
+      <div id="admin-tabela-servicos"><p class="empty">A carregar chamados…</p></div>
+    </div>
+  `;
+
+  // Buscar chamados no Supabase
+  const { data: chamados } = await sb.from("chamados").select("*").order("criado_em", { ascending: false });
+  const listaChs = chamados || [];
+
+  // Atualizar estatísticas
+  const statsEl = $("#admin-stats");
+  if (statsEl) {
+    statsEl.innerHTML = `
+      <div class="k"><b>${listaChs.length}</b><span>Chamados</span></div>
+      <div class="k"><b>${listaChs.filter(c => c.status === "Em andamento").length}</b><span>Em andamento</span></div>
+      <div class="k"><b>${listaChs.filter(c => c.status === "Concluída").length}</b><span>Concluídos</span></div>
+    `;
+  }
+
+  // Preencher tabela
+  const tabelaEl = $("#admin-tabela-servicos");
+  if (tabelaEl) {
+    tabelaEl.innerHTML = tabela(
+      ["Data", "Título", "Categoria", "Status"],
+      listaChs.map(c => `
+        <tr>
+          <td>${fmtData(c.criado_em)}</td>
+          <td><b>${esc(c.titulo)}</b></td>
+          <td>${esc(c.categoria)}</td>
+          <td>${stPill(c.status)}</td>
+        </tr>
+      `)
+    );
+  }
+};
