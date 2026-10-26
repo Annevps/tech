@@ -13,7 +13,7 @@
   .voltar { color: #b4f03c; text-decoration: none; font-weight: bold; }
   .box { background: #12161a; border: 1px solid #333; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
   .box h3 { margin-bottom: 15px; font-family: 'Space Grotesk'; border-bottom: 1px solid #333; padding-bottom: 10px; }
-  .chat-container { display: flex; flex-direction: column; height: 400px; background: #0a0d0f; border-radius: 8px; border: 1px solid #222; overflow: hidden; }
+  .chat-container { display: flex; flex-direction: column; height: 450px; background: #0a0d0f; border-radius: 8px; border: 1px solid #222; overflow: hidden; }
   .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
   .chat-msg { background: #1a1e22; padding: 12px 18px; border-radius: 12px; font-size: 14px; max-width: 80%; border-bottom-left-radius: 2px; align-self: flex-start; }
   .chat-msg.me { background: #b4f03c; color: #000; align-self: flex-end; border-bottom-left-radius: 12px; border-bottom-right-radius: 2px; }
@@ -37,18 +37,11 @@
   const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
   
   async function init() {
-    // 1. Pega o ID do sessionStorage (mesma lógica do painel)
     let idCliente = sessionStorage.getItem('te_user_id');
-    
-    // 2. Se não tiver, tenta no Supabase
     if (!idCliente) {
       const { data: { session } } = await db.auth.getSession();
-      if (session) {
-        idCliente = session.user.id;
-        sessionStorage.setItem('te_user_id', idCliente);
-      }
+      if (session) { idCliente = session.user.id; sessionStorage.setItem('te_user_id', idCliente); }
     }
-
     if (!idCliente) { window.location.href = "login.html"; return; }
 
     const params = new URLSearchParams(window.location.search);
@@ -77,14 +70,25 @@
     async function carregarChat() {
       const chatBody = document.getElementById('chat-body');
       const { data } = await db.from('mensagens').select('*').eq('chamado_id', chamadoId).order('criado_em', { ascending: true });
-      if (!data || data.length === 0) { chatBody.innerHTML = `<p style="text-align:center; color:#97a0a6;">Nenhuma mensagem ainda.</p>`; return; }
+      
+      if (!data || data.length === 0) { 
+        chatBody.innerHTML = `<p style="text-align:center; color:#97a0a6;">Nenhuma mensagem ainda.</p>`; 
+        return; 
+      }
+
+      // Guarda a posição atual do scroll para não pular para o topo se o usuário estiver lendo
+      const isScrolledToBottom = chatBody.scrollHeight - chatBody.scrollTop === chatBody.clientHeight;
 
       chatBody.innerHTML = data.map(msg => {
         const isMe = msg.remetente_id === idCliente;
         const hora = new Date(msg.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
         return `<div class="chat-msg ${isMe ? 'me' : ''}"><small>${isMe ? 'Você' : 'TechEmpire'} · ${hora}</small>${msg.conteudo}</div>`;
       }).join('');
-      chatBody.scrollTop = chatBody.scrollHeight;
+
+      // Se o usuário já estava no final do chat, rola para baixo novamente
+      if (isScrolledToBottom) {
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }
     }
 
     document.getElementById('form-chat').onsubmit = async (e) => {
@@ -94,10 +98,16 @@
       if (!texto) return;
       await db.from('mensagens').insert({ chamado_id: chamadoId, remetente_id: idCliente, conteudo: texto });
       input.value = '';
-      await carregarChat();
+      await carregarChat(); // Atualiza imediatamente após enviar
     };
 
+    // Carrega a primeira vez
     await carregarChat();
+
+    // O SEGREDO DO TEMPO REAL: Atualiza o chat a cada 3 segundos
+    setInterval(() => {
+      carregarChat();
+    }, 3000);
   }
 
   init();
