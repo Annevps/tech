@@ -4,22 +4,161 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#07090b">
-<title>Chamado — TechEmpire</title>
+<title>Detalhes do Chamado — TechEmpire</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<style>
+  /* Estilos específicos para a tela de chat do cliente */
+  .chat-container { display: flex; flex-direction: column; height: 500px; background: #0a0d0f; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-top: 20px; overflow: hidden; }
+  .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+  .chat-msg { background: #1a1e22; color: #fff; padding: 12px 18px; border-radius: 12px; font-size: 15px; max-width: 80%; border-bottom-left-radius: 2px; align-self: flex-start; }
+  .chat-msg.me { background: var(--lime); color: #000; align-self: flex-end; border-bottom-left-radius: 12px; border-bottom-right-radius: 2px; }
+  .chat-msg small { display: block; font-size: 11px; opacity: 0.7; margin-bottom: 4px; }
+  .chat-footer { padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 10px; background: #12161a; }
+  .chat-footer input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #06080a; color: #fff; outline: none; }
+  .chat-footer button { background: var(--lime); border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; color: #000; }
+</style>
 </head>
 <body data-page="chamado" data-auth="client">
 <header id="site-header"></header>
 <main class="wrap-main">
-<div class="msg" id="m-topo" role="status"></div>
-<div id="conteudo"><p class="empty">Carregando…</p></div>
+  <div id="conteudo"><p class="empty">Carregando chamado...</p></div>
 </main>
 <footer id="site-footer"></footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="supabase-config.js"></script>
 <script src="data.js"></script>
 <script src="script.js"></script>
+
+<!-- SCRIPT EXCLUSIVO PARA A TELA DO CLIENTE -->
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    // Espera 1 segundo para garantir que a sessão do usuário foi verificada pelo script.js principal
+    setTimeout(async () => {
+      if (!window.supabase || !window.App || !window.App.session) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      const db = window.supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
+      
+      // Pega o ID do usuário logado (garantindo que é uma string)
+      const idCliente = String(window.App.session.user.id);
+      
+      // Pega o ID do chamado na URL (ex: chamado.html?id=123)
+      const urlParams = new URLSearchParams(window.location.search);
+      const chamadoId = urlParams.get('id');
+      const isNovo = urlParams.get('novo');
+
+      if (!chamadoId) {
+        document.getElementById('conteudo').innerHTML = '<p class="empty">Chamado não encontrado.</p>';
+        return;
+      }
+
+      // Busca as informações do chamado no banco
+      const { data: c, error } = await db.from("chamados").select("*").eq("id", chamadoId).single();
+      
+      if (error || !c) {
+        document.getElementById('conteudo').innerHTML = '<p class="empty">Erro ao carregar o chamado.</p>';
+        return;
+      }
+
+      // Monta o HTML da página
+      document.getElementById('conteudo').innerHTML = `
+        <p><a href="painel.html" style="color: var(--lime); text-decoration: none;">← Voltar para Meus Chamados</a></p>
+        
+        ${isNovo ? '<div class="msg on ok" style="margin-bottom: 20px; display: block;">Chamado criado com sucesso! Acompanhe a conversa abaixo.</div>' : ''}
+        
+        <h2 style="font-family: var(--head); font-size: 32px;">TE-${String(c.numero).padStart(6, '0')} · ${c.titulo}</h2>
+        <p><span class="pill">${c.status}</span> <span class="sub">Aberto em ${new Date(c.criado_em).toLocaleString('pt-BR')}</span></p>
+        
+        <div class="box" style="margin-top: 20px;">
+          <h3>Sua solicitação</h3>
+          <p style="white-space: pre-wrap; color: #d1d5db;">${c.descricao}</p>
+        </div>
+
+        <div class="box" style="margin-top: 20px; padding: 0; background: transparent; border: none;">
+          <h3>💬 Conversa com a TechEmpire</h3>
+          <p class="sub">Use o chat abaixo para enviar dúvidas ou informações adicionais.</p>
+          
+          <div class="chat-container">
+            <div class="chat-body" id="chat-cliente">
+              <p style="text-align:center; color:#97a0a6;">Carregando mensagens...</p>
+            </div>
+            <form class="chat-footer" id="form-chat-cliente">
+              <input type="text" id="input-msg-cliente" placeholder="Digite sua mensagem..." required autocomplete="off">
+              <button type="submit" id="btn-enviar-cliente">Enviar</button>
+            </form>
+          </div>
+        </div>
+      `;
+
+      // ==========================================
+      // LÓGICA DO CHAT DO CLIENTE
+      // ==========================================
+      async function carregarMensagensCliente() {
+        const chatBody = document.getElementById('chat-cliente');
+        const { data, error } = await db.from('mensagens').select('*').eq('chamado_id', chamadoId).order('criado_em', { ascending: true });
+
+        if (error || !data || data.length === 0) {
+          chatBody.innerHTML = `<p style="text-align:center; color:#97a0a6;">Nenhuma mensagem ainda. Envie a primeira!</p>`;
+          return;
+        }
+
+        chatBody.innerHTML = data.map(msg => {
+          // Verifica se a mensagem foi enviada pelo próprio cliente logado
+          const isMe = String(msg.remetente_id) === idCliente;
+          const hora = new Date(msg.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+          
+          return `
+            <div class="chat-msg ${isMe ? 'me' : ''}">
+              <small>${isMe ? 'Você' : 'TechEmpire'} · ${hora}</small>
+              ${msg.conteudo}
+            </div>
+          `;
+        }).join('');
+        
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }
+
+      // Enviar mensagem
+      document.getElementById('form-chat-cliente').onsubmit = async (e) => {
+        e.preventDefault();
+        const input = document.getElementById('input-msg-cliente');
+        const btn = document.getElementById('btn-enviar-cliente');
+        const texto = input.value.trim();
+        if (!texto) return;
+
+        btn.disabled = true;
+        btn.textContent = "...";
+
+        // Insere a mensagem no banco garantindo o ID do cliente
+        const { error } = await db.from('mensagens').insert({
+          chamado_id: chamadoId,
+          remetente_id: idCliente,
+          conteudo: texto
+        });
+
+        btn.disabled = false;
+        btn.textContent = "Enviar";
+
+        if (error) {
+          // Se der erro, mostra exatamente o que o banco respondeu
+          alert("Erro ao enviar mensagem:\n" + error.message);
+          console.error(error);
+        } else {
+          input.value = '';
+          await carregarMensagensCliente();
+        }
+      };
+
+      // Carrega o chat pela primeira vez
+      await carregarMensagensCliente();
+      
+    }, 1000);
+  });
+</script>
 </body>
 </html>
