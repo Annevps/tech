@@ -12,8 +12,17 @@
 </head>
 <body data-page="admin" data-auth="admin">
 <header id="site-header"></header>
-<main class="wrap-main wide" id="admin-container">
-  <p class="empty">Carregando painel administrativo…</p>
+<main class="wrap-main">
+<div class="admin-grid">
+  <nav class="side" aria-label="Menu do painel">
+    <a href="#/">Início</a>
+    <a href="#/chamados">Chamados</a>
+    <a href="#/clientes">Clientes</a>
+    <a href="#/leads">Leads</a>
+    <a href="#/usuarios">Usuários</a>
+  </nav>
+  <div id="conteudo-admin"><p class="empty">A carregar…</p></div>
+</div>
 </main>
 <footer id="site-footer"></footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
