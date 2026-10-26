@@ -12,49 +12,81 @@
 </head>
 <body data-page="login" data-auth="guest">
 <header id="site-header"></header>
+
 <main class="wrap-main">
-<div class="panel"><h2>Entrar</h2><p class="sub">Acesse sua conta para acompanhar seus chamados.</p>
-<form id="f-login">
-  <label>E-mail<input name="email" type="email" required autocomplete="email"></label>
-  <label>Senha<input name="senha" type="password" required autocomplete="current-password"></label>
-  <div class="msg" id="m-login" role="alert"></div>
-  <button class="btn primary" type="submit">Entrar</button>
-  <p class="sub" style="margin:0"><a href="recuperar-senha.html">Esqueci minha senha</a> · <a href="criar-conta.html">Criar conta</a></p>
-</form></div>
+  <div class="panel">
+    <h2>Entrar</h2>
+    <p class="sub">Acesse sua conta para acompanhar seus chamados.</p>
+    
+    <form id="f-login">
+      <label>E-mail
+        <input name="email" type="email" required autocomplete="email" placeholder="seu@email.com">
+      </label>
+      <label>Senha
+        <input name="senha" type="password" required autocomplete="current-password" placeholder="••••••••">
+      </label>
+      
+      <div class="msg" id="m-login" role="alert"></div>
+      
+      <button class="btn primary" type="submit" id="btn-entrar">Entrar</button>
+      
+      <p class="sub" style="margin:0">
+        <a href="recuperar-senha.html">Esqueci minha senha</a> · <a href="criar-conta.html">Criar conta</a>
+      </p>
+    </form>
+  </div>
 </main>
+
 <footer id="site-footer"></footer>
+
+<!-- Importa as bibliotecas do Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="supabase-config.js"></script>
 <script src="data.js"></script>
 <script src="script.js"></script>
 
-<!-- SCRIPT QUE FORÇA O REDIRECIONAMENTO PARA O ADMIN -->
+<!-- SCRIPT EXCLUSIVO DE LOGIN E REDIRECIONAMENTO -->
 <script>
   document.getElementById('f-login').addEventListener('submit', async (e) => {
-    e.preventDefault(); // Impede o script.js de fazer o redirecionamento padrão
-    const email = e.target.email.value.trim();
+    e.preventDefault(); // Impede o recarregamento da página
+    
+    const email = e.target.email.value.trim().toLowerCase();
     const senha = e.target.senha.value;
-    const btn = e.target.querySelector('button');
+    const btn = document.getElementById('btn-entrar');
+    const msgErro = document.getElementById('m-login');
+
     btn.disabled = true;
     btn.textContent = "Entrando...";
+    msgErro.className = "msg"; // Esconde mensagens antigas
 
     const sb = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
     
-    // Tenta fazer o login
+    // Tenta fazer o login no Supabase
     const { data, error } = await sb.auth.signInWithPassword({ email, password: senha });
 
     if (error) {
       btn.disabled = false;
       btn.textContent = "Entrar";
-      document.getElementById('m-login').textContent = "E-mail ou senha incorretos.";
-      document.getElementById('m-login').className = "msg on err";
+      msgErro.textContent = "E-mail ou senha incorretos.";
+      msgErro.className = "msg on err";
       return;
     }
 
-    // AQUI ESTÁ A MÁGICA: Se o e-mail for o admin, vai DIRETO para a página admin.
+    // ==========================================
+    // O SEGREDO PARA NÃO DAR LOOP
+    // Salva o ID e o E-mail no navegador (sessionStorage)
+    // ==========================================
+    sessionStorage.setItem('te_user_id', data.user.id);
+    sessionStorage.setItem('te_user_email', data.user.email);
+
+    // ==========================================
+    // REDIRECIONAMENTO INTELIGENTE
+    // ==========================================
     if (email === 'admin@tech.com') {
+      // Se for o admin, vai direto para o painel de admin
       window.location.href = "admin.html";
     } else {
+      // Se for cliente, vai para o painel do cliente
       window.location.href = "painel.html";
     }
   });
