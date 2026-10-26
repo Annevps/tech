@@ -6,12 +6,10 @@
 <title>Painel Administrativo — TechEmpire</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-  /* RESET TOTAL E FORÇAR CORES CLARAS */
   * { box-sizing: border-box; }
   body { background: #06080a !important; margin: 0; font-family: 'Inter', sans-serif; color: #ffffff !important; display: flex; height: 100vh; overflow: hidden; }
   h1, h2, h3, h4, p, span, div, td, th, a { color: #ffffff !important; }
   
-  /* SIDEBAR */
   .sidebar { width: 260px; background: #0a0d0f !important; border-right: 1px solid #222; padding: 24px; display: flex; flex-direction: column; }
   .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: bold; margin-bottom: 40px; }
   .logo i { background: #b4f03c; color: #000 !important; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; font-style: normal; }
@@ -21,7 +19,6 @@
   .sidebar .voltar { color: #97a0a6 !important; margin-bottom: 15px; }
   .sidebar .sair { margin-top: auto; color: #ff7b6b !important; border-top: 1px solid #222; padding-top: 20px; }
 
-  /* MAIN */
   .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
   .topbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid #222; background: #0a0d0f !important; position: sticky; top: 0; z-index: 10; }
   .topbar h1 { margin: 0; font-size: 20px; font-family: 'Space Grotesk', sans-serif; }
@@ -42,7 +39,6 @@
   tr:hover td { background: rgba(255,255,255,0.05); }
   .pill { background: rgba(180,240,60,0.15) !important; color: #b4f03c !important; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: bold; border: 1px solid rgba(180,240,60,0.3); }
 
-  /* CHAT */
   .chat-panel { background: #12161a !important; border: 1px solid #333; border-radius: 12px; display: flex; flex-direction: column; height: 600px; position: sticky; top: 100px; }
   .chat-header { padding: 15px; border-bottom: 1px solid #333; display: flex; align-items: center; gap: 10px; background: #1a1e22 !important; }
   .chat-body { padding: 15px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #0a0d0f !important; }
@@ -53,7 +49,6 @@
   .chat-footer input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #06080a !important; color: #fff !important; outline: none; }
   .chat-footer button { background: #b4f03c !important; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; color: #000 !important; }
 
-  /* MODAL */
   .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; }
   .modal-content { background: #12161a !important; border: 1px solid #333; border-radius: 12px; padding: 30px; width: 500px; max-width: 90%; }
   .modal-content h2 { margin-top: 0; color: #b4f03c !important; }
@@ -83,7 +78,7 @@
       </div>
       <div style="display:flex; align-items:center; gap:10px;">
         <div style="text-align: right;">
-          <div style="font-weight: bold; font-size: 14px; color: #fff !important;" id="admin-nome">Admin TechEmpire</div>
+          <div style="font-weight: bold; font-size: 14px; color: #fff !important;" id="admin-nome">Admin</div>
           <div style="color: #b4f03c !important; font-size: 12px;">Administrador</div>
         </div>
         <div style="width: 40px; height: 40px; border-radius: 50%; background: #b4f03c; color: #000 !important; display: grid; place-items: center; font-weight: bold; font-size: 18px;">A</div>
@@ -146,6 +141,8 @@
     async function init() {
       const { data: { session } } = await db.auth.getSession();
       if (session) idAdmin = session.user.id;
+      
+      // Tenta buscar o nome, se não achar usa "Admin"
       const { data: perfil } = await db.from("usuarios").select("nome").eq("id", idAdmin).single();
       if (perfil) document.getElementById("admin-nome").textContent = perfil.nome;
       
@@ -174,41 +171,51 @@
       }
     }
 
+    // AQUI ESTÁ O SEGREDO PARA MOSTRAR OS CHAMADOS
     async function carregarChamados() {
+      // Busca todos os chamados sem filtro
       const { data: chamados, error } = await db.from("chamados").select("*").order("criado_em", { ascending: false });
-      const { data: usuarios } = await db.from("usuarios").select("*").eq("is_admin", false);
-
+      
+      // Se der erro, avisa na tela
       if (error) {
-        document.getElementById("tabela-conteudo").innerHTML = "<p style='color: #ff7b6b !important;'>Erro ao carregar chamados do banco.</p>";
+        document.getElementById("tabela-conteudo").innerHTML = `<p style="color: #ff7b6b !important; font-weight: bold;">ERRO AO LER O BANCO: ${error.message}</p>`;
         return;
       }
 
-      if (chamados && usuarios) {
-        document.getElementById("admin-kpis").innerHTML = `
-          <div class="kpi"><h3>Chamados Ativos</h3><b>${chamados.filter(c => c.status !== 'Concluída').length}</b></div>
-          <div class="kpi"><h3>Novos / Pendentes</h3><b>${chamados.filter(c => c.status === 'Nova chamada').length}</b></div>
-          <div class="kpi"><h3>Concluídos</h3><b>${chamados.filter(c => c.status === 'Concluída').length}</b></div>
-          <div class="kpi"><h3>Total Clientes</h3><b>${usuarios.length}</b></div>
-        `;
+      const { data: usuarios } = await db.from("usuarios").select("*").eq("is_admin", false);
 
-        if (chamados.length > 0) {
-          let html = `<table><thead><tr><th>Nº</th><th>Título</th><th>Status</th><th>Ação</th></tr></thead><tbody>`;
-          chamados.forEach(c => {
-            const descSegura = c.descricao ? c.descricao.replace(/'/g, "\\'").replace(/"/g, "&quot;") : "";
-            const tituloSeguro = c.titulo ? c.titulo.replace(/'/g, "\\'").replace(/"/g, "&quot;") : "";
-            
-            html += `<tr>
-              <td>TE-${String(c.numero).padStart(6, '0')}</td>
-              <td>${c.titulo}</td>
-              <td><span class="pill">${c.status}</span></td>
-              <td><button onclick="abrirChamado('${c.id}', '${tituloSeguro}', '${descSegura}', '${c.status}')" style="background:#b4f03c; color:#000 !important; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;">Abrir</button></td>
-            </tr>`;
-          });
-          html += `</tbody></table>`;
-          document.getElementById("tabela-conteudo").innerHTML = html;
-        } else {
-          document.getElementById("tabela-conteudo").innerHTML = "<p>Nenhum chamado encontrado no banco de dados.</p>";
-        }
+      // Atualiza os KPIs mesmo se estiver vazio
+      document.getElementById("admin-kpis").innerHTML = `
+        <div class="kpi"><h3>Total Chamados</h3><b>${chamados ? chamados.length : 0}</b></div>
+        <div class="kpi"><h3>Novos / Pendentes</h3><b>${chamados ? chamados.filter(c => c.status === 'Nova chamada').length : 0}</b></div>
+        <div class="kpi"><h3>Concluídos</h3><b>${chamados ? chamados.filter(c => c.status === 'Concluída').length : 0}</b></div>
+        <div class="kpi"><h3>Total Clientes</h3><b>${usuarios ? usuarios.length : 0}</b></div>
+      `;
+
+      if (chamados && chamados.length > 0) {
+        let html = `<table><thead><tr><th>Nº</th><th>Título</th><th>Status</th><th>Ação</th></tr></thead><tbody>`;
+        chamados.forEach(c => {
+          // Proteção contra caracteres especiais no texto
+          const descSegura = c.descricao ? c.descricao.replace(/'/g, "\\'").replace(/"/g, "&quot;") : "Sem descrição";
+          const tituloSeguro = c.titulo ? c.titulo.replace(/'/g, "\\'").replace(/"/g, "&quot;") : "Sem título";
+          
+          html += `<tr>
+            <td>TE-${String(c.numero).padStart(6, '0')}</td>
+            <td>${c.titulo}</td>
+            <td><span class="pill">${c.status}</span></td>
+            <td><button onclick="abrirChamado('${c.id}', '${tituloSeguro}', '${descSegura}', '${c.status}')" style="background:#b4f03c; color:#000 !important; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;">Abrir</button></td>
+          </tr>`;
+        });
+        html += `</tbody></table>`;
+        document.getElementById("tabela-conteudo").innerHTML = html;
+      } else {
+        // Se não tiver chamados, avisa.
+        document.getElementById("tabela-conteudo").innerHTML = `
+          <div style="padding: 20px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+            <p style="margin:0; color: #b4f03c !important;">O banco de dados está vazio.</p>
+            <p style="margin: 5px 0 0 0; font-size: 12px;">Se você já criou chamados, o RLS do Supabase está bloqueando. Rode o SQL de liberação no painel do Supabase.</p>
+          </div>
+        `;
       }
     }
 
@@ -237,6 +244,8 @@
         alert("Chamado finalizado com sucesso!");
         fecharModal();
         carregarChamados();
+      } else {
+        alert("Erro ao finalizar: " + error.message);
       }
     }
 
