@@ -135,6 +135,7 @@
   .btn-modal.danger { background: var(--err); color: #fff; }
   .btn-modal.secondary { background: transparent; border: 1px solid var(--border); color: #fff; }
   .btn-modal.whatsapp { background: #25D366; color: #fff; }
+  .btn-modal.print { background: #333; color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px; }
 </style>
 </head>
 <body>
@@ -308,9 +309,12 @@
       </div>
 
       <div class="modal-actions" style="flex-direction: column; gap: 10px;">
-        <button class="btn-modal primary" style="width: 100%;" onclick="salvarLaudo()">Salvar e Notificar Cliente</button>
+        <div style="display: flex; gap: 10px; width: 100%;">
+          <button class="btn-modal primary" style="flex: 1;" onclick="salvarLaudo()">Salvar Laudo</button>
+          <a href="#" id="btn-laudo-print" target="_blank" class="btn-modal print" style="flex: 1; display: none;">🖨️ Imprimir / PDF</a>
+        </div>
         <a href="#" id="btn-laudo-whatsapp" target="_blank" class="btn-modal whatsapp" style="width: 100%; text-align: center; display: none;">Enviar por WhatsApp</a>
-        <button class="btn-modal secondary" style="width: 100%;" onclick="fecharModal('modal-laudo')">Cancelar</button>
+        <button class="btn-modal secondary" style="width: 100%;" onclick="fecharModal('modal-laudo')">Fechar</button>
       </div>
     </div>
   </div>
@@ -436,9 +440,7 @@
           <td>${c.cliente_nome || 'Visitante'}</td>
           <td>${c.titulo}</td>
           <td><span class="pill">${c.status}</span></td>
-          <td>
-            <button class="btn-acao" onclick="abrirModalChamado('${c.id}')">Gerenciar</button>
-          </td>
+          <td><button class="btn-acao" onclick="abrirModalChamado('${c.id}')">Gerenciar</button></td>
         </tr>`;
       });
       document.getElementById('tabela-chamados-body').innerHTML = html;
@@ -519,7 +521,15 @@
       document.getElementById('laudo-valor').value = l.valor || '';
       document.getElementById('laudo-status').value = laudoAtual.status;
       
+      // Esconde botões até salvar
       document.getElementById('btn-laudo-whatsapp').style.display = 'none';
+      document.getElementById('btn-laudo-print').style.display = 'none';
+
+      // Se já tiver laudo, já prepara os botões
+      if (laudoAtual.laudo_tecnico) {
+        configurarBotoesLaudo();
+      }
+
       document.getElementById('modal-laudo').style.display = 'flex';
     }
 
@@ -540,19 +550,32 @@
 
       if (error) return alert("Erro ao salvar: " + error.message);
 
-      // Atualiza o botão do WhatsApp
+      // Atualiza os dados locais para gerar os botões corretamente
+      laudoAtual.laudo_tecnico = laudoObj;
+      laudoAtual.status = status;
+
+      configurarBotoesLaudo();
+      alert("Laudo salvo com sucesso! Você já pode imprimir ou enviar.");
+      await carregarDados();
+    }
+
+    function configurarBotoesLaudo() {
+      // Configura botão de imprimir
+      const btnPrint = document.getElementById('btn-laudo-print');
+      btnPrint.href = `laudo.html?id=${laudoAtual.id}`;
+      btnPrint.style.display = 'flex';
+
+      // Configura botão do WhatsApp
       const fone = laudoAtual.whatsapp || laudoAtual.cliente_telefone;
       if (fone) {
+        const l = laudoAtual.laudo_tecnico || {};
         const numLimpo = fone.replace(/\D/g, '');
-        const msg = `Olá, ${laudoAtual.cliente_nome}! Segue o laudo do seu chamado ${laudoAtual.protocolo}:\n\n*Diagnóstico:* ${diag}\n*Solução:* ${solucao}\n*Prazo:* ${prazo}\n*Valor:* R$ ${valor}`;
+        const msg = `Olá, ${laudoAtual.cliente_nome}! Segue o laudo do seu chamado ${laudoAtual.protocolo}:\n\n*Diagnóstico:* ${l.diagnostico}\n*Solução:* ${l.solucao}\n*Prazo:* ${l.prazo}\n*Valor:* R$ ${l.valor}`;
         
         const btnWpp = document.getElementById('btn-laudo-whatsapp');
         btnWpp.href = `https://wa.me/55${numLimpo}?text=${encodeURIComponent(msg)}`;
         btnWpp.style.display = 'block';
       }
-
-      alert("Laudo salvo com sucesso! Use o botão do WhatsApp para enviar ao cliente.");
-      await carregarDados();
     }
 
     // ================= ANOTAÇÕES =================
