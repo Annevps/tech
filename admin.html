@@ -6,13 +6,12 @@
 <title>Painel Administrativo — TechEmpire</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* CSS Premium Minimalista (Black & Turquesa) */
+  /* CSS Premium Minimalista */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --bg: #050505;
     --surface: #0F1012;
     --border: #222326;
-    --border-hover: #3A3D42;
     --text-main: #F5F5F5;
     --text-muted: #8C939D;
     --brand: #00DDB5;
@@ -35,15 +34,8 @@
   .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
   .topbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid var(--border); background: var(--bg); }
   .topbar h1 { font-family: 'Space Grotesk', sans-serif; font-size: 20px; }
-  
   .content { padding: 40px; overflow-y: auto; flex: 1; }
   
-  /* KPIs */
-  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-bottom: 40px; }
-  .kpi { background: var(--surface); border: 1px solid var(--border); padding: 24px; border-radius: 16px; }
-  .kpi h3 { font-size: 13px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; font-weight: 500; }
-  .kpi b { font-family: 'Space Grotesk', sans-serif; font-size: 36px; font-weight: 700; color: #fff; }
-
   /* Tabela */
   .table-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
   table { width: 100%; border-collapse: collapse; }
@@ -56,23 +48,17 @@
 
   /* Modal Ficha Técnica */
   .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
-  .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; width: 95%; max-width: 900px; max-height: 90vh; display: flex; flex-direction: column; }
+  .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; width: 95%; max-width: 700px; max-height: 90vh; display: flex; flex-direction: column; }
   .modal-header { padding: 24px 32px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
   .modal-header h2 { font-family: 'Space Grotesk', sans-serif; color: var(--brand); }
-  .modal-body { padding: 32px; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
-  @media (max-width: 760px) { .modal-body { grid-template-columns: 1fr; } }
+  .modal-body { padding: 32px; overflow-y: auto; display: grid; grid-template-columns: 1fr; gap: 20px; }
   
-  .info-group h4 { color: var(--text-main); margin-bottom: 16px; font-size: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
-  .info-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; }
-  .info-row span:first-child { color: var(--text-muted); }
-  .info-row span:last-child { font-weight: 500; }
-  
-  .form-group { margin-bottom: 20px; }
+  .form-group { margin-bottom: 16px; }
   .form-group label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; }
-  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: #fff; outline: none; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: #fff; outline: none; font-family: 'Inter'; }
   .form-group input:focus, .form-group textarea:focus { border-color: var(--brand); }
   
-  .modal-actions { padding: 24px 32px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; background: var(--bg); border-radius: 0 0 24px 24px; }
+  .modal-actions { padding: 24px 32px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; background: var(--bg); border-radius: 0 0 24px 24px; gap: 10px;}
   .btn-salvar { background: var(--brand); color: #000; padding: 12px 24px; border-radius: 8px; font-weight: 600; }
   .btn-whats { background: #25D366; color: #fff; padding: 12px 24px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
 </style>
@@ -84,7 +70,6 @@
     <nav>
       <a class="active" onclick="mudarAba('inicio', this)">📊 Início</a>
       <a onclick="mudarAba('solicitacoes', this)">🎫 Solicitações</a>
-      <a onclick="mudarAba('clientes', this)">👥 Clientes</a>
       <a href="login.html" class="sair">Sair da conta</a>
     </nav>
   </div>
@@ -95,35 +80,65 @@
     </div>
 
     <div class="content">
-      <div class="kpis" id="admin-kpis"></div>
-      
       <div class="table-box">
-        <div style="padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
-          <h3 style="font-family: 'Space Grotesk'; font-size: 18px;" id="titulo-tabela">Solicitações Recentes</h3>
+        <div style="padding: 20px; border-bottom: 1px solid var(--border);">
+          <h3 style="font-family: 'Space Grotesk'; font-size: 18px;" id="titulo-tabela">Solicitações Recebidas</h3>
         </div>
         <div id="tabela-container"></div>
       </div>
     </div>
   </div>
 
-  <!-- MODAL FICHA TÉCNICA -->
-  <div class="modal" id="modal-ficha">
+  <!-- MODAL LAUDO TÉCNICO -->
+  <div class="modal" id="modal-laudo">
     <div class="modal-box">
       <div class="modal-header">
-        <h2 id="modal-titulo">Ficha Técnica</h2>
+        <h2 id="modal-titulo">Emitir Laudo Técnico</h2>
         <button onclick="fecharModal()" style="font-size: 24px; color: var(--text-muted);">✕</button>
       </div>
       
-      <div class="modal-body" id="modal-conteudo">
-        <!-- Injetado via JS -->
+      <div class="modal-body">
+        <div style="background: rgba(255,255,255,0.02); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px;">
+          <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 4px;">Problema relatado pelo cliente:</div>
+          <div id="modal-descricao" style="font-size: 14px; line-height: 1.5;"></div>
+        </div>
+
+        <div class="form-group">
+          <label>Diagnóstico Técnico</label>
+          <textarea id="laudo-diag" rows="3" placeholder="Ex: Placa-mãe com curto no circuito de alimentação."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Solução Aplicada</label>
+          <textarea id="laudo-solucao" rows="3" placeholder="Ex: Substituição do capacitor C45 e limpeza interna."></textarea>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label>Prazo de Entrega</label>
+            <input type="text" id="laudo-prazo" placeholder="Ex: 3 dias úteis">
+          </div>
+          <div class="form-group">
+            <label>Valor do Serviço (R$)</label>
+            <input type="number" id="laudo-valor" step="0.01" placeholder="0.00">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Status do Atendimento</label>
+          <select id="laudo-status">
+            <option value="Aguardando aprovação do orçamento">Aguardando aprovação do orçamento</option>
+            <option value="Em andamento">Em andamento</option>
+            <option value="Concluída">Concluída</option>
+          </select>
+        </div>
       </div>
 
       <div class="modal-actions">
+        <button class="btn-salvar" onclick="salvarLaudo()">Salvar e Enviar ao Cliente</button>
         <a href="#" id="btn-whatsapp" target="_blank" class="btn-whats">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-          Chamar no WhatsApp
+          Enviar WhatsApp
         </a>
-        <button class="btn-salvar" onclick="salvarFicha()">Salvar Alterações</button>
       </div>
     </div>
   </div>
@@ -132,175 +147,105 @@
   <script src="supabase-config.js"></script>
   <script>
     const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
-    let idAdmin = null;
     let chamados = [];
-    let clientes = [];
-    let chamadoAbertoId = null;
+    let chamadoAberto = null;
 
     async function init() {
       const { data: { session } } = await db.auth.getSession();
       if (!session) { window.location.href = "login.html"; return; }
-      idAdmin = session.user.id;
 
-      await carregarDados();
-      renderizarInicio();
-    }
-
-    async function carregarDados() {
-      // Puxa chamados (Solicitações) e clientes
-      const { data: c } = await db.from("chamados").select("*").order("criado_em", { ascending: false });
-      chamados = c || [];
-      
-      const { data: cl } = await db.from("usuarios").select("*").eq("is_admin", false);
-      clientes = cl || [];
+      const { data } = await db.from("chamados").select("*").order("criado_em", { ascending: false });
+      chamados = data || [];
+      renderizarTabela();
     }
 
     function mudarAba(aba, el) {
       document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
       el.classList.add('active');
-      
-      if (aba === 'inicio' || aba === 'solicitacoes') {
-        document.getElementById('page-title').textContent = "Painel de Solicitações";
-        document.getElementById('titulo-tabela').textContent = "Todas as Solicitações";
-        renderizarChamados();
-      } else if (aba === 'clientes') {
-        document.getElementById('page-title').textContent = "Clientes";
-        document.getElementById('titulo-tabela').textContent = "Base de Clientes";
-        renderizarClientes();
-      }
+      // Por enquanto, o menu Início e Solicitações fazem a mesma coisa neste MVP
     }
 
-    function renderizarInicio() {
-      const abertos = chamados.filter(c => c.status !== 'Concluída' && c.status !== 'Cancelada').length;
-      const novos = chamados.filter(c => c.status === 'Nova chamada').length;
-      const concluidos = chamados.filter(c => c.status === 'Concluída').length;
-      
-      document.getElementById("admin-kpis").innerHTML = `
-        <div class="kpi"><h3>Total de Solicitações</h3><b>${chamados.length}</b></div>
-        <div class="kpi"><h3>Novas</h3><b>${novos}</b></div>
-        <div class="kpi"><h3>Em Andamento</h3><b>${abertos}</b></div>
-        <div class="kpi"><h3>Concluídas</h3><b>${concluidos}</b></div>
-      `;
-      renderizarChamados();
-    }
-
-    function renderizarChamados() {
+    function renderizarTabela() {
       if (chamados.length === 0) {
         document.getElementById("tabela-container").innerHTML = "<p style='padding: 24px; color: var(--text-muted);'>Nenhuma solicitação encontrada.</p>";
         return;
       }
 
-      let html = `<table><thead><tr><th>Protocolo</th><th>Cliente</th><th>Assunto</th><th>Status</th><th>Ação</th></tr></thead><tbody>`;
+      let html = `<table><thead><tr><th>Protocolo</th><th>Cliente</th><th>Assunto</th><th>Status</th><th>Laudo</th></tr></thead><tbody>`;
       chamados.forEach(c => {
+        const temLaudo = c.laudo_tecnico ? "✅ Emitido" : "⏳ Pendente";
         html += `<tr>
-          <td><b>${c.protocolo || 'Gerando...'}</b></td>
+          <td><b>${c.protocolo || 'N/A'}</b></td>
           <td>${c.cliente_nome || 'Visitante'}</td>
           <td>${c.titulo}</td>
           <td><span class="pill">${c.status}</span></td>
-          <td><button class="btn-action" onclick="abrirFicha('${c.id}')">Abrir Ficha</button></td>
+          <td><button class="btn-action" onclick="abrirLaudo('${c.id}')">${temLaudo}</button></td>
         </tr>`;
       });
       html += `</tbody></table>`;
       document.getElementById("tabela-container").innerHTML = html;
     }
 
-    function renderizarClientes() {
-      document.getElementById("admin-kpis").innerHTML = ''; 
-      if (clientes.length === 0) {
-        document.getElementById("tabela-container").innerHTML = "<p style='padding: 24px; color: var(--text-muted);'>Nenhum cliente cadastrado.</p>";
-        return;
-      }
-      let html = `<table><thead><tr><th>Nome</th><th>E-mail</th><th>Telefone</th></tr></thead><tbody>`;
-      clientes.forEach(c => {
-        html += `<tr><td>${c.nome}</td><td>${c.email}</td><td>${c.telefone || '—'}</td></tr>`;
-      });
-      html += `</tbody></table>`;
-      document.getElementById("tabela-container").innerHTML = html;
+    function abrirLaudo(id) {
+      chamadoAberto = chamados.find(x => x.id === id);
+      if (!chamadoAberto) return;
+
+      document.getElementById('modal-titulo').textContent = `Laudo: ${chamadoAberto.protocolo}`;
+      document.getElementById('modal-descricao').textContent = chamadoAberto.descricao;
+      
+      // Preenche se já existir um laudo salvo
+      const l = chamadoAberto.laudo_tecnico || {};
+      document.getElementById('laudo-diag').value = l.diagnostico || '';
+      document.getElementById('laudo-solucao').value = l.solucao || '';
+      document.getElementById('laudo-prazo').value = l.prazo || '';
+      document.getElementById('laudo-valor').value = l.valor || '';
+      document.getElementById('laudo-status').value = chamadoAberto.status;
+
+      document.getElementById('modal-laudo').style.display = 'flex';
     }
 
-    async function abrirFicha(id) {
-      chamadoAbertoId = id;
-      const c = chamados.find(x => x.id === id);
-      if (!c) return;
+    function fecharModal() {
+      document.getElementById('modal-laudo').style.display = 'none';
+      chamadoAberto = null;
+    }
 
-      document.getElementById('modal-titulo').textContent = `Ficha Técnica - Protocolo: ${c.protocolo || 'N/A'}`;
-      
-      // Prepara o link do WhatsApp
-      const fone = c.whatsapp || c.cliente_telefone;
+    async function salvarLaudo() {
+      if (!chamadoAberto) return;
+
+      const diag = document.getElementById('laudo-diag').value;
+      const solucao = document.getElementById('laudo-solucao').value;
+      const prazo = document.getElementById('laudo-prazo').value;
+      const valor = document.getElementById('laudo-valor').value;
+      const status = document.getElementById('laudo-status').value;
+
+      const laudoObj = { diagnostico: diag, solucao: solucao, prazo: prazo, valor: valor };
+
+      // 1. Salva no Banco
+      const { error } = await db.from("chamados").update({ 
+        laudo_tecnico: laudoObj,
+        status: status
+      }).eq("id", chamadoAberto.id);
+
+      if (error) return alert("Erro ao salvar laudo: " + error.message);
+
+      // 2. Atualiza o botão do WhatsApp com a mensagem pronta
+      const fone = chamadoAberto.whatsapp || chamadoAberto.cliente_telefone;
       if (fone) {
         const numLimpo = fone.replace(/\D/g, '');
-        const msg = encodeURIComponent(`Olá ${c.cliente_nome}, sobre o protocolo ${c.protocolo}...`);
-        document.getElementById('btn-whatsapp').href = `https://wa.me/55${numLimpo}?text=${msg}`;
+        const msg = `Olá, ${chamadoAberto.cliente_nome}! Segue o laudo técnico do seu chamado ${chamadoAberto.protocolo}:\n\n*Diagnóstico:* ${diag}\n*Solução:* ${solucao}\n*Prazo:* ${prazo}\n*Valor:* R$ ${valor}\n\nStatus atual: ${status}.\n\nVocê pode aprovar respondendo aqui ou acessando o site.`;
+        
+        document.getElementById('btn-whatsapp').href = `https://wa.me/55${numLimpo}?text=${encodeURIComponent(msg)}`;
         document.getElementById('btn-whatsapp').style.display = 'inline-flex';
       } else {
         document.getElementById('btn-whatsapp').style.display = 'none';
       }
 
-      // Monta as informações
-      document.getElementById('modal-conteudo').innerHTML = `
-        <div class="info-group">
-          <h4>Dados do Cliente</h4>
-          <div class="info-row"><span>Nome:</span><span>${c.cliente_nome || '—'}</span></div>
-          <div class="info-row"><span>E-mail:</span><span>${c.cliente_email || '—'}</span></div>
-          <div class="info-row"><span>Telefone:</span><span>${c.cliente_telefone || '—'}</span></div>
-          <div class="info-row"><span>Cidade:</span><span>${c.cidade || '—'}</span></div>
-          <div class="info-row"><span>Preferência:</span><span>${c.preferencia_contato || '—'}</span></div>
-        </div>
-
-        <div class="info-group">
-          <h4>Dados da Solicitação</h4>
-          <div class="info-row"><span>Data:</span><span>${new Date(c.criado_em).toLocaleString('pt-BR')}</span></div>
-          <div class="info-row"><span>Categoria:</span><span>${c.categoria || '—'}</span></div>
-          <p style="margin-top: 16px; color: var(--text-muted); font-size: 14px; line-height: 1.6;">${c.descricao}</p>
-        </div>
-
-        <div class="info-group" style="grid-column: 1 / -1; margin-top: 16px;">
-          <h4>Diagnóstico e Andamento (Preenchimento Interno)</h4>
-          <div class="form-group">
-            <label>Status do Atendimento</label>
-            <select id="edit-status">
-              <option value="Nova chamada" ${c.status === 'Nova chamada' ? 'selected' : ''}>Nova chamada</option>
-              <option value="Aguardando análise" ${c.status === 'Aguardando análise' ? 'selected' : ''}>Aguardando análise</option>
-              <option value="Em andamento" ${c.status === 'Em andamento' ? 'selected' : ''}>Em andamento</option>
-              <option value="Aguardando informações do cliente" ${c.status === 'Aguardando informações do cliente' ? 'selected' : ''}>Aguardando cliente</option>
-              <option value="Concluída" ${c.status === 'Concluída' ? 'selected' : ''}>Concluída</option>
-              <option value="Cancelada" ${c.status === 'Cancelada' ? 'selected' : ''}>Cancelada</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Diagnóstico / Observações Técnicas</label>
-            <textarea id="edit-diagnostico" rows="4">${c.ficha_tecnica?.diagnostico || ''}</textarea>
-          </div>
-        </div>
-      `;
-
-      document.getElementById('modal-ficha').style.display = 'flex';
-    }
-
-    function fecharModal() {
-      document.getElementById('modal-ficha').style.display = 'none';
-      chamadoAbertoId = null;
-    }
-
-    async function salvarFicha() {
-      if (!chamadoAbertoId) return;
+      alert("Laudo salvo com sucesso! O cliente já pode ver as informações no painel dele.");
       
-      const novoStatus = document.getElementById('edit-status').value;
-      const novoDiag = document.getElementById('edit-diagnostico').value;
-
-      const { error } = await db.from("chamados").update({ 
-        status: novoStatus,
-        ficha_tecnica: { diagnostico: novoDiag }
-      }).eq("id", chamadoAbertoId);
-
-      if (error) {
-        alert("Erro ao salvar: " + error.message);
-      } else {
-        alert("Ficha atualizada com sucesso!");
-        fecharModal();
-        await carregarDados();
-        renderizarInicio();
-      }
+      // Recarrega os dados na tela
+      const { data } = await db.from("chamados").select("*").order("criado_em", { ascending: false });
+      chamados = data || [];
+      renderizarTabela();
     }
 
     init();
