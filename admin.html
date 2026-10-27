@@ -15,7 +15,7 @@
     --border: #222326;
     --text-main: #F5F5F5;
     --text-muted: #8C939D;
-    --brand: #b4f03c; /* Verde limão original */
+    --brand: #b4f03c;
     --err: #FF6464;
   }
   body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
@@ -145,7 +145,7 @@
     <nav>
       <a id="nav-inicio" class="active" onclick="mudarAba('inicio')">🏠 Início</a>
       <a id="nav-chamados" onclick="mudarAba('chamados')">🎫 Chamados</a>
-      <a id="nav-laudos" onclick="mudarAba('laudos')">📄 Laudos Técnicos</a>
+      <a id="nav-laudos" onclick="mudarAba('laudos')">📄 Laudos / Briefings</a>
       <a id="nav-clientes" onclick="mudarAba('clientes')">👥 Clientes</a>
       <a href="login.html" class="sair">🚪 Sair da conta</a>
     </nav>
@@ -200,11 +200,11 @@
           </div>
         </div>
 
-        <!-- TELA: LAUDOS -->
+        <!-- TELA: LAUDOS / BRIEFINGS -->
         <div id="tela-laudos" class="tela">
           <div class="table-box">
             <table>
-              <thead><tr><th>Protocolo</th><th>Cliente</th><th>Status do Laudo</th><th>Ação</th></tr></thead>
+              <thead><tr><th>Protocolo</th><th>Cliente</th><th>Tipo</th><th>Status do Doc</th><th>Ação</th></tr></thead>
               <tbody id="tabela-laudos-body"></tbody>
             </table>
           </div>
@@ -269,22 +269,37 @@
     </div>
   </div>
 
-  <!-- MODAL DE LAUDO TÉCNICO -->
+  <!-- MODAL DE DOCUMENTO (Laudo ou Briefing) -->
   <div class="modal" id="modal-laudo">
     <div class="modal-box">
-      <h2 id="modal-laudo-titulo">Emitir Laudo</h2>
+      <h2 id="modal-laudo-titulo">Gerenciar Documento</h2>
       <div style="background: rgba(255,255,255,0.02); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px;">
-        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Problema relatado:</div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Problema / Descrição:</div>
         <div id="modal-laudo-desc" style="font-size: 13px; line-height: 1.5;"></div>
       </div>
 
-      <div class="form-group">
-        <label>Diagnóstico Técnico</label>
-        <textarea id="laudo-diag" rows="3" placeholder="Ex: Placa-mãe com curto..."></textarea>
+      <!-- CAMPOS PARA MANUTENÇÃO -->
+      <div id="campos-manutencao">
+        <div class="form-group">
+          <label>Diagnóstico Técnico</label>
+          <textarea id="laudo-diag" rows="3" placeholder="Ex: Placa-mãe com curto..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Solução Aplicada</label>
+          <textarea id="laudo-solucao" rows="3" placeholder="Ex: Substituição do capacitor..."></textarea>
+        </div>
       </div>
-      <div class="form-group">
-        <label>Solução Aplicada</label>
-        <textarea id="laudo-solucao" rows="3" placeholder="Ex: Substituição do capacitor..."></textarea>
+
+      <!-- CAMPOS PARA SITE -->
+      <div id="campos-site" style="display: none;">
+        <div class="form-group">
+          <label>Briefing e Escopo do Projeto</label>
+          <textarea id="proj-escopo" rows="4" placeholder="Descreva o que será feito no site..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Link do Protótipo / Preview</label>
+          <input type="url" id="proj-link" placeholder="https://preview.exemplo.com">
+        </div>
       </div>
       
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
@@ -309,7 +324,7 @@
 
       <div class="modal-actions" style="flex-direction: column; gap: 10px;">
         <div style="display: flex; gap: 10px; width: 100%;">
-          <button class="btn-modal primary" style="flex: 1;" onclick="salvarLaudo()">Salvar Laudo</button>
+          <button class="btn-modal primary" style="flex: 1;" onclick="salvarLaudo()">Salvar Documento</button>
           <a href="#" id="btn-laudo-print" target="_blank" class="btn-modal print" style="flex: 1; display: none;">🖨️ Imprimir / PDF</a>
         </div>
         <a href="#" id="btn-laudo-whatsapp" target="_blank" class="btn-modal whatsapp" style="width: 100%; text-align: center; display: none;">Enviar por WhatsApp</a>
@@ -326,6 +341,7 @@
     let chamados = [];
     let clientes = [];
     let laudoAtual = null;
+    let isSiteAtual = false;
 
     async function init() {
       const { data: { session } } = await db.auth.getSession();
@@ -371,8 +387,8 @@
         desc.textContent = 'Lista completa de pedidos de clientes.';
         renderizarTabelaChamados();
       } else if (aba === 'laudos') {
-        title.textContent = 'Laudos Técnicos';
-        desc.textContent = 'Gerencie os laudos de manutenção.';
+        title.textContent = 'Laudos e Briefings';
+        desc.textContent = 'Gerencie os laudos de manutenção e briefings de sites.';
         renderizarTabelaLaudos();
       } else if (aba === 'clientes') {
         title.textContent = 'Base de Clientes';
@@ -447,16 +463,20 @@
 
     function renderizarTabelaLaudos() {
       let html = '';
-      chamados.filter(c => !c.categoria || !c.categoria.toLowerCase().includes('site')).forEach(c => {
-        const temLaudo = c.laudo_tecnico ? "✅ Emitido" : "⏳ Pendente";
+      chamados.forEach(c => {
+        const isSite = c.categoria && c.categoria.toLowerCase().includes('site');
+        const temDoc = isSite ? c.detalhes_projeto : c.laudo_tecnico;
+        const statusDoc = temDoc ? "✅ Emitido" : "⏳ Pendente";
+        
         html += `<tr>
           <td>${c.protocolo || 'S/N'}</td>
           <td>${c.cliente_nome || 'Visitante'}</td>
-          <td>${temLaudo}</td>
-          <td><button class="btn-sec" onclick="abrirModalLaudo('${c.id}')">Gerenciar Laudo</button></td>
+          <td>${isSite ? 'Site' : 'Manutenção'}</td>
+          <td>${statusDoc}</td>
+          <td><button class="btn-sec" onclick="abrirModalLaudo('${c.id}')">Gerenciar</button></td>
         </tr>`;
       });
-      document.getElementById('tabela-laudos-body').innerHTML = html || "<tr><td colspan='4' style='text-align:center;'>Nenhum laudo pendente.</td></tr>";
+      document.getElementById('tabela-laudos-body').innerHTML = html || "<tr><td colspan='5' style='text-align:center;'>Nenhum documento pendente.</td></tr>";
     }
 
     function renderizarTabelaClientes() {
@@ -505,27 +525,39 @@
       await carregarDados();
     }
 
-    // ================= MODAL LAUDO =================
+    // ================= MODAL LAUDO / BRIEFING =================
     function abrirModalLaudo(id) {
       laudoAtual = chamados.find(x => x.id === id);
       if (!laudoAtual) return;
+      isSiteAtual = laudoAtual.categoria && laudoAtual.categoria.toLowerCase().includes('site');
 
-      document.getElementById('modal-laudo-titulo').textContent = `Laudo: ${laudoAtual.protocolo}`;
+      document.getElementById('modal-laudo-titulo').textContent = isSiteAtual ? 'Briefing do Projeto' : 'Laudo Técnico';
       document.getElementById('modal-laudo-desc').textContent = laudoAtual.descricao;
 
-      const l = laudoAtual.laudo_tecnico || {};
-      document.getElementById('laudo-diag').value = l.diagnostico || '';
-      document.getElementById('laudo-solucao').value = l.solucao || '';
-      document.getElementById('laudo-prazo').value = l.prazo || '';
-      document.getElementById('laudo-valor').value = l.valor || '';
+      // Alterna os campos visíveis
+      document.getElementById('campos-manutencao').style.display = isSiteAtual ? 'none' : 'block';
+      document.getElementById('campos-site').style.display = isSiteAtual ? 'block' : 'none';
+
+      if (isSiteAtual) {
+        const p = laudoAtual.detalhes_projeto || {};
+        document.getElementById('proj-escopo').value = p.escopo || '';
+        document.getElementById('proj-link').value = p.link || '';
+        document.getElementById('laudo-prazo').value = p.prazo || '';
+        document.getElementById('laudo-valor').value = p.valor || '';
+      } else {
+        const l = laudoAtual.laudo_tecnico || {};
+        document.getElementById('laudo-diag').value = l.diagnostico || '';
+        document.getElementById('laudo-solucao').value = l.solucao || '';
+        document.getElementById('laudo-prazo').value = l.prazo || '';
+        document.getElementById('laudo-valor').value = l.valor || '';
+      }
+
       document.getElementById('laudo-status').value = laudoAtual.status;
-      
       document.getElementById('btn-laudo-whatsapp').style.display = 'none';
       document.getElementById('btn-laudo-print').style.display = 'none';
 
-      if (laudoAtual.laudo_tecnico) {
-        configurarBotoesLaudo();
-      }
+      const temDoc = isSiteAtual ? laudoAtual.detalhes_projeto : laudoAtual.laudo_tecnico;
+      if (temDoc) configurarBotoesDocumento();
 
       document.getElementById('modal-laudo').style.display = 'flex';
     }
@@ -533,38 +565,59 @@
     async function salvarLaudo() {
       if (!laudoAtual) return;
 
-      const diag = document.getElementById('laudo-diag').value;
-      const solucao = document.getElementById('laudo-solucao').value;
       const prazo = document.getElementById('laudo-prazo').value;
       const valor = document.getElementById('laudo-valor').value;
       const status = document.getElementById('laudo-status').value;
 
-      const laudoObj = { diagnostico: diag, solucao: solucao, prazo: prazo, valor: valor };
+      let updateData = { status: status };
 
-      const { error } = await db.from("chamados").update({ 
-        laudo_tecnico: laudoObj, status: status 
-      }).eq("id", laudoAtual.id);
+      if (isSiteAtual) {
+        updateData.detalhes_projeto = {
+          escopo: document.getElementById('proj-escopo').value,
+          link: document.getElementById('proj-link').value,
+          prazo: prazo,
+          valor: valor
+        };
+        laudoAtual.detalhes_projeto = updateData.detalhes_projeto;
+      } else {
+        updateData.laudo_tecnico = {
+          diagnostico: document.getElementById('laudo-diag').value,
+          solucao: document.getElementById('laudo-solucao').value,
+          prazo: prazo,
+          valor: valor
+        };
+        laudoAtual.laudo_tecnico = updateData.laudo_tecnico;
+      }
 
-      if (error) return alert("Erro ao salvar: " + error.message);
-
-      laudoAtual.laudo_tecnico = laudoObj;
       laudoAtual.status = status;
 
-      configurarBotoesLaudo();
-      alert("Laudo salvo com sucesso! Você já pode imprimir ou enviar.");
+      const { error } = await db.from("chamados").update(updateData).eq("id", laudoAtual.id);
+      if (error) return alert("Erro ao salvar: " + error.message);
+
+      configurarBotoesDocumento();
+      alert("Documento salvo com sucesso!");
       await carregarDados();
     }
 
-    function configurarBotoesLaudo() {
+    function configurarBotoesDocumento() {
+      // Imprimir
       const btnPrint = document.getElementById('btn-laudo-print');
-      btnPrint.href = `laudo.html?id=${laudoAtual.id}`;
+      btnPrint.href = `laudo.html?id=${laudoAtual.id}`; // Funciona para os dois (o laudo.html vai adaptar)
       btnPrint.style.display = 'flex';
 
+      // WhatsApp
       const fone = laudoAtual.whatsapp || laudoAtual.cliente_telefone;
       if (fone) {
-        const l = laudoAtual.laudo_tecnico || {};
         const numLimpo = fone.replace(/\D/g, '');
-        const msg = `Olá, ${laudoAtual.cliente_nome}! Segue o laudo do seu chamado ${laudoAtual.protocolo}:\n\n*Diagnóstico:* ${l.diagnostico}\n*Solução:* ${l.solucao}\n*Prazo:* ${l.prazo}\n*Valor:* R$ ${l.valor}`;
+        let msg = "";
+        
+        if (isSiteAtual) {
+          const p = laudoAtual.detalhes_projeto || {};
+          msg = `Olá, ${laudoAtual.cliente_nome}! Segue a atualização do seu projeto ${laudoAtual.protocolo}:\n\n*Escopo:* ${p.escopo}\n*Preview:* ${p.link}\n*Prazo:* ${p.prazo}\n*Valor:* R$ ${p.valor}`;
+        } else {
+          const l = laudoAtual.laudo_tecnico || {};
+          msg = `Olá, ${laudoAtual.cliente_nome}! Segue o laudo do seu chamado ${laudoAtual.protocolo}:\n\n*Diagnóstico:* ${l.diagnostico}\n*Solução:* ${l.solucao}\n*Prazo:* ${l.prazo}\n*Valor:* R$ ${l.valor}`;
+        }
         
         const btnWpp = document.getElementById('btn-laudo-whatsapp');
         btnWpp.href = `https://wa.me/55${numLimpo}?text=${encodeURIComponent(msg)}`;
