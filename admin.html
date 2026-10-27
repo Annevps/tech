@@ -24,9 +24,10 @@
   
   /* ================= SIDEBAR ================= */
   .sidebar { width: 240px; background: var(--s1); border-right: 1px solid var(--border); padding: 24px; display: flex; flex-direction: column; flex-shrink: 0; }
-  .logo { display: flex; align-items: center; gap: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 40px; color: #fff; }
-  .logo i { background: var(--brand); color: #000; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; font-style: normal; font-weight: 800; }
-  .logo b { color: var(--brand); }
+  
+  /* LOGO NO ADMIN */
+  .logo-admin { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; text-decoration: none; }
+  .logo-admin img { height: 70px; width: auto; object-fit: contain; filter: drop-shadow(0 0 15px rgba(180, 240, 60, 0.6)); }
   
   .sidebar nav { display: flex; flex-direction: column; gap: 4px; }
   .sidebar a { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px; font-weight: 500; color: var(--text-muted); transition: 0.2s; font-size: 14px; cursor: pointer; }
@@ -56,8 +57,6 @@
   .page-header .texts span { color: var(--brand); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; display: block; }
   .page-header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; }
   .page-header p { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
-  
-  .btn-new { background: var(--brand); color: #000; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 8px; }
 
   .tela { display: none; flex-direction: column; flex: 1; }
   .tela.active { display: flex; }
@@ -120,7 +119,7 @@
   .btn-del-note { color: var(--err); cursor: pointer; font-size: 16px; padding: 0 4px; opacity: 0.5; transition: 0.2s; }
   .btn-del-note:hover { opacity: 1; }
 
-  /* MODAIS GERAIS */
+  /* MODAIS */
   .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
   .modal-box { background: var(--s1); border: 1px solid var(--border); border-radius: 16px; width: 95%; max-width: 500px; padding: 32px; display: flex; flex-direction: column; gap: 16px; max-height: 90vh; overflow-y: auto; }
   .modal-box h2 { font-family: 'Space Grotesk'; color: var(--brand); font-size: 20px; margin-bottom: 8px;}
@@ -141,7 +140,9 @@
 
   <!-- SIDEBAR -->
   <div class="sidebar">
-    <a href="index.html" class="logo"><i>TE</i><span>Tech<b>Empire</b></span></a>
+    <a href="index.html" class="logo-admin">
+      <img src="tech.png?v=99" alt="TechEmpire">
+    </a>
     <nav>
       <a id="nav-inicio" class="active" onclick="mudarAba('inicio')">🏠 Início</a>
       <a id="nav-chamados" onclick="mudarAba('chamados')">🎫 Chamados</a>
@@ -534,7 +535,6 @@
       document.getElementById('modal-laudo-titulo').textContent = isSiteAtual ? 'Briefing do Projeto' : 'Laudo Técnico';
       document.getElementById('modal-laudo-desc').textContent = laudoAtual.descricao;
 
-      // Alterna os campos visíveis
       document.getElementById('campos-manutencao').style.display = isSiteAtual ? 'none' : 'block';
       document.getElementById('campos-site').style.display = isSiteAtual ? 'block' : 'none';
 
@@ -600,12 +600,10 @@
     }
 
     function configurarBotoesDocumento() {
-      // Imprimir
       const btnPrint = document.getElementById('btn-laudo-print');
-      btnPrint.href = `laudo.html?id=${laudoAtual.id}`; // Funciona para os dois (o laudo.html vai adaptar)
+      btnPrint.href = `laudo.html?id=${laudoAtual.id}`; 
       btnPrint.style.display = 'flex';
 
-      // WhatsApp
       const fone = laudoAtual.whatsapp || laudoAtual.cliente_telefone;
       if (fone) {
         const numLimpo = fone.replace(/\D/g, '');
