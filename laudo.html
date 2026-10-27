@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laudo Técnico — TechEmpire</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* CSS focado em impressão */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #e0e0e0; font-family: 'Inter', sans-serif; color: #111; padding: 40px; display: flex; justify-content: center; }
+  
+  .folha { 
+    background: #fff; width: 100%; max-width: 800px; min-height: 1000px; 
+    padding: 60px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+    position: relative; display: flex; flex-direction: column;
+  }
+
+  /* Cabeçalho */
+  .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #00DDB5; padding-bottom: 20px; margin-bottom: 40px; }
+  .logo-area { display: flex; align-items: center; gap: 12px; }
+  .logo-icon { background: #00DDB5; color: #000; width: 40px; height: 40px; border-radius: 8px; display: grid; place-items: center; font-family: 'Space Grotesk'; font-weight: 800; font-size: 18px; }
+  .logo-text { font-family: 'Space Grotesk'; font-weight: 700; font-size: 24px; letter-spacing: -1px; }
+  .logo-text b { color: #00DDB5; }
+  
+  .doc-info { text-align: right; }
+  .doc-info h1 { font-family: 'Space Grotesk'; font-size: 20px; color: #333; text-transform: uppercase; letter-spacing: 1px; }
+  .doc-info p { font-size: 13px; color: #666; margin-top: 4px; }
+
+  /* Dados do Cliente */
+  .section-title { font-size: 12px; font-weight: 700; color: #00DDB5; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #ddd; padding-bottom: 8px; margin-bottom: 16px; margin-top: 30px; }
+  
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .data-row { margin-bottom: 12px; font-size: 14px; }
+  .data-row span { display: block; font-size: 11px; color: #666; text-transform: uppercase; margin-bottom: 2px; }
+  .data-row strong { font-size: 15px; color: #000; }
+
+  /* Descrição */
+  .box-texto { background: #f9f9f9; border: 1px solid #eee; padding: 20px; border-radius: 8px; font-size: 14px; line-height: 1.6; color: #333; white-space: pre-wrap; margin-bottom: 30px; }
+
+  /* Valores */
+  .destaque-financeiro { border: 2px dashed #00DDB5; padding: 24px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; background: rgba(0, 221, 181, 0.05); margin-top: 40px; }
+  .destaque-financeiro div p { font-size: 12px; color: #666; text-transform: uppercase; margin-bottom: 4px; }
+  .destaque-financeiro div h2 { font-family: 'Space Grotesk'; font-size: 32px; color: #000; }
+
+  /* Assinaturas */
+  .assinaturas { margin-top: auto; padding-top: 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  .linha-assinatura { border-top: 1px solid #333; text-align: center; padding-top: 10px; font-size: 12px; color: #666; }
+
+  /* Botões de Ação (Escondidos na impressão) */
+  .acoes { position: fixed; bottom: 30px; right: 30px; display: flex; gap: 10px; }
+  .btn-acao { background: #00DDB5; color: #000; padding: 14px 28px; border-radius: 8px; font-weight: 700; font-family: 'Inter'; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: 0.2s; }
+  .btn-acao:hover { transform: scale(1.05); background: #00F5C8; }
+  .btn-fechar { background: #333; color: #fff; }
+
+  /* Regras de Impressão */
+  @media print {
+    body { background: #fff; padding: 0; display: block; }
+    .folha { box-shadow: none; max-width: 100%; min-height: 100vh; padding: 40px; }
+    .acoes { display: none; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="folha" id="folha-laudo">
+    <!-- Cabeçalho -->
+    <div class="header">
+      <div class="logo-area">
+        <div class="logo-icon">TE</div>
+        <div class="logo-text">Tech<b>Empire</b></div>
+      </div>
+      <div class="doc-info">
+        <h1>Laudo Técnico</h1>
+        <p id="doc-protocolo">Protocolo: Carregando...</p>
+        <p id="doc-data">Data: Carregando...</p>
+      </div>
+    </div>
+
+    <!-- Dados do Cliente -->
+    <div class="section-title">Dados do Cliente</div>
+    <div class="grid-2">
+      <div class="data-row"><span>Nome</span><strong id="cli-nome">—</strong></div>
+      <div class="data-row"><span>Telefone / WhatsApp</span><strong id="cli-fone">—</strong></div>
+      <div class="data-row"><span>E-mail</span><strong id="cli-email">—</strong></div>
+      <div class="data-row"><span>Cidade</span><strong id="cli-cidade">—</strong></div>
+    </div>
+
+    <!-- Descrição do Problema -->
+    <div class="section-title" style="margin-top: 40px;">Relato do Cliente</div>
+    <div class="box-texto" id="cli-descricao">—</div>
+
+    <!-- Laudo Técnico -->
+    <div class="section-title">Diagnóstico e Solução</div>
+    <div class="grid-2">
+      <div>
+        <div class="data-row"><span>Diagnóstico Técnico</span><strong id="laudo-diag">—</strong></div>
+      </div>
+      <div>
+        <div class="data-row"><span>Solução Aplicada</span><strong id="laudo-solucao">—</strong></div>
+      </div>
+    </div>
+
+    <!-- Prazos e Valores -->
+    <div class="destaque-financeiro">
+      <div>
+        <p>Prazo de Entrega</p>
+        <h2 id="laudo-prazo" style="font-size: 24px;">—</h2>
+      </div>
+      <div style="text-align: right;">
+        <p>Valor do Serviço</p>
+        <h2 id="laudo-valor">R$ 0,00</h2>
+      </div>
+    </div>
+
+    <!-- Assinaturas -->
+    <div class="assinaturas">
+      <div class="linha-assinatura">TechEmpire<br>Responsável Técnico</div>
+      <div class="linha-assinatura">Cliente<br>Aprovação do Orçamento</div>
+    </div>
+  </div>
+
+  <!-- Botões flutuantes -->
+  <div class="acoes">
+    <button class="btn-acao btn-fechar" onclick="window.history.back()">Voltar</button>
+    <button class="btn-acao" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script>
+    const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
+
+    async function carregarLaudo() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+
+      if (!id) {
+        alert("Laudo não encontrado.");
+        window.location.href = "admin.html";
+        return;
+      }
+
+      // Puxa os dados do chamado
+      const { data: c, error } = await db.from("chamados").select("*").eq("id", id).single();
+      
+      if (error || !c) {
+        alert("Erro ao buscar dados do laudo.");
+        return;
+      }
+
+      // Preenche o HTML
+      const dataFormatada = new Date(c.criado_em).toLocaleDateString('pt-BR');
+      
+      document.getElementById('doc-protocolo').textContent = `Protocolo: ${c.protocolo || 'S/N'}`;
+      document.getElementById('doc-data').textContent = `Data: ${dataFormatada}`;
+      
+      document.getElementById('cli-nome').textContent = c.cliente_nome || '—';
+      document.getElementById('cli-fone').textContent = c.whatsapp || c.cliente_telefone || '—';
+      document.getElementById('cli-email').textContent = c.cliente_email || '—';
+      document.getElementById('cli-cidade').textContent = c.cidade || '—';
+      
+      document.getElementById('cli-descricao').textContent = c.descricao || '—';
+
+      const l = c.laudo_tecnico || {};
+      document.getElementById('laudo-diag').textContent = l.diagnostico || 'Aguardando diagnóstico';
+      document.getElementById('laudo-solucao').textContent = l.solucao || 'Aguardando solução';
+      document.getElementById('laudo-prazo').textContent = l.prazo || 'A definir';
+      
+      if (l.valor) {
+        const valorFormatado = Number(l.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        document.getElementById('laudo-valor').textContent = valorFormatado;
+      } else {
+        document.getElementById('laudo-valor').textContent = 'A definir';
+      }
+    }
+
+    carregarLaudo();
+  </script>
+</body>
+</html>
