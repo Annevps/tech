@@ -4,202 +4,126 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Painel Administrativo — TechEmpire</title>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* ================= ESTÉTICA PREMIUM ================= */
+  /* CSS Premium Minimalista (Black & Turquesa) */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #07090b;
-    --s1: rgba(18, 21, 24, 0.7);
-    --s2: rgba(26, 29, 33, 0.8);
-    --s3: rgba(30, 34, 39, 0.9);
-    --line: rgba(255, 255, 255, 0.08);
-    --line2: rgba(255, 255, 255, 0.15);
-    --ink: #FFFFFF;
-    --muted: #9ba1a6;
-    --turquesa: #00DDB5;
-    --err: #ff7b6b;
+    --bg: #050505;
+    --surface: #0F1012;
+    --border: #222326;
+    --border-hover: #3A3D42;
+    --text-main: #F5F5F5;
+    --text-muted: #8C939D;
+    --brand: #00DDB5;
   }
-  body { 
-    background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); display: flex; height: 100vh; overflow: hidden;
-    background-image: radial-gradient(ellipse at 50% -20%, rgba(0, 221, 181, 0.15), transparent 50%), linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-    background-size: 100% 100%, 40px 40px, 40px 40px;
-  }
+  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
   a { text-decoration: none; color: inherit; }
-  button { cursor: pointer; font-family: inherit; border: none; }
+  button { cursor: pointer; font-family: inherit; border: none; background: none; }
   
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-  .animate-in { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+  /* Sidebar */
+  .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); padding: 30px 24px; display: flex; flex-direction: column; flex-shrink: 0; }
+  .logo { display: flex; align-items: center; gap: 12px; font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 40px; color: #fff; }
+  .logo i { background: var(--brand); color: #000; width: 36px; height: 36px; border-radius: 8px; display: grid; place-items: center; font-style: normal; font-weight: 800; }
+  .logo b { color: var(--brand); }
+  .sidebar nav { display: flex; flex-direction: column; gap: 4px; }
+  .sidebar a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; font-weight: 500; color: var(--text-muted); transition: 0.2s; font-size: 14px; cursor: pointer; }
+  .sidebar a:hover, .sidebar a.active { background: rgba(0, 221, 181, 0.1); color: var(--brand); }
+  .sidebar .sair { margin-top: auto; color: #FF6464; }
 
-  /* SIDEBAR */
-  .sidebar { width: 260px; background: var(--s1); backdrop-filter: blur(20px); border-right: 1px solid var(--line); padding: 30px 24px; display: flex; flex-direction: column; flex-shrink: 0; }
-  .logo { display: flex; align-items: center; gap: 12px; font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 40px; }
-  .logo i { background: var(--turquesa); color: #000; width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; font-style: normal; box-shadow: 0 0 20px rgba(0, 221, 181, 0.4); }
-  .logo b { color: var(--turquesa); }
-  .sidebar nav { display: flex; flex-direction: column; gap: 6px; }
-  .sidebar a { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 12px; font-weight: 500; color: var(--muted); transition: 0.3s; cursor: pointer; font-size: 15px; border: 1px solid transparent; }
-  .sidebar a:hover { color: var(--ink); background: rgba(255,255,255,0.03); }
-  .sidebar a.active { background: rgba(0, 221, 181, 0.1); color: var(--turquesa); border-color: rgba(0, 221, 181, 0.2); box-shadow: inset 0 0 20px rgba(0,221,181,0.05); }
-  .sidebar .sair { margin-top: auto; color: var(--err); border-top: 1px solid var(--line); border-radius: 0; padding-top: 24px; }
-  
-  /* MAIN */
+  /* Main */
   .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-  .topbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid var(--line); background: var(--s1); backdrop-filter: blur(20px); }
-  .search-bar { background: rgba(0,0,0,0.3); border: 1px solid var(--line2); border-radius: 99px; padding: 12px 24px; color: var(--ink); width: 300px; outline: none; transition: 0.3s; }
-  .search-bar:focus { border-color: var(--turquesa); box-shadow: 0 0 0 3px rgba(0,221,181,0.1); }
-  .user-info { display: flex; align-items: center; gap: 16px; }
-  .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--turquesa); color: #000; display: grid; place-items: center; font-weight: 800; font-size: 18px; }
-
-  .content { flex: 1; display: grid; grid-template-columns: 1fr 400px; gap: 30px; padding: 40px; overflow-y: auto; }
-  .dashboard-area { display: flex; flex-direction: column; gap: 30px; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid var(--border); background: var(--bg); }
+  .topbar h1 { font-family: 'Space Grotesk', sans-serif; font-size: 20px; }
+  
+  .content { padding: 40px; overflow-y: auto; flex: 1; }
   
   /* KPIs */
-  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-  .kpi { background: var(--s2); backdrop-filter: blur(12px); border: 1px solid var(--line); border-radius: 20px; padding: 24px; position: relative; overflow: hidden; transition: transform 0.3s; }
-  .kpi:hover { transform: translateY(-4px); border-color: var(--line2); }
-  .kpi::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--turquesa), transparent); opacity: 0.8; }
-  .kpi h3 { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; font-weight: 600; }
-  .kpi b { font-family: 'Montserrat', sans-serif; font-size: 38px; color: var(--ink); line-height: 1; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-bottom: 40px; }
+  .kpi { background: var(--surface); border: 1px solid var(--border); padding: 24px; border-radius: 16px; }
+  .kpi h3 { font-size: 13px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; font-weight: 500; }
+  .kpi b { font-family: 'Space Grotesk', sans-serif; font-size: 36px; font-weight: 700; color: #fff; }
 
   /* Tabela */
-  .table-box { background: var(--s2); backdrop-filter: blur(12px); border: 1px solid var(--line); border-radius: 24px; overflow: hidden; }
-  .table-header { padding: 24px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
-  .table-header h3 { font-family: 'Montserrat', sans-serif; font-size: 20px; }
+  .table-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
   table { width: 100%; border-collapse: collapse; }
-  th { text-align: left; padding: 16px 24px; font-size: 12px; color: var(--muted); text-transform: uppercase; border-bottom: 1px solid var(--line); letter-spacing: 1px; }
-  td { padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 15px; vertical-align: middle; }
-  tr:hover td { background: rgba(255,255,255,0.02); }
-  .pill { background: rgba(0, 221, 181, 0.1); color: var(--turquesa); padding: 6px 14px; border-radius: 99px; font-size: 13px; font-weight: 600; border: 1px solid rgba(0, 221, 181, 0.2); display: inline-block; }
-  .btn-acao { background: var(--turquesa); color: #000; padding: 8px 16px; border-radius: 10px; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 15px rgba(0, 221, 181, 0.2); }
-  .btn-acao:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 221, 181, 0.4); background: #00F5C8; }
-  .btn-sec { background: rgba(255,255,255,0.05); color: var(--ink); padding: 8px 16px; border-radius: 10px; font-weight: 600; font-size: 13px; border: 1px solid var(--line2); transition: 0.3s; }
-  .btn-sec:hover { background: rgba(255,255,255,0.1); }
+  th { text-align: left; padding: 20px; font-size: 13px; color: var(--text-muted); border-bottom: 1px solid var(--border); font-weight: 500; }
+  td { padding: 20px; border-bottom: 1px solid var(--border); font-size: 14px; }
+  tr:hover td { background: var(--surface-hover); }
+  .pill { display: inline-block; padding: 6px 12px; border-radius: 99px; font-size: 12px; font-weight: 500; background: rgba(0, 221, 181, 0.1); color: var(--brand); }
+  .btn-action { background: var(--brand); color: #000; padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 13px; transition: 0.2s; }
+  .btn-action:hover { background: #00F5C8; }
 
-  /* CHAT LATERAL */
-  .chat-sidebar { background: var(--s2); backdrop-filter: blur(12px); border: 1px solid var(--line); border-radius: 24px; display: flex; flex-direction: column; height: calc(100vh - 160px); position: sticky; top: 40px; }
-  .chat-header { padding: 24px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 16px; background: var(--s3); border-radius: 24px 24px 0 0; }
-  .chat-header h4 { font-family: 'Montserrat', sans-serif; font-size: 16px; }
-  .chat-header span { color: var(--turquesa); font-size: 12px; font-weight: 600; }
-  .chat-body { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
-  .chat-msg { padding: 14px 20px; border-radius: 16px; font-size: 14px; max-width: 90%; line-height: 1.5; }
-  .chat-msg small { display: block; font-size: 10px; opacity: 0.7; margin-bottom: 4px; }
-  .chat-msg.ou { background: var(--s3); align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid var(--line); }
-  .chat-msg.me { background: var(--turquesa); color: #000; align-self: flex-end; border-bottom-right-radius: 2px; }
-  .chat-footer { padding: 20px; border-top: 1px solid var(--line); display: flex; gap: 12px; background: var(--s3); border-radius: 0 0 24px 24px; }
-  .chat-footer input { flex: 1; padding: 14px; border-radius: 12px; border: 1px solid var(--line2); background: rgba(0,0,0,0.3); color: var(--ink); outline: none; transition: 0.3s; }
-  .chat-footer input:focus { border-color: var(--turquesa); }
-  .chat-footer button { background: var(--turquesa); color: #000; padding: 0 24px; border-radius: 12px; font-weight: 700; transition: 0.3s; }
-  .chat-footer button:hover { background: #00F5C8; }
-
-  /* MODAL */
+  /* Modal Ficha Técnica */
   .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
-  .modal-box { background: var(--s2); border: 1px solid var(--line2); border-radius: 24px; width: 90%; max-width: 500px; padding: 40px; animation: fadeUp 0.4s ease; }
-  .modal-box h2 { font-family: 'Montserrat', sans-serif; color: var(--turquesa); margin-bottom: 24px; font-size: 24px; }
-  .form-group { margin-bottom: 20px; }
-  .form-group label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-  .form-group select { width: 100%; padding: 16px; border-radius: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--line2); color: var(--ink); outline: none; }
-  .form-group select:focus { border-color: var(--turquesa); }
-  .modal-actions { display: flex; gap: 16px; justify-content: flex-end; margin-top: 32px; }
-  .btn-salvar { background: var(--turquesa); color: #000; padding: 14px 28px; border-radius: 12px; font-weight: 700; transition: 0.3s; box-shadow: 0 4px 15px rgba(0, 221, 181, 0.2); }
-  .btn-salvar:hover { transform: translateY(-2px); background: #00F5C8; box-shadow: 0 6px 20px rgba(0, 221, 181, 0.4); }
-  .btn-fechar { background: rgba(255,255,255,0.05); color: var(--ink); padding: 14px 28px; border-radius: 12px; font-weight: 600; border: 1px solid var(--line2); transition: 0.3s; }
-  .btn-fechar:hover { background: rgba(255,255,255,0.1); }
-
-  /* NOTIFICAÇÕES */
-  .notification-bell { position: relative; cursor: pointer; font-size: 24px; margin-right: 20px; display: flex; align-items: center; color: var(--muted); transition: 0.3s; }
-  .notification-bell:hover { color: var(--turquesa); }
-  .notification-badge { position: absolute; top: -5px; right: -8px; background: var(--err); color: #fff; font-size: 10px; font-weight: 800; padding: 3px 7px; border-radius: 99px; display: none; box-shadow: 0 0 10px rgba(255, 123, 107, 0.5); }
-  .notification-dropdown { position: absolute; top: 50px; right: 0; width: 320px; background: var(--s2); border: 1px solid var(--line2); border-radius: 16px; padding: 20px; display: none; z-index: 100; box-shadow: 0 10px 40px rgba(0,0,0,0.5); backdrop-filter: blur(20px); }
-  .notification-dropdown.active { display: block; animation: fadeUp 0.3s ease; }
-  .notification-item { padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+  .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; width: 95%; max-width: 900px; max-height: 90vh; display: flex; flex-direction: column; }
+  .modal-header { padding: 24px 32px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .modal-header h2 { font-family: 'Space Grotesk', sans-serif; color: var(--brand); }
+  .modal-body { padding: 32px; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  @media (max-width: 760px) { .modal-body { grid-template-columns: 1fr; } }
   
-  @media (max-width: 1024px) { .content { grid-template-columns: 1fr; } .chat-sidebar { display: none !important; } }
+  .info-group h4 { color: var(--text-main); margin-bottom: 16px; font-size: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  .info-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; }
+  .info-row span:first-child { color: var(--text-muted); }
+  .info-row span:last-child { font-weight: 500; }
+  
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: #fff; outline: none; }
+  .form-group input:focus, .form-group textarea:focus { border-color: var(--brand); }
+  
+  .modal-actions { padding: 24px 32px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; background: var(--bg); border-radius: 0 0 24px 24px; }
+  .btn-salvar { background: var(--brand); color: #000; padding: 12px 24px; border-radius: 8px; font-weight: 600; }
+  .btn-whats { background: #25D366; color: #fff; padding: 12px 24px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
 </style>
 </head>
 <body>
 
-  <!-- SIDEBAR -->
-  <div class="sidebar animate-in" style="animation-delay: 0.1s;">
+  <div class="sidebar">
     <a href="index.html" class="logo"><i>TE</i><span>Tech<b>Empire</b></span></a>
     <nav>
-      <a href="#" class="active" onclick="mudarAba('inicio', this)">📊 Início</a>
-      <a href="#" onclick="mudarAba('chamados', this)">🎫 Chamados</a>
-      <a href="#" onclick="mudarAba('clientes', this)">👥 Clientes</a>
-      <a href="#" onclick="mudarAba('leads', this)">🎯 Leads</a>
+      <a class="active" onclick="mudarAba('inicio', this)">📊 Início</a>
+      <a onclick="mudarAba('solicitacoes', this)">🎫 Solicitações</a>
+      <a onclick="mudarAba('clientes', this)">👥 Clientes</a>
       <a href="login.html" class="sair">Sair da conta</a>
     </nav>
   </div>
 
-  <!-- MAIN -->
   <div class="main">
-    <div class="topbar animate-in" style="animation-delay: 0.2s;">
-      <input type="text" class="search-bar" placeholder="Buscar chamados ou clientes...">
-      <div class="user-info">
-        <div class="notification-bell" onclick="toggleNotificacoes(event)">
-          🔔
-          <span class="notification-badge" id="notif-badge">0</span>
-          <div class="notification-dropdown" id="notif-dropdown">
-            <h4 style="margin-bottom: 15px; color: var(--turquesa); font-family: 'Montserrat';">Notificações</h4>
-            <div id="notif-lista"><p style="font-size: 13px; color: var(--muted);">Nenhuma notificação nova.</p></div>
-          </div>
-        </div>
-        <div style="text-align: right;">
-          <div style="font-weight: 700; font-size: 15px;" id="admin-nome">Admin</div>
-          <div style="color: var(--turquesa); font-size: 12px; font-weight: 600;">Administrador</div>
-        </div>
-        <div class="avatar">A</div>
-      </div>
+    <div class="topbar">
+      <h1 id="page-title">Dashboard</h1>
     </div>
 
-    <div class="content animate-in" style="animation-delay: 0.3s;">
-      <!-- ÁREA DINÂMICA -->
-      <div class="dashboard-area" id="area-dinamica">
-        <div class="kpis" id="kpis-container"></div>
-        <div class="table-box">
-          <div class="table-header">
-            <h3 id="titulo-tabela">Chamados Recentes</h3>
-          </div>
-          <div id="tabela-container"></div>
+    <div class="content">
+      <div class="kpis" id="admin-kpis"></div>
+      
+      <div class="table-box">
+        <div style="padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="font-family: 'Space Grotesk'; font-size: 18px;" id="titulo-tabela">Solicitações Recentes</h3>
         </div>
-      </div>
-
-      <!-- CHAT LATERAL -->
-      <div class="chat-sidebar" id="painel-chat" style="display: flex;">
-        <div class="chat-header">
-          <div class="avatar" style="width: 36px; height: 36px; font-size: 14px;">👤</div>
-          <div>
-            <h4 id="chat-titulo">Selecione um chamado</h4>
-            <span id="chat-status">Aguardando...</span>
-          </div>
-        </div>
-        <div class="chat-body" id="chat-mensagens">
-          <p style="text-align: center; color: var(--muted); font-size: 14px;">Clique em "Chat" na tabela para conversar.</p>
-        </div>
-        <form class="chat-footer" id="form-chat" style="display: none;">
-          <input type="text" id="input-msg" placeholder="Digite sua resposta..." required autocomplete="off">
-          <button type="submit">Enviar</button>
-        </form>
+        <div id="tabela-container"></div>
       </div>
     </div>
   </div>
 
-  <!-- MODAL -->
-  <div class="modal" id="modal-detalhes">
+  <!-- MODAL FICHA TÉCNICA -->
+  <div class="modal" id="modal-ficha">
     <div class="modal-box">
-      <h2 id="modal-titulo">Detalhes do Chamado</h2>
-      <div class="form-group">
-        <label>Status do Atendimento</label>
-        <select id="edit-status">
-          <option value="Nova chamada">Nova chamada</option>
-          <option value="Aguardando análise">Aguardando análise</option>
-          <option value="Em andamento">Em andamento</option>
-          <option value="Concluída">Concluída</option>
-          <option value="Cancelada">Cancelada</option>
-        </select>
+      <div class="modal-header">
+        <h2 id="modal-titulo">Ficha Técnica</h2>
+        <button onclick="fecharModal()" style="font-size: 24px; color: var(--text-muted);">✕</button>
       </div>
+      
+      <div class="modal-body" id="modal-conteudo">
+        <!-- Injetado via JS -->
+      </div>
+
       <div class="modal-actions">
-        <button class="btn-fechar" onclick="fecharModal()">Fechar</button>
-        <button class="btn-salvar" onclick="salvarStatus()">Salvar Alterações</button>
+        <a href="#" id="btn-whatsapp" target="_blank" class="btn-whats">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+          Chamar no WhatsApp
+        </a>
+        <button class="btn-salvar" onclick="salvarFicha()">Salvar Alterações</button>
       </div>
     </div>
   </div>
@@ -209,197 +133,119 @@
   <script>
     const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
     let idAdmin = null;
-    let chamadoSelecionado = null;
-    let todosChamados = [];
-    let todosClientes = [];
-    let todosLeads = [];
+    let chamados = [];
+    let clientes = [];
+    let chamadoAbertoId = null;
 
     async function init() {
       const { data: { session } } = await db.auth.getSession();
       if (!session) { window.location.href = "login.html"; return; }
       idAdmin = session.user.id;
 
-      const { data: perfil } = await db.from("usuarios").select("nome").eq("id", idAdmin).single();
-      if (perfil) document.getElementById("admin-nome").textContent = perfil.nome;
-
-      await carregarDadosGlobais();
-      document.querySelector('.sidebar nav a').classList.add('active');
+      await carregarDados();
       renderizarInicio();
-      carregarNotificacoes();
-
-      db.channel('notificacoes-live')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notificacoes', filter: `usuario_id=eq.${idAdmin}` }, () => {
-          carregarNotificacoes();
-        }).subscribe();
     }
 
-    async function carregarDadosGlobais() {
+    async function carregarDados() {
+      // Puxa chamados (Solicitações) e clientes
       const { data: c } = await db.from("chamados").select("*").order("criado_em", { ascending: false });
-      todosChamados = c || [];
-      const { data: cl } = await db.from("usuarios").select("*").eq("is_admin", false).order("nome");
-      todosClientes = cl || [];
-      const { data: l } = await db.from("formleads").select("*").order("criado_em", { ascending: false });
-      todosLeads = l || [];
+      chamados = c || [];
+      
+      const { data: cl } = await db.from("usuarios").select("*").eq("is_admin", false);
+      clientes = cl || [];
     }
 
-    function toggleNotificacoes(event) {
-      event.stopPropagation();
-      document.getElementById('notif-dropdown').classList.toggle('active');
-    }
-    document.addEventListener('click', () => {
-      document.getElementById('notif-dropdown').classList.remove('active');
-    });
-
-    async function carregarNotificacoes() {
-      const { data } = await db.from("notificacoes").select("*").eq("usuario_id", idAdmin).eq("lida", false).order("criado_em", { ascending: false });
-      const badge = document.getElementById('notif-badge');
-      const lista = document.getElementById('notif-lista');
-      if (data && data.length > 0) {
-        badge.style.display = 'block';
-        badge.textContent = data.length;
-        lista.innerHTML = data.map(n => `<div class="notification-item">${n.mensagem}</div>`).join('');
-      } else {
-        badge.style.display = 'none';
-        lista.innerHTML = '<p style="font-size: 13px; color: var(--muted);">Nenhuma notificação nova.</p>';
-      }
-    }
-
-    async function mudarAba(aba, el) {
+    function mudarAba(aba, el) {
       document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
       el.classList.add('active');
-      await carregarDadosGlobais();
-
-      if (aba === 'inicio') renderizarInicio();
-      if (aba === 'chamados') renderizarChamados();
-      if (aba === 'clientes') renderizarClientes();
-      if (aba === 'leads') renderizarLeads();
+      
+      if (aba === 'inicio' || aba === 'solicitacoes') {
+        document.getElementById('page-title').textContent = "Painel de Solicitações";
+        document.getElementById('titulo-tabela').textContent = "Todas as Solicitações";
+        renderizarChamados();
+      } else if (aba === 'clientes') {
+        document.getElementById('page-title').textContent = "Clientes";
+        document.getElementById('titulo-tabela').textContent = "Base de Clientes";
+        renderizarClientes();
+      }
     }
 
     function renderizarInicio() {
-      document.getElementById('titulo-tabela').textContent = "Chamados Recentes";
-      const abertos = todosChamados.filter(c => c.status !== 'Concluída' && c.status !== 'Cancelada').length;
-      const pendentes = todosChamados.filter(c => c.status === 'Nova chamada').length;
-      const concluidos = todosChamados.filter(c => c.status === 'Concluída').length;
-
-      document.getElementById("kpis-container").innerHTML = `
-        <div class="kpi"><h3>Chamados Ativos</h3><b>${abertos}</b></div>
-        <div class="kpi"><h3>Pendentes</h3><b>${pendentes}</b></div>
-        <div class="kpi"><h3>Concluídos</h3><b>${concluidos}</b></div>
-        <div class="kpi"><h3>Total Clientes</h3><b>${todosClientes.length}</b></div>
+      const abertos = chamados.filter(c => c.status !== 'Concluída' && c.status !== 'Cancelada').length;
+      const novos = chamados.filter(c => c.status === 'Nova chamada').length;
+      const concluidos = chamados.filter(c => c.status === 'Concluída').length;
+      
+      document.getElementById("admin-kpis").innerHTML = `
+        <div class="kpi"><h3>Total de Solicitações</h3><b>${chamados.length}</b></div>
+        <div class="kpi"><h3>Novas</h3><b>${novos}</b></div>
+        <div class="kpi"><h3>Em Andamento</h3><b>${abertos}</b></div>
+        <div class="kpi"><h3>Concluídas</h3><b>${concluidos}</b></div>
       `;
-      montarTabelaChamados(todosChamados.slice(0, 5));
+      renderizarChamados();
     }
 
     function renderizarChamados() {
-      document.getElementById('titulo-tabela').textContent = "Todos os Chamados";
-      document.getElementById("kpis-container").innerHTML = ''; 
-      montarTabelaChamados(todosChamados);
-    }
-
-    function montarTabelaChamados(lista) {
-      if (lista.length > 0) {
-        let html = `<table><thead><tr><th>Nº</th><th>Título</th><th>Status</th><th>Ações</th></tr></thead><tbody>`;
-        lista.forEach(c => {
-          html += `<tr>
-            <td>TE-${String(c.numero).padStart(6, '0')}</td>
-            <td>${c.titulo}</td>
-            <td><span class="pill">${c.status}</span></td>
-            <td>
-              <button class="btn-acao" onclick="abrirChat('${c.id}', '${c.titulo}', '${c.status}')">Chat</button>
-              <button class="btn-sec" onclick="abrirModal('${c.id}', '${c.status}')">Status</button>
-            </td>
-          </tr>`;
-        });
-        html += `</tbody></table>`;
-        document.getElementById("tabela-container").innerHTML = html;
-      } else {
-        document.getElementById("tabela-container").innerHTML = "<p style='padding: 24px; color: var(--muted);'>Nenhum chamado encontrado.</p>";
-      }
-    }
-
-    function renderizarClientes() {
-      document.getElementById('titulo-tabela').textContent = "Base de Clientes";
-      document.getElementById("kpis-container").innerHTML = ''; 
-      let html = `<table><thead><tr><th>Nome</th><th>E-mail</th><th>Telefone</th><th>CPF</th></tr></thead><tbody>`;
-      todosClientes.forEach(c => {
-        html += `<tr><td>${c.nome}</td><td>${c.email}</td><td>${c.telefone || '—'}</td><td>${c.cpf || '—'}</td></tr>`;
-      });
-      html += `</tbody></table>`;
-      document.getElementById("tabela-container").innerHTML = html;
-    }
-
-    function renderizarLeads() {
-      document.getElementById('titulo-tabela').textContent = "Leads do Site";
-      document.getElementById("kpis-container").innerHTML = ''; 
-      if (todosLeads.length === 0) {
-        document.getElementById("tabela-container").innerHTML = "<p style='padding: 24px; color: var(--muted);'>Nenhum lead recebido ainda.</p>";
+      if (chamados.length === 0) {
+        document.getElementById("tabela-container").innerHTML = "<p style='padding: 24px; color: var(--text-muted);'>Nenhuma solicitação encontrada.</p>";
         return;
       }
-      let html = `<table><thead><tr><th>Nome</th><th>Contato</th><th>Mensagem</th><th>Data</th></tr></thead><tbody>`;
-      todosLeads.forEach(l => {
+
+      let html = `<table><thead><tr><th>Protocolo</th><th>Cliente</th><th>Assunto</th><th>Status</th><th>Ação</th></tr></thead><tbody>`;
+      chamados.forEach(c => {
         html += `<tr>
-          <td>${l.nome}</td><td>${l.email || l.telefone || '—'}</td>
-          <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${l.observacoes || '—'}</td>
-          <td>${new Date(l.criado_em).toLocaleDateString('pt-BR')}</td>
+          <td><b>${c.protocolo || 'Gerando...'}</b></td>
+          <td>${c.cliente_nome || 'Visitante'}</td>
+          <td>${c.titulo}</td>
+          <td><span class="pill">${c.status}</span></td>
+          <td><button class="btn-action" onclick="abrirFicha('${c.id}')">Abrir Ficha</button></td>
         </tr>`;
       });
       html += `</tbody></table>`;
       document.getElementById("tabela-container").innerHTML = html;
     }
 
-    function abrirModal(id, status) {
-      chamadoSelecionado = id;
-      document.getElementById('edit-status').value = status;
-      document.getElementById('modal-detalhes').style.display = 'flex';
-    }
-    function fecharModal() {
-      document.getElementById('modal-detalhes').style.display = 'none';
-    }
-    async function salvarStatus() {
-      const novoStatus = document.getElementById('edit-status').value;
-      await db.from("chamados").update({ status: novoStatus }).eq("id", chamadoSelecionado);
-      fecharModal();
-      await carregarDadosGlobais();
-      renderizarInicio();
-    }
-
-    async function abrirChat(id, titulo, status) {
-      chamadoSelecionado = id;
-      document.getElementById('chat-titulo').textContent = titulo;
-      document.getElementById('chat-status').textContent = status;
-      document.getElementById('form-chat').style.display = 'flex';
-      await db.from('notificacoes').update({ lida: true }).eq('chamado_id', id).eq('usuario_id', idAdmin);
-      carregarNotificacoes();
-      await carregarMensagens(id);
-    }
-
-    async function carregarMensagens(chamadoId) {
-      const chatBody = document.getElementById('chat-mensagens');
-      const { data } = await db.from('mensagens').select('*').eq('chamado_id', chamadoId).order('criado_em', { ascending: true });
-      if (!data || data.length === 0) {
-        chatBody.innerHTML = `<p style="text-align:center; color:var(--muted);">Nenhuma mensagem ainda.</p>`;
+    function renderizarClientes() {
+      document.getElementById("admin-kpis").innerHTML = ''; 
+      if (clientes.length === 0) {
+        document.getElementById("tabela-container").innerHTML = "<p style='padding: 24px; color: var(--text-muted);'>Nenhum cliente cadastrado.</p>";
         return;
       }
-      chatBody.innerHTML = data.map(msg => {
-        const isMe = msg.remetente_id === idAdmin;
-        const hora = new Date(msg.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-        return `<div class="chat-msg ${isMe ? 'me' : 'ou'}"><small>${isMe ? 'Você' : 'Cliente'} · ${hora}</small>${msg.conteudo}</div>`;
-      }).join('');
-      chatBody.scrollTop = chatBody.scrollHeight;
+      let html = `<table><thead><tr><th>Nome</th><th>E-mail</th><th>Telefone</th></tr></thead><tbody>`;
+      clientes.forEach(c => {
+        html += `<tr><td>${c.nome}</td><td>${c.email}</td><td>${c.telefone || '—'}</td></tr>`;
+      });
+      html += `</tbody></table>`;
+      document.getElementById("tabela-container").innerHTML = html;
     }
 
-    document.getElementById('form-chat').onsubmit = async (e) => {
-      e.preventDefault();
-      if (!chamadoSelecionado) return;
-      const input = document.getElementById('input-msg');
-      const texto = input.value.trim();
-      if (!texto) return;
-      await db.from('mensagens').insert({ chamado_id: chamadoSelecionado, remetente_id: idAdmin, conteudo: texto });
-      input.value = '';
-      await carregarMensagens(chamadoSelecionado);
-    };
+    async function abrirFicha(id) {
+      chamadoAbertoId = id;
+      const c = chamados.find(x => x.id === id);
+      if (!c) return;
 
-    init();
-  </script>
-</body>
-</html>
+      document.getElementById('modal-titulo').textContent = `Ficha Técnica - Protocolo: ${c.protocolo || 'N/A'}`;
+      
+      // Prepara o link do WhatsApp
+      const fone = c.whatsapp || c.cliente_telefone;
+      if (fone) {
+        const numLimpo = fone.replace(/\D/g, '');
+        const msg = encodeURIComponent(`Olá ${c.cliente_nome}, sobre o protocolo ${c.protocolo}...`);
+        document.getElementById('btn-whatsapp').href = `https://wa.me/55${numLimpo}?text=${msg}`;
+        document.getElementById('btn-whatsapp').style.display = 'inline-flex';
+      } else {
+        document.getElementById('btn-whatsapp').style.display = 'none';
+      }
+
+      // Monta as informações
+      document.getElementById('modal-conteudo').innerHTML = `
+        <div class="info-group">
+          <h4>Dados do Cliente</h4>
+          <div class="info-row"><span>Nome:</span><span>${c.cliente_nome || '—'}</span></div>
+          <div class="info-row"><span>E-mail:</span><span>${c.cliente_email || '—'}</span></div>
+          <div class="info-row"><span>Telefone:</span><span>${c.cliente_telefone || '—'}</span></div>
+          <div class="info-row"><span>Cidade:</span><span>${c.cidade || '—'}</span></div>
+          <div class="info-row"><span>Preferência:</span><span>${c.preferencia_contato || '—'}</span></div>
+        </div>
+
+        <div class="info-group">
+          <h4>Dados da Solic
