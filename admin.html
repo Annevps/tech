@@ -6,83 +6,72 @@
 <title>Painel Administrativo — TechEmpire</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* ================= RESET E VARIÁVEIS ================= */
+  /* ================= TEMA CLARO PREMIUM ================= */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #050505;
-    --s1: #0F1012;
-    --s2: #1A1D21;
-    --border: #222326;
-    --text-main: #F5F5F5;
-    --text-muted: #8C939D;
+    --bg: #F8F9FA;
+    --s1: #FFFFFF;
+    --s2: #F3F4F6;
+    --border: #E5E7EB;
+    --text-main: #111827;
+    --text-muted: #6B7280;
     --brand: #00DDB5;
     --brand-dark: #00A884;
-    --err: #FF6464;
+    --err: #EF4444;
   }
   body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
   a { text-decoration: none; color: inherit; }
   button { cursor: pointer; font-family: inherit; border: none; background: none; }
   
-  /* ================= SIDEBAR ================= */
+  /* SIDEBAR */
   .sidebar { width: 240px; background: var(--s1); border-right: 1px solid var(--border); padding: 24px; display: flex; flex-direction: column; flex-shrink: 0; }
-  .logo { display: flex; align-items: center; gap: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 40px; color: #fff; }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 40px; color: var(--text-main); }
   .logo i { background: var(--brand); color: #000; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; font-style: normal; font-weight: 800; }
-  .logo b { color: var(--brand); }
+  .logo b { color: var(--text-main); }
   
   .sidebar nav { display: flex; flex-direction: column; gap: 4px; }
   .sidebar a { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px; font-weight: 500; color: var(--text-muted); transition: 0.2s; font-size: 14px; cursor: pointer; }
-  .sidebar a:hover, .sidebar a.active { background: rgba(0, 221, 181, 0.1); color: var(--brand); }
+  .sidebar a:hover, .sidebar a.active { background: rgba(0, 221, 181, 0.1); color: var(--brand-dark); }
   .sidebar .sair { margin-top: auto; color: var(--err); }
 
-  .card-footer-logo { margin-top: 20px; background: var(--s2); padding: 16px; border-radius: 12px; border: 1px solid var(--border); font-size: 12px; color: var(--text-muted); }
-  .card-footer-logo b { color: #fff; display: block; font-size: 14px; margin-bottom: 4px; }
-
-  /* ================= MAIN ================= */
+  /* MAIN */
   .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-  
-  .topbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 32px; border-bottom: 1px solid var(--border); background: var(--bg); }
-  .search-box { background: var(--s1); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; width: 350px; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
-  .search-box input { background: none; border: none; outline: none; color: #fff; width: 100%; font-size: 13px; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 32px; border-bottom: 1px solid var(--border); background: var(--s1); }
+  .search-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; width: 350px; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+  .search-box input { background: none; border: none; outline: none; color: var(--text-main); width: 100%; font-size: 13px; }
   .user-info { display: flex; align-items: center; gap: 20px; }
-  .notif-icon { position: relative; font-size: 20px; color: var(--text-muted); cursor: pointer; }
-  .user-block { display: flex; align-items: center; gap: 12px; }
   .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--s2); display: grid; place-items: center; border: 1px solid var(--border); }
 
-  /* ================= ÁREA DE CONTEÚDO ================= */
+  /* CONTEÚDO */
   .content-area { flex: 1; display: grid; grid-template-columns: 1fr 340px; overflow: hidden; }
-  
   .main-content { padding: 32px; overflow-y: auto; display: flex; flex-direction: column; }
-  
   .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
-  .page-header .texts span { color: var(--brand); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; display: block; }
-  .page-header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; }
+  .page-header h1 { font-family: 'Space Grotesk'; font-size: 28px; font-weight: 700; }
   .page-header p { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
-  
-  .btn-new { background: var(--brand); color: #000; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 8px; }
 
   .tela { display: none; flex-direction: column; flex: 1; }
   .tela.active { display: flex; }
 
   /* Tabelas */
-  .table-box { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-top: 16px; width: 100%; }
+  .table-box { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-top: 16px; width: 100%; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
   table { width: 100%; border-collapse: collapse; }
-  th { text-align: left; padding: 16px; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--border); font-weight: 500; }
+  th { text-align: left; padding: 16px; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--border); font-weight: 600; background: var(--bg); }
   td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; }
-  tr:hover td { background: rgba(255,255,255,0.02); }
-  .pill { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; background: rgba(0, 221, 181, 0.1); color: var(--brand); }
+  tr:hover td { background: var(--bg); }
+  .pill { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 600; background: rgba(0, 221, 181, 0.15); color: var(--brand-dark); }
   .btn-acao { background: var(--brand); color: #000; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; transition: 0.2s; }
-  .btn-acao:hover { background: #00F5C8; }
-  .btn-sec { background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; margin-left: 5px; transition: 0.2s; }
-  .btn-sec:hover { border-color: var(--brand); color: var(--brand); }
+  .btn-acao:hover { background: var(--brand-dark); }
+  .btn-sec { background: var(--s1); border: 1px solid var(--border); color: var(--text-main); padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; margin-left: 5px; transition: 0.2s; }
+  .btn-sec:hover { border-color: var(--brand); color: var(--brand-dark); }
 
   /* Kanban */
   .summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
-  .summary-card { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 12px; }
+  .summary-card { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
   .summary-card .icon { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-size: 18px; }
-  .summary-card .icon.green { background: rgba(0, 221, 181, 0.1); color: var(--brand); }
-  .summary-card .icon.blue { background: rgba(100, 150, 255, 0.1); color: #6496FF; }
-  .summary-card .icon.yellow { background: rgba(255, 200, 50, 0.1); color: #FFC832; }
-  .summary-card .icon.gray { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); }
+  .summary-card .icon.green { background: rgba(0, 221, 181, 0.1); color: var(--brand-dark); }
+  .summary-card .icon.blue { background: rgba(59, 130, 246, 0.1); color: #3B82F6; }
+  .summary-card .icon.yellow { background: rgba(245, 158, 11, 0.1); color: #F59E0B; }
+  .summary-card .icon.gray { background: var(--s2); color: var(--text-muted); }
   .summary-card .info h3 { font-size: 20px; font-family: 'Space Grotesk'; line-height: 1; }
   .summary-card .info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
@@ -93,54 +82,51 @@
   .kanban-header .count { color: var(--text-muted); }
   
   .kanban-cards { display: flex; flex-direction: column; gap: 12px; }
-  .kanban-card { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; cursor: pointer; transition: 0.2s; }
-  .kanban-card:hover { border-color: var(--brand); }
+  .kanban-card { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; cursor: pointer; transition: 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .kanban-card:hover { border-color: var(--brand); transform: translateY(-2px); }
   .k-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-  .k-icon { width: 32px; height: 32px; background: rgba(255, 255, 255, 0.03); border-radius: 8px; display: grid; place-items: center; font-size: 16px; }
+  .k-icon { width: 32px; height: 32px; background: var(--s2); border-radius: 8px; display: grid; place-items: center; font-size: 16px; }
   .k-tag { font-size: 10px; color: var(--text-muted); font-family: monospace; }
   .k-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
   .k-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
-  .k-card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 12px; }
-  .k-date { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
-  .k-pill { font-size: 10px; font-weight: 600; padding: 4px 8px; border-radius: 4px; background: rgba(0, 221, 181, 0.1); color: var(--brand); }
+  .k-card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 12px; }
+  .k-date { font-size: 11px; color: var(--text-muted); }
+  .k-pill { font-size: 10px; font-weight: 600; padding: 4px 8px; border-radius: 4px; background: rgba(0, 221, 181, 0.15); color: var(--brand-dark); }
 
-  .empty-col { border: 1px dashed var(--border); border-radius: 12px; padding: 40px 20px; text-align: center; color: var(--text-muted); font-size: 12px; }
-
-  /* Painel de Anotações */
+  /* Anotações */
   .sidebar-notes { background: var(--s1); border-left: 1px solid var(--border); padding: 24px; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; }
   .notes-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: 600; font-size: 15px; }
-  .note-input-box { background: var(--s2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 24px; }
-  .note-input-box textarea { width: 100%; background: transparent; border: none; color: #fff; outline: none; resize: none; font-size: 13px; font-family: 'Inter'; height: 60px; margin-bottom: 12px; }
-  .note-tools { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px; color: var(--text-muted); }
+  .note-input-box { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 24px; }
+  .note-input-box textarea { width: 100%; background: transparent; border: none; color: var(--text-main); outline: none; resize: none; font-size: 13px; font-family: 'Inter'; height: 60px; margin-bottom: 12px; }
+  .note-tools { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 12px; color: var(--text-muted); }
   .btn-save-note { background: var(--brand); color: #000; padding: 6px 16px; border-radius: 6px; font-weight: 600; font-size: 12px; }
 
   .notes-list-title { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 16px; }
-  .note-item { background: var(--s2); border-radius: 8px; padding: 16px; margin-bottom: 12px; position: relative; border-left: 3px solid var(--brand); display: flex; justify-content: space-between; }
+  .note-item { background: var(--bg); border-radius: 8px; padding: 16px; margin-bottom: 12px; position: relative; border-left: 3px solid var(--brand); display: flex; justify-content: space-between; }
   .note-meta { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-bottom: 8px; }
-  .note-text { font-size: 12px; line-height: 1.5; color: #ddd; }
+  .note-text { font-size: 12px; line-height: 1.5; color: var(--text-main); }
   .btn-del-note { color: var(--err); cursor: pointer; font-size: 16px; padding: 0 4px; opacity: 0.5; transition: 0.2s; }
   .btn-del-note:hover { opacity: 1; }
 
-  /* MODAIS GERAIS */
-  .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
-  .modal-box { background: var(--s1); border: 1px solid var(--border); border-radius: 16px; width: 95%; max-width: 500px; padding: 32px; display: flex; flex-direction: column; gap: 16px; max-height: 90vh; overflow-y: auto; }
-  .modal-box h2 { font-family: 'Space Grotesk'; color: var(--brand); font-size: 20px; margin-bottom: 8px;}
+  /* MODAIS */
+  .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-box { background: var(--s1); border: 1px solid var(--border); border-radius: 16px; width: 95%; max-width: 500px; padding: 32px; display: flex; flex-direction: column; gap: 16px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+  .modal-box h2 { font-family: 'Space Grotesk'; color: var(--text-main); font-size: 20px; margin-bottom: 8px;}
   .form-group { margin-bottom: 8px; }
-  .form-group label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block;}
-  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: #fff; outline: none; font-family: 'Inter';}
-  .form-group input:focus, .form-group textarea:focus { border-color: var(--brand); }
+  .form-group label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block; font-weight: 600;}
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-main); outline: none; font-family: 'Inter';}
+  .form-group input:focus, .form-group textarea:focus { border-color: var(--brand); background: #fff; }
   .modal-actions { display: flex; justify-content: space-between; margin-top: 16px; gap: 10px;}
   .btn-modal { padding: 12px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; }
   .btn-modal.primary { background: var(--brand); color: #000; }
   .btn-modal.danger { background: var(--err); color: #fff; }
-  .btn-modal.secondary { background: transparent; border: 1px solid var(--border); color: #fff; }
+  .btn-modal.secondary { background: var(--s1); border: 1px solid var(--border); color: var(--text-main); }
   .btn-modal.whatsapp { background: #25D366; color: #fff; }
-  .btn-modal.print { background: #333; color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-modal.print { background: var(--text-main); color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px; }
 </style>
 </head>
 <body>
 
-  <!-- SIDEBAR -->
   <div class="sidebar">
     <a href="index.html" class="logo"><i>TE</i><span>Tech<b>Empire</b></span></a>
     <nav>
@@ -150,21 +136,16 @@
       <a id="nav-clientes" onclick="mudarAba('clientes')">👥 Clientes</a>
       <a href="login.html" class="sair">🚪 Sair da conta</a>
     </nav>
-    <div class="card-footer-logo">
-      <b>TechEmpire</b>
-      Tecnologia que resolve.
-    </div>
   </div>
 
-  <!-- MAIN -->
   <div class="main">
     <div class="topbar">
       <div class="search-box"><span>🔍</span><input type="text" placeholder="Buscar..."></div>
       <div class="user-info">
-        <div class="notif-icon">🔔</div>
-        <div class="user-block">
+        <div style="font-size: 20px;">🔔</div>
+        <div style="display: flex; align-items: center; gap: 12px;">
           <div class="avatar">👤</div>
-          <div><div style="font-size: 13px; font-weight: 600;">Administrador</div><div style="font-size: 11px; color: var(--brand);">Painel</div></div>
+          <div><div style="font-size: 13px; font-weight: 600;">Administrador</div><div style="font-size: 11px; color: var(--brand-dark);">Painel</div></div>
         </div>
       </div>
     </div>
@@ -174,7 +155,7 @@
         
         <div class="page-header">
           <div class="texts">
-            <span id="page-subtitle">Painel Administrativo</span>
+            <span id="page-subtitle" style="color: var(--brand-dark); font-size: 12px; font-weight: 700; text-transform: uppercase;">Painel Administrativo</span>
             <h1 id="page-title">Organização de Projetos</h1>
             <p id="page-desc">Acompanhe e gerencie todos os projetos e chamados.</p>
           </div>
@@ -244,12 +225,10 @@
     <div class="modal-box">
       <h2>Gerenciar Chamado</h2>
       <input type="hidden" id="edit-id">
-      
       <div class="form-group">
         <label>Cliente</label>
         <input type="text" id="edit-cliente" disabled style="opacity: 0.6;">
       </div>
-      
       <div class="form-group">
         <label>Status do Atendimento</label>
         <select id="edit-status">
@@ -259,7 +238,6 @@
           <option value="Concluída">Concluída</option>
         </select>
       </div>
-      
       <div class="modal-actions">
         <button class="btn-modal danger" onclick="excluirChamado()">Excluir</button>
         <div style="display: flex; gap: 10px;">
@@ -274,11 +252,10 @@
   <div class="modal" id="modal-laudo">
     <div class="modal-box">
       <h2 id="modal-laudo-titulo">Emitir Laudo</h2>
-      <div style="background: rgba(255,255,255,0.02); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px;">
+      <div style="background: var(--bg); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px;">
         <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Problema relatado:</div>
         <div id="modal-laudo-desc" style="font-size: 13px; line-height: 1.5;"></div>
       </div>
-
       <div class="form-group">
         <label>Diagnóstico Técnico</label>
         <textarea id="laudo-diag" rows="3" placeholder="Ex: Placa-mãe com curto..."></textarea>
@@ -287,7 +264,6 @@
         <label>Solução Aplicada</label>
         <textarea id="laudo-solucao" rows="3" placeholder="Ex: Substituição do capacitor..."></textarea>
       </div>
-      
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
         <div class="form-group">
           <label>Prazo</label>
@@ -298,7 +274,6 @@
           <input type="number" id="laudo-valor" step="0.01" placeholder="0.00">
         </div>
       </div>
-
       <div class="form-group">
         <label>Status</label>
         <select id="laudo-status">
@@ -307,7 +282,6 @@
           <option value="Concluída">Concluída</option>
         </select>
       </div>
-
       <div class="modal-actions" style="flex-direction: column; gap: 10px;">
         <div style="display: flex; gap: 10px; width: 100%;">
           <button class="btn-modal primary" style="flex: 1;" onclick="salvarLaudo()">Salvar Laudo</button>
@@ -341,7 +315,6 @@
     async function carregarDados() {
       const { data: c } = await db.from("chamados").select("*").order("criado_em", { ascending: false });
       chamados = c || [];
-      
       const { data: cl } = await db.from("usuarios").select("*").eq("is_admin", false);
       clientes = cl || [];
       
@@ -351,7 +324,6 @@
       renderizarTabelaClientes();
     }
 
-    // ================= NAVEGAÇÃO =================
     function mudarAba(aba) {
       document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
       const el = document.getElementById('nav-' + aba);
@@ -382,7 +354,6 @@
       }
     }
 
-    // ================= RENDERIZAÇÃO: KANBAN =================
     function renderizarKanban() {
       const novos = chamados.filter(c => c.status === 'Nova chamada').length;
       const exec = chamados.filter(c => c.status === 'Em andamento').length;
@@ -396,8 +367,8 @@
 
       const colunas = [
         { id: 'Nova chamada', title: 'Novos pedidos', color: 'var(--brand)', count: novos },
-        { id: 'Em andamento', title: 'Em execução', color: '#6496FF', count: exec },
-        { id: 'Aguardando', title: 'Aguardando cliente', color: '#FFC832', count: aguard },
+        { id: 'Em andamento', title: 'Em execução', color: '#3B82F6', count: exec },
+        { id: 'Aguardando', title: 'Aguardando cliente', color: '#F59E0B', count: aguard },
         { id: 'Concluída', title: 'Concluídos', color: 'var(--text-muted)', count: concl }
       ];
 
@@ -412,7 +383,7 @@
           <div class="kanban-cards">`;
 
         if (filtrados.length === 0) {
-          html += `<div class="empty-col"><p>Nenhum projeto aqui.</p></div>`;
+          html += `<div style="border: 1px dashed var(--border); border-radius: 12px; padding: 30px; text-align: center; color: var(--text-muted); font-size: 12px;">Nenhum projeto aqui.</div>`;
         } else {
           filtrados.forEach(c => {
             const isSite = c.categoria && c.categoria.toLowerCase().includes('site');
@@ -431,7 +402,6 @@
       document.getElementById('kanban-board').innerHTML = html;
     }
 
-    // ================= RENDERIZAÇÃO: TABELAS =================
     function renderizarTabelaChamados() {
       let html = '';
       chamados.forEach(c => {
@@ -474,7 +444,6 @@
       document.getElementById('tabela-clientes-body').innerHTML = html || "<tr><td colspan='4' style='text-align:center;'>Nenhum cliente cadastrado.</td></tr>";
     }
 
-    // ================= MODAL CHAMADO (STATUS/EXCLUIR) =================
     function abrirModalChamado(id) {
       const c = chamados.find(x => x.id === id);
       if (!c) return;
@@ -506,7 +475,6 @@
       await carregarDados();
     }
 
-    // ================= MODAL LAUDO =================
     function abrirModalLaudo(id) {
       laudoAtual = chamados.find(x => x.id === id);
       if (!laudoAtual) return;
@@ -521,11 +489,9 @@
       document.getElementById('laudo-valor').value = l.valor || '';
       document.getElementById('laudo-status').value = laudoAtual.status;
       
-      // Esconde botões até salvar
       document.getElementById('btn-laudo-whatsapp').style.display = 'none';
       document.getElementById('btn-laudo-print').style.display = 'none';
 
-      // Se já tiver laudo, já prepara os botões
       if (laudoAtual.laudo_tecnico) {
         configurarBotoesLaudo();
       }
@@ -550,7 +516,6 @@
 
       if (error) return alert("Erro ao salvar: " + error.message);
 
-      // Atualiza os dados locais para gerar os botões corretamente
       laudoAtual.laudo_tecnico = laudoObj;
       laudoAtual.status = status;
 
@@ -560,12 +525,10 @@
     }
 
     function configurarBotoesLaudo() {
-      // Configura botão de imprimir
       const btnPrint = document.getElementById('btn-laudo-print');
       btnPrint.href = `laudo.html?id=${laudoAtual.id}`;
       btnPrint.style.display = 'flex';
 
-      // Configura botão do WhatsApp
       const fone = laudoAtual.whatsapp || laudoAtual.cliente_telefone;
       if (fone) {
         const l = laudoAtual.laudo_tecnico || {};
@@ -578,7 +541,6 @@
       }
     }
 
-    // ================= ANOTAÇÕES =================
     async function salvarAnotacao() {
       const texto = document.getElementById('note-text').value.trim();
       if (!texto) return;
@@ -602,7 +564,7 @@
         return `
           <div class="note-item">
             <div class="content">
-              <div class="note-meta"><span style="color: var(--brand);">● ${dataStr}</span></div>
+              <div class="note-meta"><span style="color: var(--brand-dark);">● ${dataStr}</span></div>
               <div class="note-text">${n.texto}</div>
             </div>
             <button class="btn-del-note" onclick="excluirAnotacao('${n.id}')" title="Excluir anotação">🗑️</button>
