@@ -1,108 +1,44 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tecnologia que funciona — TechEmpire</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-<style>
-  /* Estilos diretos para garantir que a logo e o menu apareçam */
-  .header-forcado {
-    position: sticky; top: 0; z-index: 50;
-    background: rgba(7, 9, 11, 0.85); backdrop-filter: blur(14px);
-    border-bottom: 1px solid rgba(255,255,255,0.09);
-  }
-  .header-forcado .conteudo {
-    max-width: 1160px; margin: 0 auto; padding: 12px 24px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .header-forcado img.logo-img {
-    height: 60px; width: auto; object-fit: contain;
-    filter: drop-shadow(0 0 10px rgba(180, 240, 60, 0.5));
-  }
-  .header-forcado nav a {
-    color: #97a0a6; text-decoration: none; font-weight: 500; font-size: 15px; margin-left: 20px;
-  }
-  .header-forcado nav a:hover { color: #b4f03c; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechEmpire - Tecnologia que funciona</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
-<body data-page="home" data-auth="public">
+<body>
 
-<!-- CABEÇALHO ESCRITO DIRETO NO HTML -->
-<header class="header-forcado">
-  <div class="conteudo">
-    <a href="index.html">
-      <!-- Se o nome do seu arquivo no GitHub for tech.png, deixe assim -->
-      <img src="tech.png" alt="TechEmpire" class="logo-img">
-    </a>
-    <nav>
-      <a href="index.html">Início</a>
-      <a href="servicos.html">Serviços</a>
-      <a href="manutencao.html">Manutenção</a>
-      <a href="sobre.html">Sobre</a>
-      <a href="contato.html">Contato</a>
-      <a href="login.html" class="btn sm">Entrar</a>
-      <a href="criar-conta.html" class="btn sm primary">Criar conta</a>
-    </nav>
-  </div>
-</header>
+    <!-- MENU ESCRITO DIRETO AQUI -->
+    <header style="background: #07090b; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222;">
+        <a href="index.html">
+            <img src="tech.png" alt="TechEmpire" style="height: 60px;">
+        </a>
+        <nav style="display: flex; gap: 20px;">
+            <a href="index.html" style="color: #b4f03c; text-decoration: none;">Início</a>
+            <a href="servicos.html" style="color: #fff; text-decoration: none;">Serviços</a>
+            <a href="contato.html" style="color: #fff; text-decoration: none;">Contato</a>
+            <a href="login.html" style="color: #fff; text-decoration: none; border: 1px solid #444; padding: 8px 16px; border-radius: 20px;">Entrar</a>
+        </nav>
+    </header>
 
-<main class="wrap-main">
-<section class="hero">
-  <div>
-    <span class="badge">Empresa júnior de TI</span>
-    <h1>Tecnologia que <em>funciona.</em></h1>
-    <p class="lead">Manutenção de computadores, suporte técnico e criação de sites com preço justo. Abra um chamado, converse com a gente pelo site e acompanhe cada etapa.</p>
-    <div class="row" style="margin-top:30px"><a class="btn primary" href="criar-conta.html">Criar minha conta →</a><a class="btn" href="servicos.html">Ver serviços</a></div>
-  </div>
-  <div class="mock" aria-hidden="true">
-    <div class="top"><i></i><i></i><i></i></div>
-    <div class="ex">Exemplo ilustrativo de acompanhamento</div>
-    <div class="st"><span class="dot"></span>Chamado recebido<b>✓</b></div>
-    <div class="st"><span class="dot"></span>Diagnóstico e orçamento<b>✓</b></div>
-    <div class="st on"><span class="dot"></span>Em andamento<b>agora</b></div>
-    <div class="st"><span class="dot"></span>Concluído</div>
-  </div>
-</section>
+    <!-- CONTEÚDO -->
+    <main style="padding: 60px 20px; max-width: 1100px; margin: 0 auto; text-align: center;">
+        <h1 style="font-family: 'Space Grotesk'; font-size: 60px; color: #fff;">Tecnologia que <br> <span style="color: #b4f03c;">funciona.</span></h1>
+        <p style="color: #97a0a6; font-size: 20px; max-width: 600px; margin: 20px auto;">
+            Manutenção de computadores, suporte técnico e criação de sites com preço justo.
+        </p>
+        <div style="margin-top: 40px;">
+            <a href="criar-conta.html" style="background: #b4f03c; color: #000; padding: 15px 30px; border-radius: 30px; text-decoration: none; font-weight: bold;">Criar minha conta</a>
+            <a href="servicos.html" style="background: transparent; color: #fff; padding: 15px 30px; border-radius: 30px; text-decoration: none; border: 1px solid #444; margin-left: 10px;">Ver serviços</a>
+        </div>
+    </main>
 
-<section class="sec reveal"><div class="sec-h"><span class="badge">Serviços</span><h2>Tudo o que sua tecnologia precisa.</h2></div><div class="bento" id="cards-servicos"></div></section>
+    <!-- RODAPÉ -->
+    <footer style="background: #0a0d0f; padding: 40px 20px; border-top: 1px solid #222; margin-top: 60px; text-align: center; color: #97a0a6;">
+        <img src="tech.png" alt="TechEmpire" style="height: 50px; margin-bottom: 20px;">
+        <p>© 2026 TechEmpire. Todos os direitos reservados.</p>
+    </footer>
 
-<section class="sec reveal"><div class="sec-h"><span class="badge">Como funciona</span><h2>Do problema à solução, sem complicação.</h2></div>
-  <div class="steps">
-    <div class="card"><h3>Crie sua conta</h3><p>Cadastro rápido e seguro, com seus dados protegidos.</p></div>
-    <div class="card"><h3>Abra um chamado</h3><p>Descreva o problema ou o site que quer, com fotos se precisar.</p></div>
-    <div class="card"><h3>Converse com a gente</h3><p>Tire dúvidas pelo chat do site e aprove o orçamento.</p></div>
-    <div class="card"><h3>Acompanhe</h3><p>Veja o status, a solução e os vídeos do serviço no seu painel.</p></div>
-  </div></section>
-
-<div class="cta reveal"><div><h2>Pronto para resolver?</h2><p>Crie sua conta e abra seu primeiro chamado em poucos minutos.</p></div><a class="btn" href="criar-conta.html">Começar agora →</a></div>
-</main>
-
-<!-- RODAPÉ ESCRITO DIRETO NO HTML -->
-<footer style="border-top: 1px solid rgba(255,255,255,0.09); padding: 40px 24px; background: #0a0d0f;">
-  <div style="max-width: 1160px; margin: 0 auto; display: flex; gap: 40px; flex-wrap: wrap;">
-    <div style="flex: 1; min-width: 250px;">
-      <img src="tech.png" alt="TechEmpire" style="height: 60px; margin-bottom: 16px;">
-      <p style="color: #97a0a6; font-size: 14px; max-width: 300px;">Manutenção de dispositivos, suporte técnico e criação de sites. Tecnologia que funciona.</p>
-    </div>
-    <div>
-      <h4 style="color: #fff; margin-bottom: 12px; font-family: 'Space Grotesk';">Site</h4>
-      <a href="servicos.html" style="display:block; color:#97a0a6; font-size:14px; margin-bottom:8px;">Serviços</a>
-      <a href="manutencao.html" style="display:block; color:#97a0a6; font-size:14px; margin-bottom:8px;">Manutenção</a>
-      <a href="contato.html" style="display:block; color:#97a0a6; font-size:14px;">Contato</a>
-    </div>
-  </div>
-  <div style="max-width: 1160px; margin: 30px auto 0; border-top: 1px solid rgba(255,255,255,0.09); padding-top: 20px; text-align: center; color: #97a0a6; font-size: 13px;">
-    © 2026 TechEmpire · Todos os direitos reservados.
-  </div>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="supabase-config.js"></script>
-<script src="data.js"></script>
-<script src="script.js"></script>
 </body>
 </html>
