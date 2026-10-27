@@ -248,4 +248,62 @@
         </div>
 
         <div class="info-group">
-          <h4>Dados da Solic
+          <h4>Dados da Solicitação</h4>
+          <div class="info-row"><span>Data:</span><span>${new Date(c.criado_em).toLocaleString('pt-BR')}</span></div>
+          <div class="info-row"><span>Categoria:</span><span>${c.categoria || '—'}</span></div>
+          <p style="margin-top: 16px; color: var(--text-muted); font-size: 14px; line-height: 1.6;">${c.descricao}</p>
+        </div>
+
+        <div class="info-group" style="grid-column: 1 / -1; margin-top: 16px;">
+          <h4>Diagnóstico e Andamento (Preenchimento Interno)</h4>
+          <div class="form-group">
+            <label>Status do Atendimento</label>
+            <select id="edit-status">
+              <option value="Nova chamada" ${c.status === 'Nova chamada' ? 'selected' : ''}>Nova chamada</option>
+              <option value="Aguardando análise" ${c.status === 'Aguardando análise' ? 'selected' : ''}>Aguardando análise</option>
+              <option value="Em andamento" ${c.status === 'Em andamento' ? 'selected' : ''}>Em andamento</option>
+              <option value="Aguardando informações do cliente" ${c.status === 'Aguardando informações do cliente' ? 'selected' : ''}>Aguardando cliente</option>
+              <option value="Concluída" ${c.status === 'Concluída' ? 'selected' : ''}>Concluída</option>
+              <option value="Cancelada" ${c.status === 'Cancelada' ? 'selected' : ''}>Cancelada</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Diagnóstico / Observações Técnicas</label>
+            <textarea id="edit-diagnostico" rows="4">${c.ficha_tecnica?.diagnostico || ''}</textarea>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('modal-ficha').style.display = 'flex';
+    }
+
+    function fecharModal() {
+      document.getElementById('modal-ficha').style.display = 'none';
+      chamadoAbertoId = null;
+    }
+
+    async function salvarFicha() {
+      if (!chamadoAbertoId) return;
+      
+      const novoStatus = document.getElementById('edit-status').value;
+      const novoDiag = document.getElementById('edit-diagnostico').value;
+
+      const { error } = await db.from("chamados").update({ 
+        status: novoStatus,
+        ficha_tecnica: { diagnostico: novoDiag }
+      }).eq("id", chamadoAbertoId);
+
+      if (error) {
+        alert("Erro ao salvar: " + error.message);
+      } else {
+        alert("Ficha atualizada com sucesso!");
+        fecharModal();
+        await carregarDados();
+        renderizarInicio();
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
