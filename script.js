@@ -44,8 +44,8 @@ function desenharChrome() {
   if (headerEl && document.body.dataset.page !== 'admin') {
     headerEl.innerHTML = `<div class="bar-in">
       <a class="logo" href="index.html" aria-label="TechEmpire — início" style="display:flex; align-items:center; text-decoration:none;">
-        <!-- APONTANDO PARA A SUA IMAGEM TECH.PNG -->
-        <img src="tech.png" alt="TechEmpire" style="height: 75px; width: auto; object-fit: contain; filter: drop-shadow(0 0 15px rgba(180, 240, 60, 0.6)); transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        <!-- O ?v=99 força o navegador a baixar a nova imagem -->
+        <img src="tech.png?v=99" alt="TechEmpire" style="height: 75px; width: auto; object-fit: contain; filter: drop-shadow(0 0 15px rgba(180, 240, 60, 0.6)); transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
       </a>
      <button class="menu" aria-expanded="false" aria-label="Abrir menu">☰</button>
      <nav id="nav">${l("index.html", "Início")}${l("servicos.html", "Serviços")}${l("manutencao.html", "Manutenção")}${l("sobre.html", "Sobre")}${l("contato.html", "Contato")}
@@ -59,8 +59,7 @@ function desenharChrome() {
     footerEl.innerHTML = `<div class="foot">
       <div>
         <a href="index.html" style="display:inline-block; margin-bottom:24px;">
-          <!-- APONTANDO PARA A SUA IMAGEM TECH.PNG NO RODAPÉ -->
-          <img src="tech.png" alt="TechEmpire" style="height: 90px; width: auto; object-fit: contain;">
+          <img src="tech.png?v=99" alt="TechEmpire" style="height: 90px; width: auto; object-fit: contain;">
         </a>
         <p>Manutenção de dispositivos, suporte técnico e criação de sites. Tecnologia que funciona.</p>
       </div>
