@@ -6,7 +6,7 @@
 <title>Painel Administrativo — TechEmpire</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* ================= RESET E VARIÁVEIS ================= */
+  /* CSS Premium Minimalista */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --bg: #050505;
@@ -20,7 +20,7 @@
   a { text-decoration: none; color: inherit; }
   button { cursor: pointer; font-family: inherit; border: none; background: none; }
   
-  /* ================= SIDEBAR ================= */
+  /* Sidebar */
   .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); padding: 30px 24px; display: flex; flex-direction: column; flex-shrink: 0; }
   .logo { display: flex; align-items: center; gap: 12px; font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 40px; color: #fff; }
   .logo i { background: var(--brand); color: #000; width: 36px; height: 36px; border-radius: 8px; display: grid; place-items: center; font-style: normal; font-weight: 800; }
@@ -30,15 +30,13 @@
   .sidebar a:hover, .sidebar a.active { background: rgba(0, 221, 181, 0.1); color: var(--brand); }
   .sidebar .sair { margin-top: auto; color: #FF6464; border-radius: 0; padding-top: 24px; }
 
-  /* ================= LAYOUT PRINCIPAL ================= */
+  /* Main */
   .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
   .topbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid var(--border); background: var(--bg); }
   .topbar h1 { font-family: 'Space Grotesk', sans-serif; font-size: 20px; }
   
-  /* Área que divide a Tabela (esq) do Chat (dir) */
   .content-wrapper { flex: 1; display: grid; grid-template-columns: 1fr 380px; gap: 24px; padding: 32px; overflow-y: auto; }
   
-  .content { overflow: hidden; }
   .tela { display: none; }
   .tela.active { display: block; }
 
@@ -53,6 +51,15 @@
   .btn-action:hover { background: #00F5C8; }
   .btn-sec { background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 13px; transition: 0.2s; margin-left: 8px; }
   .btn-sec:hover { border-color: var(--brand); color: var(--brand); }
+
+  /* ================= KANBAN (ORGANIZAÇÃO) ================= */
+  .kanban-board { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px; height: calc(100vh - 180px); }
+  .kanban-col { min-width: 280px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; }
+  .kanban-col h4 { font-family: 'Space Grotesk', sans-serif; font-size: 15px; color: var(--text-muted); margin-bottom: 16px; text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+  .kanban-card { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; cursor: grab; transition: 0.2s; }
+  .kanban-card:hover { border-color: var(--brand); transform: translateY(-2px); }
+  .kanban-card .tag { font-size: 11px; color: var(--brand); font-weight: 600; margin-bottom: 4px; display: block; }
+  .kanban-card b { display: block; font-size: 14px; margin-bottom: 8px; color: #fff; }
 
   /* ================= CHAT LATERAL ================= */
   .chat-sidebar { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; display: flex; flex-direction: column; height: calc(100vh - 160px); position: sticky; top: 32px; }
@@ -69,7 +76,7 @@
   .chat-footer input:focus { border-color: var(--brand); }
   .chat-footer button { background: var(--brand); color: #000; padding: 0 20px; border-radius: 8px; font-weight: 600; }
 
-  /* ================= MODAL LAUDO ================= */
+  /* ================= MODAL ================= */
   .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
   .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; width: 95%; max-width: 700px; max-height: 90vh; display: flex; flex-direction: column; }
   .modal-header { padding: 24px 32px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
@@ -91,7 +98,8 @@
     <a href="index.html" class="logo"><i>TE</i><span>Tech<b>Empire</b></span></a>
     <nav>
       <a class="active" onclick="mudarAba('solicitacoes', this)">🎫 Solicitações</a>
-      <a onclick="mudarAba('laudos', this)">📄 Laudos Técnicos</a>
+      <a onclick="mudarAba('organizacao', this)">📋 Organização</a>
+      <a onclick="mudarAba('laudos', this)">📄 Laudos / Projetos</a>
       <a href="login.html" class="sair">Sair da conta</a>
     </nav>
   </div>
@@ -102,8 +110,7 @@
       <h1 id="page-title">Solicitações</h1>
     </div>
 
-    <!-- ÁREA DIVIDIDA: ESQUERDA (CONTEÚDO) E DIREITA (CHAT) -->
-    <div class="content-wrapper">
+    <div class="content-wrapper" id="content-wrapper">
       
       <!-- CONTEÚDO DA ESQUERDA -->
       <div class="content">
@@ -117,19 +124,26 @@
           </div>
         </div>
 
-        <!-- Tela de Laudos Técnicos -->
+        <!-- Tela de Laudos / Projetos -->
         <div id="tela-laudos" class="tela">
           <div class="table-box">
             <div style="padding: 20px; border-bottom: 1px solid var(--border);">
-              <h3 style="font-family: 'Space Grotesk'; font-size: 18px;">Laudos Emitidos e Pendentes</h3>
+              <h3 style="font-family: 'Space Grotesk'; font-size: 18px;">Documentos e Laudos</h3>
             </div>
             <div id="tabela-laudos"></div>
+          </div>
+        </div>
+
+        <!-- Tela de Organização (Kanban) -->
+        <div id="tela-organizacao" class="tela">
+          <div class="kanban-board" id="kanban-board">
+            <!-- Colunas injetadas via JS -->
           </div>
         </div>
       </div>
 
       <!-- CHAT LATERAL (DIREITA) -->
-      <div class="chat-sidebar">
+      <div class="chat-sidebar" id="chat-sidebar">
         <div class="chat-header">
           <div style="width: 32px; height: 32px; background: var(--brand); border-radius: 50%; display: grid; place-items: center; color: #000; font-weight: bold;">👤</div>
           <div>
@@ -149,27 +163,42 @@
     </div>
   </div>
 
-  <!-- MODAL LAUDO TÉCNICO -->
+  <!-- MODAL DOCUMENTO (Laudo ou Briefing) -->
   <div class="modal" id="modal-laudo">
     <div class="modal-box">
       <div class="modal-header">
-        <h2 id="modal-titulo">Emitir Laudo Técnico</h2>
+        <h2 id="modal-titulo">Gerenciar Documento</h2>
         <button onclick="fecharModal()" style="font-size: 24px; color: var(--text-muted);">✕</button>
       </div>
       
       <div class="modal-body">
         <div style="background: rgba(255,255,255,0.02); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px;">
-          <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 4px;">Problema relatado:</div>
+          <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 4px;">Descrição do cliente:</div>
           <div id="modal-descricao" style="font-size: 14px; line-height: 1.5;"></div>
         </div>
 
-        <div class="form-group">
-          <label>Diagnóstico Técnico</label>
-          <textarea id="laudo-diag" rows="3" placeholder="Ex: Placa-mãe com curto..."></textarea>
+        <!-- Campos para Manutenção -->
+        <div id="campos-manutencao">
+          <div class="form-group">
+            <label>Diagnóstico Técnico</label>
+            <textarea id="laudo-diag" rows="3" placeholder="Ex: Placa-mãe com curto..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Solução Aplicada</label>
+            <textarea id="laudo-solucao" rows="3" placeholder="Ex: Substituição do capacitor..."></textarea>
+          </div>
         </div>
-        <div class="form-group">
-          <label>Solução Aplicada</label>
-          <textarea id="laudo-solucao" rows="3" placeholder="Ex: Substituição do capacitor..."></textarea>
+
+        <!-- Campos para Site -->
+        <div id="campos-site" style="display: none;">
+          <div class="form-group">
+            <label>Briefing e Escopo do Projeto</label>
+            <textarea id="proj-escopo" rows="4" placeholder="Descreva o que será feito no site..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Link do Protótipo / Preview</label>
+            <input type="url" id="proj-link" placeholder="https://preview.exemplo.com">
+          </div>
         </div>
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
@@ -194,11 +223,8 @@
       </div>
 
       <div class="modal-actions">
-        <button class="btn-salvar" onclick="salvarLaudo()">Salvar e Enviar ao Cliente</button>
-        <a href="#" id="btn-whatsapp" target="_blank" class="btn-whats">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-          Enviar WhatsApp
-        </a>
+        <button class="btn-salvar" onclick="salvarDocumento()">Salvar e Notificar Cliente</button>
+        <a href="#" id="btn-whatsapp" target="_blank" class="btn-whats">Enviar WhatsApp</a>
       </div>
     </div>
   </div>
@@ -210,13 +236,12 @@
     let idAdmin = null;
     let chamados = [];
     let chamadoChatAtual = null;
-    let chamadoLaudoAtual = null;
+    let chamadoDocAtual = null;
 
     async function init() {
       const { data: { session } } = await db.auth.getSession();
       if (!session) { window.location.href = "login.html"; return; }
       idAdmin = session.user.id;
-
       await carregarDados();
       renderizarSolicitacoes();
     }
@@ -233,32 +258,38 @@
       document.querySelectorAll('.tela').forEach(t => t.classList.remove('active'));
       document.getElementById(`tela-${aba}`).classList.add('active');
 
-      if (aba === 'solicitacoes') {
-        document.getElementById('page-title').textContent = "Solicitações";
-        renderizarSolicitacoes();
-      } else if (aba === 'laudos') {
-        document.getElementById('page-title').textContent = "Laudos Técnicos";
-        renderizarLaudos();
+      // Esconde/Mostra o chat dependendo da aba
+      const chat = document.getElementById('chat-sidebar');
+      if (aba === 'organizacao') {
+        chat.style.display = 'none';
+        document.getElementById('content-wrapper').style.gridTemplateColumns = '1fr';
+      } else {
+        chat.style.display = 'flex';
+        document.getElementById('content-wrapper').style.gridTemplateColumns = '1fr 380px';
       }
+
+      document.getElementById('page-title').textContent = 
+        aba === 'solicitacoes' ? "Solicitações" : 
+        aba === 'organizacao' ? "Organização de Projetos" : "Laudos / Briefings";
+
+      if (aba === 'solicitacoes') renderizarSolicitacoes();
+      if (aba === 'laudos') renderizarLaudos();
+      if (aba === 'organizacao') renderizarKanban();
     }
 
-    // ================= TELA DE SOLICITAÇÕES =================
+    // ================= SOLICITAÇÕES =================
     function renderizarSolicitacoes() {
-      if (chamados.length === 0) {
-        document.getElementById("tabela-solicitacoes").innerHTML = "<p style='padding: 24px; color: var(--text-muted);'>Nenhuma solicitação encontrada.</p>";
-        return;
-      }
-
-      let html = `<table><thead><tr><th>Protocolo</th><th>Cliente</th><th>Assunto</th><th>Status</th><th>Ações</th></tr></thead><tbody>`;
+      let html = `<table><thead><tr><th>Protocolo</th><th>Cliente</th><th>Serviço</th><th>Status</th><th>Ações</th></tr></thead><tbody>`;
       chamados.forEach(c => {
+        const isSite = c.categoria && c.categoria.toLowerCase().includes('site');
         html += `<tr>
           <td><b>${c.protocolo || 'Gerando...'}</b></td>
           <td>${c.cliente_nome || 'Visitante'}</td>
-          <td>${c.titulo}</td>
+          <td>${isSite ? '💻 Site' : '🔧 Manutenção'}</td>
           <td><span class="pill">${c.status}</span></td>
           <td>
             <button class="btn-action" onclick="abrirChat('${c.id}')">Chat</button>
-            <button class="btn-sec" onclick="abrirLaudo('${c.id}')">Laudo</button>
+            <button class="btn-sec" onclick="abrirDocumento('${c.id}', ${isSite})">${isSite ? 'Briefing' : 'Laudo'}</button>
           </td>
         </tr>`;
       });
@@ -266,28 +297,140 @@
       document.getElementById("tabela-solicitacoes").innerHTML = html;
     }
 
-    // ================= TELA DE LAUDOS =================
-    function renderizarLaudos() {
-      if (chamados.length === 0) {
-        document.getElementById("tabela-laudos").innerHTML = "<p style='padding: 24px; color: var(--text-muted);'>Nenhum laudo encontrado.</p>";
-        return;
-      }
+    // ================= KANBAN (ORGANIZAÇÃO) =================
+    function renderizarKanban() {
+      const colunas = [
+        { id: 'Nova chamada', titulo: '🟢 Novos Pedidos' },
+        { id: 'Em andamento', titulo: '🔵 Em Execução' },
+        { id: 'Aguardando aprovação do orçamento', titulo: '🟡 Aguardando Cliente' },
+        { id: 'Concluída', titulo: '⚪ Concluídos' }
+      ];
 
-      let html = `<table><thead><tr><th>Protocolo</th><th>Cliente</th><th>Status do Laudo</th><th>Ação</th></tr></thead><tbody>`;
+      let html = '';
+      colunas.forEach(col => {
+        const cards = chamados.filter(c => c.status === col.id);
+        html += `<div class="kanban-col">
+          <h4>${col.titulo} (${cards.length})</h4>`;
+          
+        cards.forEach(c => {
+          const isSite = c.categoria && c.categoria.toLowerCase().includes('site');
+          html += `<div class="kanban-card" onclick="abrirDocumento('${c.id}', ${isSite})">
+            <span class="tag">${c.protocolo || 'S/N'}</span>
+            <b>${c.cliente_nome || 'Visitante'}</b>
+            <div style="font-size: 12px; color: var(--text-muted);">${c.titulo}</div>
+          </div>`;
+        });
+        
+        html += `</div>`;
+      });
+      
+      document.getElementById("kanban-board").innerHTML = html;
+    }
+
+    // ================= LAUDOS / BRIEFINGS =================
+    function renderizarLaudos() {
+      let html = `<table><thead><tr><th>Protocolo</th><th>Cliente</th><th>Tipo</th><th>Status</th><th>Ação</th></tr></thead><tbody>`;
       chamados.forEach(c => {
-        const temLaudo = c.laudo_tecnico ? "✅ Emitido" : "⏳ Pendente";
+        const isSite = c.categoria && c.categoria.toLowerCase().includes('site');
+        const temDoc = isSite ? c.detalhes_projeto : c.laudo_tecnico;
+        const statusDoc = temDoc ? "✅ Emitido" : "⏳ Pendente";
+        
         html += `<tr>
           <td><b>${c.protocolo || 'N/A'}</b></td>
           <td>${c.cliente_nome || 'Visitante'}</td>
-          <td>${temLaudo}</td>
-          <td><button class="btn-action" onclick="abrirLaudo('${c.id}')">Gerenciar Laudo</button></td>
+          <td>${isSite ? 'Site' : 'Manutenção'}</td>
+          <td>${statusDoc}</td>
+          <td><button class="btn-action" onclick="abrirDocumento('${c.id}', ${isSite})">Gerenciar</button></td>
         </tr>`;
       });
       html += `</tbody></table>`;
       document.getElementById("tabela-laudos").innerHTML = html;
     }
 
-    // ================= CHAT LATERAL =================
+    // ================= MODAL DINÂMICO =================
+    function abrirDocumento(id, isSite) {
+      chamadoDocAtual = chamados.find(x => x.id === id);
+      if (!chamadoDocAtual) return;
+
+      document.getElementById('modal-titulo').textContent = isSite ? 'Briefing do Projeto' : 'Laudo Técnico';
+      document.getElementById('modal-descricao').textContent = chamadoDocAtual.descricao;
+      
+      // Alterna os campos visíveis
+      document.getElementById('campos-manutencao').style.display = isSite ? 'none' : 'block';
+      document.getElementById('campos-site').style.display = isSite ? 'block' : 'none';
+
+      if (isSite) {
+        const p = chamadoDocAtual.detalhes_projeto || {};
+        document.getElementById('proj-escopo').value = p.escopo || '';
+        document.getElementById('proj-link').value = p.link || '';
+      } else {
+        const l = chamadoDocAtual.laudo_tecnico || {};
+        document.getElementById('laudo-diag').value = l.diagnostico || '';
+        document.getElementById('laudo-solucao').value = l.solucao || '';
+      }
+
+      const l = chamadoDocAtual.laudo_tecnico || {};
+      const p = chamadoDocAtual.detalhes_projeto || {};
+      document.getElementById('laudo-prazo').value = l.prazo || p.prazo || '';
+      document.getElementById('laudo-valor').value = l.valor || p.valor || '';
+      document.getElementById('laudo-status').value = chamadoDocAtual.status;
+
+      document.getElementById('modal-laudo').style.display = 'flex';
+    }
+
+    function fecharModal() {
+      document.getElementById('modal-laudo').style.display = 'none';
+      chamadoDocAtual = null;
+    }
+
+    async function salvarDocumento() {
+      if (!chamadoDocAtual) return;
+      const isSite = chamadoDocAtual.categoria && chamadoDocAtual.categoria.toLowerCase().includes('site');
+      
+      const prazo = document.getElementById('laudo-prazo').value;
+      const valor = document.getElementById('laudo-valor').value;
+      const status = document.getElementById('laudo-status').value;
+
+      let updateData = { status: status };
+
+      if (isSite) {
+        updateData.detalhes_projeto = {
+          escopo: document.getElementById('proj-escopo').value,
+          link: document.getElementById('proj-link').value,
+          prazo: prazo,
+          valor: valor
+        };
+      } else {
+        updateData.laudo_tecnico = {
+          diagnostico: document.getElementById('laudo-diag').value,
+          solucao: document.getElementById('laudo-solucao').value,
+          prazo: prazo,
+          valor: valor
+        };
+      }
+
+      const { error } = await db.from("chamados").update(updateData).eq("id", chamadoDocAtual.id);
+      if (error) return alert("Erro ao salvar: " + error.message);
+
+      // Atualiza o link do WhatsApp
+      const fone = chamadoDocAtual.whatsapp || chamadoDocAtual.cliente_telefone;
+      if (fone) {
+        const numLimpo = fone.replace(/\D/g, '');
+        const msg = `Olá, ${chamadoDocAtual.cliente_nome}! Atualizamos seu chamado ${chamadoDocAtual.protocolo}.\nPrazo: ${prazo}\nValor: R$ ${valor}\nStatus: ${status}`;
+        document.getElementById('btn-whatsapp').href = `https://wa.me/55${numLimpo}?text=${encodeURIComponent(msg)}`;
+      }
+
+      alert("Documento salvo com sucesso!");
+      await carregarDados();
+      
+      // Atualiza a tela que está aberta
+      const abaAtiva = document.querySelector('.tela.active').id;
+      if (abaAtiva === 'tela-laudos') renderizarLaudos();
+      else if (abaAtiva === 'tela-organizacao') renderizarKanban();
+      else renderizarSolicitacoes();
+    }
+
+    // ================= CHAT =================
     async function abrirChat(id) {
       chamadoChatAtual = chamados.find(x => x.id === id);
       if (!chamadoChatAtual) return;
@@ -296,15 +439,11 @@
       document.getElementById('chat-status').textContent = chamadoChatAtual.protocolo || 'S/N';
       document.getElementById('form-chat').style.display = 'flex';
       
-      await carregarMensagens(id);
-    }
-
-    async function carregarMensagens(chamadoId) {
+      const { data } = await db.from('mensagens').select('*').eq('chamado_id', id).order('criado_em', { ascending: true });
       const chatBody = document.getElementById('chat-mensagens');
-      const { data } = await db.from('mensagens').select('*').eq('chamado_id', chamadoId).order('criado_em', { ascending: true });
       
       if (!data || data.length === 0) {
-        chatBody.innerHTML = `<p style="text-align:center; color:var(--text-muted);">Nenhuma mensagem ainda. Envie a primeira!</p>`;
+        chatBody.innerHTML = `<p style="text-align:center; color:var(--text-muted);">Nenhuma mensagem ainda.</p>`;
         return;
       }
 
@@ -325,68 +464,8 @@
 
       await db.from('mensagens').insert({ chamado_id: chamadoChatAtual.id, remetente_id: idAdmin, conteudo: texto });
       input.value = '';
-      await carregarMensagens(chamadoChatAtual.id);
+      await abrirChat(chamadoChatAtual.id);
     };
-
-    // ================= LAUDO =================
-    function abrirLaudo(id) {
-      chamadoLaudoAtual = chamados.find(x => x.id === id);
-      if (!chamadoLaudoAtual) return;
-
-      document.getElementById('modal-titulo').textContent = `Laudo: ${chamadoLaudoAtual.protocolo}`;
-      document.getElementById('modal-descricao').textContent = chamadoLaudoAtual.descricao;
-      
-      const l = chamadoLaudoAtual.laudo_tecnico || {};
-      document.getElementById('laudo-diag').value = l.diagnostico || '';
-      document.getElementById('laudo-solucao').value = l.solucao || '';
-      document.getElementById('laudo-prazo').value = l.prazo || '';
-      document.getElementById('laudo-valor').value = l.valor || '';
-      document.getElementById('laudo-status').value = chamadoLaudoAtual.status;
-
-      document.getElementById('modal-laudo').style.display = 'flex';
-    }
-
-    function fecharModal() {
-      document.getElementById('modal-laudo').style.display = 'none';
-      chamadoLaudoAtual = null;
-    }
-
-    async function salvarLaudo() {
-      if (!chamadoLaudoAtual) return;
-
-      const diag = document.getElementById('laudo-diag').value;
-      const solucao = document.getElementById('laudo-solucao').value;
-      const prazo = document.getElementById('laudo-prazo').value;
-      const valor = document.getElementById('laudo-valor').value;
-      const status = document.getElementById('laudo-status').value;
-
-      const laudoObj = { diagnostico: diag, solucao: solucao, prazo: prazo, valor: valor };
-
-      const { error } = await db.from("chamados").update({ 
-        laudo_tecnico: laudoObj, status: status 
-      }).eq("id", chamadoLaudoAtual.id);
-
-      if (error) return alert("Erro ao salvar laudo: " + error.message);
-
-      const fone = chamadoLaudoAtual.whatsapp || chamadoLaudoAtual.cliente_telefone;
-      if (fone) {
-        const numLimpo = fone.replace(/\D/g, '');
-        const msg = `Olá, ${chamadoLaudoAtual.cliente_nome}! Segue o laudo técnico do seu chamado ${chamadoLaudoAtual.protocolo}:\n\n*Diagnóstico:* ${diag}\n*Solução:* ${solucao}\n*Prazo:* ${prazo}\n*Valor:* R$ ${valor}\n\nStatus atual: ${status}.`;
-        
-        document.getElementById('btn-whatsapp').href = `https://wa.me/55${numLimpo}?text=${encodeURIComponent(msg)}`;
-        document.getElementById('btn-whatsapp').style.display = 'inline-flex';
-      } else {
-        document.getElementById('btn-whatsapp').style.display = 'none';
-      }
-
-      alert("Laudo salvo com sucesso!");
-      await carregarDados();
-      
-      // Atualiza a tabela atual
-      const abaAtiva = document.querySelector('.tela.active').id;
-      if (abaAtiva === 'tela-laudos') renderizarLaudos();
-      else renderizarSolicitacoes();
-    }
 
     init();
   </script>
