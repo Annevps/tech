@@ -24,10 +24,9 @@
   
   /* ================= SIDEBAR ================= */
   .sidebar { width: 240px; background: var(--s1); border-right: 1px solid var(--border); padding: 24px; display: flex; flex-direction: column; flex-shrink: 0; }
-  
-  /* LOGO NO ADMIN */
-  .logo-admin { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; text-decoration: none; }
-  .logo-admin img { height: 70px; width: auto; object-fit: contain; filter: drop-shadow(0 0 15px rgba(180, 240, 60, 0.6)); }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 40px; color: #fff; }
+  .logo i { background: var(--brand); color: #000; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; font-style: normal; font-weight: 800; }
+  .logo b { color: var(--brand); }
   
   .sidebar nav { display: flex; flex-direction: column; gap: 4px; }
   .sidebar a { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px; font-weight: 500; color: var(--text-muted); transition: 0.2s; font-size: 14px; cursor: pointer; }
@@ -140,9 +139,7 @@
 
   <!-- SIDEBAR -->
   <div class="sidebar">
-    <a href="index.html" class="logo-admin">
-      <img src="tech.png?v=99" alt="TechEmpire">
-    </a>
+    <a href="index.html" class="logo"><i>TE</i><span>Tech<b>Empire</b></span></a>
     <nav>
       <a id="nav-inicio" class="active" onclick="mudarAba('inicio')">🏠 Início</a>
       <a id="nav-chamados" onclick="mudarAba('chamados')">🎫 Chamados</a>
@@ -279,7 +276,6 @@
         <div id="modal-laudo-desc" style="font-size: 13px; line-height: 1.5;"></div>
       </div>
 
-      <!-- CAMPOS PARA MANUTENÇÃO -->
       <div id="campos-manutencao">
         <div class="form-group">
           <label>Diagnóstico Técnico</label>
@@ -291,7 +287,6 @@
         </div>
       </div>
 
-      <!-- CAMPOS PARA SITE -->
       <div id="campos-site" style="display: none;">
         <div class="form-group">
           <label>Briefing e Escopo do Projeto</label>
@@ -367,7 +362,6 @@
       renderizarTabelaClientes();
     }
 
-    // ================= NAVEGAÇÃO =================
     function mudarAba(aba) {
       document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
       const el = document.getElementById('nav-' + aba);
@@ -398,7 +392,6 @@
       }
     }
 
-    // ================= RENDERIZAÇÃO: KANBAN =================
     function renderizarKanban() {
       const novos = chamados.filter(c => c.status === 'Nova chamada').length;
       const exec = chamados.filter(c => c.status === 'Em andamento').length;
@@ -447,7 +440,6 @@
       document.getElementById('kanban-board').innerHTML = html;
     }
 
-    // ================= RENDERIZAÇÃO: TABELAS =================
     function renderizarTabelaChamados() {
       let html = '';
       chamados.forEach(c => {
@@ -494,7 +486,6 @@
       document.getElementById('tabela-clientes-body').innerHTML = html || "<tr><td colspan='4' style='text-align:center;'>Nenhum cliente cadastrado.</td></tr>";
     }
 
-    // ================= MODAL CHAMADO (STATUS/EXCLUIR) =================
     function abrirModalChamado(id) {
       const c = chamados.find(x => x.id === id);
       if (!c) return;
@@ -526,7 +517,6 @@
       await carregarDados();
     }
 
-    // ================= MODAL LAUDO / BRIEFING =================
     function abrirModalLaudo(id) {
       laudoAtual = chamados.find(x => x.id === id);
       if (!laudoAtual) return;
@@ -623,7 +613,6 @@
       }
     }
 
-    // ================= ANOTAÇÕES =================
     async function salvarAnotacao() {
       const texto = document.getElementById('note-text').value.trim();
       if (!texto) return;
