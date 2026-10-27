@@ -1,197 +1,213 @@
-/* TechEmpire — design system */
-:root{--bg:#07090b;--s1:#0e1114;--s2:#14181c;--line:rgba(255,255,255,.09);--line2:rgba(255,255,255,.16);--ink:#f2f5f0;--muted:#97a0a6;--lime:#b4f03c;--lime2:#8fd21f;--tint:rgba(180,240,60,.12);--err:#ff7b6b;--r:20px;--head:"Space Grotesk",Inter,system-ui,sans-serif}
-*{box-sizing:border-box}html{scroll-behavior:smooth;color-scheme:dark}
-body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;
- background-image:radial-gradient(60rem 30rem at 85% -10%,rgba(180,240,60,.10),transparent 60%),linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:auto,64px 64px,64px 64px;background-attachment:fixed;background-position:0 0,-1px -1px,-1px -1px}
-body::before{content:"";position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 30%,var(--bg) 85%);pointer-events:none;z-index:0}
-a{color:inherit}button,input,select,textarea{font:inherit;color:inherit}:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
-#site-header,.wrap-main,#site-footer,.warn{position:relative;z-index:1}
-.wrap-main{max-width:1160px;margin:0 auto;padding:40px 24px 88px;min-height:70vh}
+/* TechEmpire — Lógica global */
+const CFG = window.SUPABASE_CONFIG || {};
+const CONFIGURADO = !!(CFG.url && CFG.anonKey && !CFG.url.startsWith("COLE"));
+const sb = CONFIGURADO ? supabase.createClient(CFG.url, CFG.anonKey) : null;
+const { SERVICOS, STATUS, PAGAMENTO_STATUS, FORMAS, ETAPAS_LEAD, DISPOSITIVOS, TIPOS_SITE, ATENDIMENTO } = window.TE || {};
+const App = { session: null, perfil: null };
 
-/* Cabeçalho */
-#site-header{position:sticky;top:0;z-index:30;background:rgba(7,9,11,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
-.bar-in{max-width:1160px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.logo{display:flex;align-items:center;gap:11px;font-family:var(--head);font-weight:700;font-size:21px;text-decoration:none;letter-spacing:-.02em}
-.logo i{font-style:normal;background:var(--lime);color:#0a0d05;width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:16px;box-shadow:0 0 28px rgba(180,240,60,.35)}.logo b{color:var(--lime)}
-#nav{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
-#nav a:not(.btn){padding:8px 13px;border-radius:999px;text-decoration:none;font-weight:500;font-size:15px;color:var(--muted);transition:.2s}
-#nav a:not(.btn):hover,#nav a.on{color:var(--ink);background:rgba(255,255,255,.07)}
-.menu{display:none;background:none;border:1px solid var(--line2);border-radius:10px;padding:6px 12px;cursor:pointer}
+/* Utilitários */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmtData = d => d ? new Date(d).toLocaleString("pt-BR") : "—";
+const brl = v => Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const num = n => "TE-" + String(n ?? "").padStart(6, "0");
+const digitos = v => String(v || "").replace(/\D/g, "");
+const qs = k => new URLSearchParams(location.search).get(k);
+const opts = (arr, sel) => (arr || []).map(x => `<option ${x === sel ? "selected" : ""}>${esc(x)}</option>`).join("");
+const pill = (t, cinza) => `<span class="pill ${cinza ? "gray" : ""}">${esc(t)}</span>`;
+const tabela = (cab, linhas) => linhas.length ? `<div class="tw"><table><thead><tr>${cab.map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody>${linhas.join("")}</tbody></table></div>` : `<p class="empty">Nada por aqui ainda.</p>`;
 
-/* Botões */
-.btn{border:1px solid var(--line2);background:rgba(255,255,255,.04);border-radius:999px;padding:12px 24px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:transform .15s,background .2s,box-shadow .2s}
-.btn:hover{background:rgba(255,255,255,.09);transform:translateY(-1px)}
-.btn.primary{background:var(--lime);border-color:var(--lime);color:#0a0d05;box-shadow:0 10px 30px -10px rgba(180,240,60,.6)}.btn.primary:hover{background:#c6f75e;box-shadow:0 14px 34px -8px rgba(180,240,60,.7)}
-.btn.sm{padding:8px 16px;font-size:14px}.btn.danger{color:var(--err);border-color:rgba(255,123,107,.5)}.btn:disabled{opacity:.55;cursor:wait;transform:none}
-.warn{background:#3a2f06;color:#ffd866;padding:12px 24px;text-align:center;font-weight:600}
+function toast(t) { let e = $("#toast"); if (!e) { e = document.createElement("div"); e.id = "toast"; e.setAttribute("role", "status"); document.body.append(e); } e.textContent = t; e.style.display = "block"; clearTimeout(toast.t); toast.t = setTimeout(() => e.style.display = "none", 3500); }
+function msg(id, texto, ok) { const e = $("#" + id); if (!e) return; e.textContent = texto; e.className = "msg on " + (ok ? "ok" : "err"); }
+function ocupado(form, on) { const b = form.querySelector("button[type=submit]"); if (b) b.disabled = on; }
+function cpfValido(c) { c = digitos(c); if (c.length !== 11 || /^(\d)\1+$/.test(c)) return false; for (const t of [9, 10]) { let s = 0; for (let i = 0; i < t; i++) s += +c[i] * (t + 1 - i); if ((s * 10) % 11 % 10 !== +c[t]) return false; } return true; }
+const proximaSegura = n => /^[a-z\-]+\.html(\?[\w=&\-]*)?$/i.test(n || "") ? n : null;
 
-/* Tipografia */
-h1,h2,h3{font-family:var(--head);letter-spacing:-.03em;margin:0}
-h1{font-size:clamp(42px,8vw,86px);line-height:1;font-weight:700;margin-bottom:22px}
-h1 em,.grad{font-style:normal;background:linear-gradient(100deg,var(--lime),#e4ff9a 60%,var(--lime2));-webkit-background-clip:text;background-clip:text;color:transparent}
-h2{font-size:clamp(28px,4.4vw,44px);line-height:1.08;font-weight:700;margin-bottom:10px}h3{font-size:20px;font-weight:600;margin-bottom:8px}
-.lead{max-width:58ch;color:var(--muted);font-size:clamp(16px,2vw,19px)}.sub{color:var(--muted);margin:0 0 22px}
-.badge{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(180,240,60,.35);background:var(--tint);color:var(--lime);border-radius:999px;padding:6px 14px;font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:22px}
-.badge::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--lime);box-shadow:0 0 10px var(--lime)}
-.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-
-/* Hero */
-.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center;padding:36px 0 56px}
-.hero.solo{grid-template-columns:1fr;max-width:860px}
-.mock{background:linear-gradient(160deg,var(--s2),var(--s1));border:1px solid var(--line2);border-radius:24px;padding:22px;box-shadow:0 40px 80px -30px rgba(0,0,0,.8),0 0 60px -20px rgba(180,240,60,.25);transform:rotate(1.2deg)}
-.mock .top{display:flex;gap:6px;margin-bottom:16px}.mock .top i{width:10px;height:10px;border-radius:50%;background:var(--line2)}
-.mock .ex{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
-.mock .st{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.04);margin-bottom:8px;font-size:14px}
-.mock .st b{margin-left:auto;font-size:12px;color:var(--lime)}.mock .dot{width:9px;height:9px;border-radius:50%;background:var(--line2)}.mock .on .dot{background:var(--lime);box-shadow:0 0 12px var(--lime)}.mock .on{outline:1px solid rgba(180,240,60,.4)}
-.mark{overflow:hidden;border-block:1px solid var(--line);margin:8px 0 56px;padding:14px 0;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
-.mark div{display:flex;gap:48px;width:max-content;animation:mq 30s linear infinite;font-family:var(--head);font-size:20px;color:var(--muted)}.mark span::after{content:"✦";color:var(--lime);margin-left:48px}
-@keyframes mq{to{transform:translateX(-50%)}}
-
-/* Seções e cartões */
-.sec{margin:72px 0}.sec-h{max-width:640px;margin-bottom:32px}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;margin:24px 0}
-.card,.panel,.box{background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.02));border:1px solid var(--line);border-radius:var(--r);padding:26px;position:relative;transition:border-color .25s,transform .25s}
-.card:hover{border-color:rgba(180,240,60,.45);transform:translateY(-3px)}.card p{margin:0;color:var(--muted)}
-.ic{width:48px;height:48px;border-radius:14px;background:var(--tint);color:var(--lime);display:grid;place-items:center;margin-bottom:18px}.ic svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-.bento{display:grid;grid-template-columns:repeat(6,1fr);gap:18px}.bento .card:nth-child(1){grid-column:span 3}.bento .card:nth-child(2){grid-column:span 3}.bento .card:nth-child(3){grid-column:span 2}.bento .card:nth-child(4){grid-column:span 4;background:linear-gradient(135deg,rgba(180,240,60,.16),rgba(255,255,255,.02))}
-.steps{counter-reset:s;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}.steps .card::before{counter-increment:s;content:"0" counter(s);font-family:var(--head);font-size:44px;font-weight:700;color:var(--lime);display:block;line-height:1;margin-bottom:14px}
-.cta{background:var(--lime);color:#0a0d05;border-radius:28px;padding:clamp(28px,5vw,56px);display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;margin:72px 0 0}
-.cta h2{margin:0;color:#0a0d05}.cta p{margin:6px 0 0;opacity:.75}.cta .btn{background:#0a0d05;border-color:#0a0d05;color:var(--lime)}
-
-/* Formulários */
-.panel{max-width:660px;margin:0 auto;padding:clamp(22px,4vw,38px);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));backdrop-filter:blur(8px)}.panel.wide{max-width:800px}.box{margin-bottom:16px;padding:22px}
-form{display:grid;gap:14px}.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-label{display:grid;gap:6px;font-size:13.5px;font-weight:600;color:#d4dad6}
-input,select,textarea{border:1px solid var(--line2);background:#0b0e11;border-radius:12px;padding:12px 14px;width:100%;transition:border-color .2s,box-shadow .2s}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--lime);box-shadow:0 0 0 3px rgba(180,240,60,.18)}input:disabled{opacity:.6}textarea{min-height:100px;resize:vertical}input[type=file]{padding:9px}
-select option{background:#0b0e11}
-.msg{padding:12px 14px;border-radius:12px;font-size:14px;display:none}.msg.on{display:block}.msg.err{background:rgba(255,123,107,.12);color:var(--err);border:1px solid rgba(255,123,107,.3)}.msg.ok{background:var(--tint);color:var(--lime);border:1px solid rgba(180,240,60,.3)}
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}.tabs .btn.act{background:var(--lime);color:#0a0d05;border-color:var(--lime)}
-
-/* Painel, tabelas */
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:24px}
-.k{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));border:1px solid var(--line);border-radius:18px;padding:18px}.k b{display:block;font-family:var(--head);font-size:36px;font-weight:700;color:var(--lime);line-height:1.1}.k span{color:var(--muted);font-size:14px}
-.tw{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.02)}table{width:100%;border-collapse:collapse;font-size:14px}
-th{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600}th,td{text-align:left;padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}
-tr.go{cursor:pointer}tr.go:hover{background:rgba(180,240,60,.06)}td a{color:var(--lime);font-weight:600;text-decoration:none}
-.pill{background:var(--tint);color:var(--lime);border-radius:999px;padding:3px 11px;font-weight:600;font-size:12px;white-space:nowrap;display:inline-block;border:1px solid rgba(180,240,60,.25)}.pill.gray{background:var(--line);color:var(--muted);border-color:transparent}
-.empty{color:var(--muted);padding:18px 0}.bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}.bar input,.bar select{width:auto;min-width:170px}
-.files{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}.file{margin:0}.file img,.file video{width:100%;border-radius:12px;max-height:180px;object-fit:cover;border:1px solid var(--line)}.file figcaption{font-size:13px;word-break:break-all;margin-top:4px}.file a{color:var(--lime)}
-.tl{list-style:none;padding:0;margin:0}.tl li{padding:7px 0 7px 18px;border-left:2px solid var(--lime);margin-left:6px;font-size:14px;color:#d4dad6}
-
-/* Chat */
-.chat{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#090c0f}
-.chat-log{height:380px;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
-.b{max-width:80%;padding:10px 14px;border-radius:16px;font-size:14.5px;white-space:pre-wrap;word-break:break-word}.b small{display:block;font-size:11px;opacity:.7;margin-bottom:2px}
-.b.ou{align-self:flex-start;background:var(--s2);border:1px solid var(--line);border-bottom-left-radius:4px}.b.me{align-self:flex-end;background:var(--lime);color:#0a0d05;border-bottom-right-radius:4px}
-.b.int{background:repeating-linear-gradient(135deg,#2b2508,#2b2508 8px,#241f06 8px,#241f06 16px);color:#ffd866;border:1px dashed #a88a1a}
-.chat-form{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line);align-items:flex-end;flex-wrap:wrap}.chat-form textarea{flex:1;min-width:160px;min-height:44px;max-height:120px;padding:10px 14px;border-radius:14px}
-.chat-form .clip{font-size:20px;cursor:pointer;padding:6px}.chat-form .int{display:flex;gap:6px;align-items:center;font-size:12px;color:#ffd866}.chat-form .int input{width:auto}
-#toast{position:fixed;bottom:20px;right:20px;background:var(--lime);color:#0a0d05;font-weight:600;padding:12px 18px;border-radius:14px;display:none;z-index:99;max-width:80vw;box-shadow:0 10px 40px rgba(0,0,0,.5)}
-
-/* ================= NOVO RODAPÉ PREMIUM ================= */
-#site-footer {
-  background: #0a0d0f !important;
-  border-top: 1px solid var(--line);
-  padding: 60px 24px 30px;
-  margin-top: 60px;
+async function comClientes(linhas) { 
+  const ids = [...new Set(linhas.map(l => l.cliente_id).filter(Boolean))]; if (!ids.length) return linhas;
+  const { data } = await sb.from("usuarios").select("id,nome,email").in("id", ids); const m = Object.fromEntries((data || []).map(u => [u.id, u]));
+  return linhas.map(l => ({ ...l, cliente: m[l.cliente_id] || {} }));
 }
 
-.foot-new {
-  max-width: 1160px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr 1fr;
-  gap: 40px;
-}
+/* Ações Rápidas */
+const Act = {}, Chg = {};
+document.addEventListener("click", e => { const b = e.target.closest("[data-act]"); if (b && Act[b.dataset.act]) { e.preventDefault(); Act[b.dataset.act](b.dataset, b); } });
+document.addEventListener("change", e => { const b = e.target.closest("[data-chg]"); if (b && Chg[b.dataset.chg]) Chg[b.dataset.chg](b.dataset, b); });
 
-.foot-col.brand p {
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.6;
-  margin-bottom: 20px;
-  max-width: 250px;
-}
+/* ====================== MENU GLOBAL E SEGURANÇA ====================== */
+function desenharChrome() {
+  const adm = App.perfil?.is_admin, logado = !!App.session, atual = location.pathname.split("/").pop() || "index.html";
+  const l = (href, txt) => `<a href="${href}" class="${atual === href ? "on" : ""}">${txt}</a>`;
+  
+  const headerEl = $("#site-header");
+  if (headerEl && document.body.dataset.page !== 'admin') {
+    headerEl.innerHTML = `<div class="bar-in">
+      <a class="logo" href="index.html" aria-label="TechEmpire — início" style="display:flex; align-items:center; text-decoration:none;">
+        <img src="tech.png" alt="TechEmpire" style="height: 75px; width: auto; object-fit: contain; filter: drop-shadow(0 0 15px rgba(180, 240, 60, 0.6)); transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+      </a>
+     <button class="menu" aria-expanded="false" aria-label="Abrir menu">☰</button>
+     <nav id="nav">${l("index.html", "Início")}${l("servicos.html", "Serviços")}${l("manutencao.html", "Manutenção")}${l("sobre.html", "Sobre")}${l("contato.html", "Contato")}
+     ${logado ? `${adm ? l("admin.html", "Admin") : ""}${l("painel.html", "Meu painel")}${l("perfil.html", "Perfil")}<a href="#" class="btn sm" onclick="fazerLogout(event)">Sair</a>`
+       : `<a class="btn sm" href="login.html">Entrar</a><a class="btn sm primary" href="criar-conta.html">Criar conta</a>`}</nav></div>`;
+    $(".menu").onclick = e => { const n = $("#nav").classList.toggle("open"); e.currentTarget.setAttribute("aria-expanded", n); };
+  }
 
-.social-links {
-  display: flex;
-  gap: 12px;
-}
-
-.social-links a {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--line);
-  font-size: 16px;
-  transition: 0.2s;
-}
-
-.social-links a:hover {
-  border-color: var(--lime);
-  color: var(--lime);
-  transform: translateY(-3px);
-}
-
-.foot-col h4 {
-  font-family: var(--head);
-  color: var(--ink);
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 20px;
-  letter-spacing: -0.5px;
-}
-
-.foot-col a:not(.social-links a) {
-  display: block;
-  color: var(--muted);
-  font-size: 14px;
-  margin-bottom: 12px;
-  transition: 0.2s;
-}
-
-.foot-col a:not(.social-links a):hover {
-  color: var(--lime);
-  padding-left: 4px;
-}
-
-.copy-new {
-  max-width: 1160px;
-  margin: 40px auto 0;
-  padding-top: 24px;
-  border-top: 1px solid var(--line);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  color: var(--muted);
-  font-size: 13px;
-}
-
-@media (max-width: 900px) {
-  .foot-new {
-    grid-template-columns: 1fr 1fr;
+  const footerEl = $("#site-footer");
+  if (footerEl && document.body.dataset.page !== 'admin') {
+    footerEl.innerHTML = `<div class="foot">
+      <div>
+        <a href="index.html" style="display:inline-block; margin-bottom:24px;"><img src="tech.png" alt="TechEmpire" style="height: 90px; width: auto; object-fit: contain;"></a>
+        <p>Manutenção de dispositivos, suporte técnico e criação de sites. Tecnologia que funciona.</p>
+      </div>
+      <div><h4>Site</h4><a href="servicos.html">Serviços</a><a href="manutencao.html">Manutenção preventiva</a><a href="sobre.html">Sobre</a><a href="contato.html">Contato</a></div>
+      <div><h4>Sua conta</h4><a href="login.html">Entrar</a><a href="criar-conta.html">Criar conta</a><a href="recuperar-senha.html">Recuperar senha</a></div></div>
+      <div class="copy">© ${new Date().getFullYear()} TechEmpire · Seus dados são tratados conforme a LGPD.</div>`;
   }
 }
 
-@media (max-width: 600px) {
-  .foot-new {
-    grid-template-columns: 1fr;
-    text-align: center;
+window.fazerLogout = async (e) => {
+  if (e) e.preventDefault();
+  sessionStorage.removeItem('te_user_id');
+  sessionStorage.removeItem('te_user_email');
+  if (sb) await sb.auth.signOut();
+  window.location.href = "index.html";
+};
+
+async function boot() {
+  const need = document.body.dataset.auth || "public";
+  
+  if (sb) {
+    const { data } = await sb.auth.getSession(); 
+    App.session = data.session;
+    
+    if (App.session) { 
+      const r = await sb.from("usuarios").select("*").eq("id", App.session.user.id).maybeSingle(); 
+      App.perfil = r.data;
+      if (App.perfil?.ativo === false) { await sb.auth.signOut(); location.href = "login.html?inativo=1"; return; } 
+    }
   }
-  .foot-col.brand p { margin: 0 auto 20px; }
-  .social-links { justify-content: center; }
-  .copy-new {
-    flex-direction: column;
-    text-align: center;
+
+  if ((need === "client" || need === "admin") && !App.session) { location.href = "login.html?next=" + encodeURIComponent(location.pathname.split("/").pop() + location.search); return; }
+  if (need === "admin" && !App.perfil?.is_admin) { location.href = "painel.html"; return; }
+  if (need === "guest" && App.session && !location.hash.includes("type=recovery")) { location.href = App.perfil?.is_admin ? "admin.html" : "painel.html"; return; }
+  
+  desenharChrome();
+  const fn = Pages[document.body.dataset.page];
+  if (fn) { 
+    if (!sb && need !== "public") return; 
+    try { await fn(); } catch (e) { console.error(e); toast("Ocorreu um erro ao carregar a página."); } 
   }
+  
+  const io = new IntersectionObserver(es => es.forEach(x => { if (x.isIntersecting) { x.target.classList.add("in"); io.unobserve(x.target); } }), { threshold: .1 }); 
+  $$(".reveal").forEach(e => io.observe(e));
 }
 
-/* Responsivo Geral */
-@media(max-width:860px){.hero,.lab{grid-template-columns:1fr}.mock{transform:none}.bento{grid-template-columns:1fr}.bento .card{grid-column:auto!important}.stage{min-height:360px}}
-@media(max-width:760px){.two{grid-template-columns:1fr}.menu{display:block}#nav{display:none;position:absolute;left:0;right:0;top:100%;background:rgba(7,9,11,.97);border-bottom:1px solid var(--line);padding:12px 24px;flex-direction:column;align-items:stretch}#nav.open{display:flex}.wrap-main{padding:24px 16px 64px}.b{max-width:92%}}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}.reveal{opacity:1;transform:none}}
+/* ====================== PÁGINAS ====================== */
+const Pages = {};
+
+Pages.home = () => { 
+  const c = $("#cards-servicos"); 
+  if (c) c.innerHTML = SERVICOS.map(s => `<div class="card"><div class="ic">${s.icone}</div><h3>${esc(s.titulo)}</h3><p>${esc(s.texto)}</p></div>`).join(""); 
+};
+
+Pages.servicos = () => { 
+  const el = $("#lista-servicos"); 
+  if(el) el.innerHTML = SERVICOS.map(s => `<div class="card"><div class="ic">${s.icone}</div><h3>${esc(s.titulo)}</h3><p>${esc(s.texto)}</p><p style="margin-top:14px"><a class="btn sm primary" href="novo-chamado.html?tipo=${s.cat}">Solicitar</a></p></div>`).join(""); 
+};
+
+Pages.painel = async () => {
+  const elOla = $("#ola");
+  if (elOla) elOla.textContent = App.perfil?.nome ? "Olá, " + App.perfil.nome.split(" ")[0] + "." : "";
+  
+  const carregar = async () => {
+    const { data, error } = await sb.from("chamados").select("id,numero,categoria,titulo,status,criado_em").eq("cliente_id", App.session.user.id).order("criado_em", { ascending: false });
+    if (error) { const l = $("#lista"); if (l) l.innerHTML = '<p class="empty">Erro ao carregar.</p>'; return; }
+    
+    const abertos = data.filter(c => !["Concluída", "Cancelada"].includes(c.status)).length;
+    const kpisEl = $("#kpis");
+    if (kpisEl) kpisEl.innerHTML = [[data.length, "Chamados"], [abertos, "Em aberto"], [data.length - abertos, "Finalizados"], [0, "Novas msgs"]].map(([n, l]) => `<div class="k"><b>${n}</b><span>${l}</span></div>`).join("");
+    
+    const listaEl = $("#lista");
+    if (listaEl) {
+      listaEl.innerHTML = data.length ? tabela(["Nº", "Serviço", "Título", "Status", "Data"], data.map(c => `<tr class="go" data-act="abrir" data-id="${c.id}"><td><a href="chamado.html?id=${c.id}">${num(c.numero)}</a></td><td>${c.categoria === "site" ? "Site" : "Manutenção"}</td><td>${esc(c.titulo)}</td><td>${pill(c.status)}</td><td>${fmtData(c.criado_em)}</td></tr>`))
+        : '<p class="empty">Você ainda não tem chamados.</p>';
+    }
+  };
+  Act.abrir = d => location.href = "chamado.html?id=" + d.id;
+  await carregar(); 
+};
+
+Pages.perfil = () => {
+  const p = App.perfil || {}, en = p.endereco || {};
+  const campos = { nome: p.nome, telefone: p.telefone, rua: en.rua, numero: en.numero, bairro: en.bairro, cidade: en.cidade, estado: en.estado };
+  const f = $("#f-perfil"); 
+  if(f) {
+    Object.entries(campos).forEach(([k, v]) => { if (f[k]) f[k].value = v || ""; }); 
+    f.email.value = p.email || App.session.user.email; 
+    f.cpf.value = p.cpf || "";
+    
+    f.addEventListener("submit", async e => { 
+      e.preventDefault(); 
+      const d = Object.fromEntries(new FormData(f)); 
+      if (!d.nome.trim()) return msg("m-perfil", "Informe seu nome."); 
+      ocupado(f, true);
+      const { error } = await sb.from("usuarios").update({ nome: d.nome.trim(), telefone: digitos(d.telefone) }).eq("id", App.session.user.id);
+      ocupado(f, false); 
+      msg("m-perfil", error ? "Erro ao salvar." : "Dados atualizados.", !error); 
+    });
+  }
+};
+
+Pages.chamado = async () => {
+  const id = qs("id"); 
+  const { data: c } = await sb.from("chamados").select("*").eq("id", id).maybeSingle();
+  if (!c) { const el = $("#conteudo"); if (el) el.innerHTML = '<p class="empty">Chamado não encontrado.</p>'; return; }
+  if (qs("novo")) msg("m-topo", `Chamado ${num(c.numero)} registrado!`, true);
+  
+  const el = $("#conteudo");
+  if (el) {
+    el.innerHTML = `
+      <p><a href="painel.html">← Voltar</a></p>
+      <h2>${num(c.numero)} · ${esc(c.titulo)}</h2>
+      <p>${pill(c.status)} <span class="sub">Aberto em ${fmtData(c.criado_em)}</span></p>
+      <div class="box"><h3>Sua solicitação</h3><p style="white-space:pre-wrap">${esc(c.descricao)}</p></div>
+      <div class="box"><h3>💬 Conversa com a TechEmpire</h3><div id="chat-container"></div></div>
+    `;
+  }
+
+  const chatBody = $("<div class='chat-body' id='chat-msgs' style='height:300px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; background:#0a0d0f; padding:15px; border-radius:8px;'><p style='text-align:center;'>Carregando chat...</p></div>");
+  const inputMsg = $("<input type='text' placeholder='Digite sua mensagem...' style='flex:1; padding:10px; border-radius:8px; border:1px solid #444; background:#06080a; color:#fff;'>");
+  const form = $("<form style='display:flex; gap:10px; margin-top:10px;'></form>");
+  const btn = $("<button type='submit' style='background:#b4f03c; color:#000; border:none; padding:10px 20px; border-radius:8px; font-weight:bold;'>Enviar</button>");
+  
+  form.append(inputMsg, btn);
+  const chatContainer = $("#chat-container");
+  if (chatContainer) chatContainer.append(chatBody, form);
+
+  async function carregarMsgs() {
+    const { data } = await sb.from('mensagens').select('*').eq('chamado_id', id).order('criado_em', { ascending: true });
+    if (!data || data.length === 0) { if (chatBody) chatBody.innerHTML = "<p style='color:#97a0a6; text-align:center;'>Nenhuma mensagem ainda.</p>"; return; }
+    
+    if (chatBody) {
+      chatBody.innerHTML = data.map(m => {
+        const isMe = m.remetente_id === App.session.user.id;
+        return `<div style="background:${isMe ? '#b4f03c' : '#1a1e22'}; color:${isMe ? '#000' : '#fff'}; padding:10px 15px; border-radius:12px; align-self:${isMe ? 'flex-end' : 'flex-start'}; max-width:80%;"><small style="display:block; opacity:0.7; font-size:10px;">${isMe ? 'Você' : 'TechEmpire'}</small>${m.conteudo}</div>`;
+      }).join('');
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+  }
+
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const t = inputMsg.value.trim();
+    if(!t) return;
+    await sb.from('mensagens').insert({ chamado_id: id, remetente_id: App.session.user.id, conteudo: t });
+    inputMsg.value = "";
+    await carregarMsgs();
+  };
+
+  await carregarMsgs();
+};
+
+document.addEventListener("DOMContentLoaded", boot);
