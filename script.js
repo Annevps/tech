@@ -24,21 +24,6 @@ function ocupado(form, on) { const b = form.querySelector("button[type=submit]")
 function cpfValido(c) { c = digitos(c); if (c.length !== 11 || /^(\d)\1+$/.test(c)) return false; for (const t of [9, 10]) { let s = 0; for (let i = 0; i < t; i++) s += +c[i] * (t + 1 - i); if ((s * 10) % 11 % 10 !== +c[t]) return false; } return true; }
 const proximaSegura = n => /^[a-z\-]+\.html(\?[\w=&\-]*)?$/i.test(n || "") ? n : null;
 
-/* ====================== LOGOUT GLOBAL ====================== */
-window.fazerLogout = async (e) => {
-  if (e) e.preventDefault();
-  
-  // Limpa a memória local
-  sessionStorage.removeItem('te_user_id');
-  sessionStorage.removeItem('te_user_email');
-  
-  // Faz o logout no Supabase
-  if (sb) await sb.auth.signOut();
-  
-  // Redireciona para a home
-  window.location.href = "index.html";
-};
-
 async function comClientes(linhas) { 
   const ids = [...new Set(linhas.map(l => l.cliente_id).filter(Boolean))]; if (!ids.length) return linhas;
   const { data } = await sb.from("usuarios").select("id,nome,email").in("id", ids); const m = Object.fromEntries((data || []).map(u => [u.id, u]));
@@ -57,7 +42,10 @@ function desenharChrome() {
   
   const headerEl = $("#site-header");
   if (headerEl && document.body.dataset.page !== 'admin') {
-    headerEl.innerHTML = `<div class="bar-in"><a class="logo" href="index.html" aria-label="TechEmpire — início"><i>TE</i><span>Tech<b>Empire</b></span></a>
+    headerEl.innerHTML = `<div class="bar-in">
+      <a class="logo" href="index.html" aria-label="TechEmpire — início" style="display:flex; align-items:center;">
+        <img src="logo.png" alt="TechEmpire" style="height: 38px; width: auto; border-radius: 8px;">
+      </a>
      <button class="menu" aria-expanded="false" aria-label="Abrir menu">☰</button>
      <nav id="nav">${l("index.html", "Início")}${l("servicos.html", "Serviços")}${l("manutencao.html", "Manutenção")}${l("sobre.html", "Sobre")}${l("contato.html", "Contato")}
      ${logado ? `${adm ? l("admin.html", "Admin") : ""}${l("painel.html", "Meu painel")}${l("perfil.html", "Perfil")}<a href="#" class="btn sm" onclick="fazerLogout(event)">Sair</a>`
@@ -67,54 +55,43 @@ function desenharChrome() {
 
   const footerEl = $("#site-footer");
   if (footerEl && document.body.dataset.page !== 'admin') {
-    footerEl.innerHTML = `<div class="foot"><div><a class="logo" href="index.html"><i>TE</i><span>Tech<b>Empire</b></span></a><p>Manutenção de dispositivos, suporte técnico e criação de sites. Tecnologia que funciona.</p></div>
+    footerEl.innerHTML = `<div class="foot">
+      <div>
+        <a href="index.html" style="display:inline-block; margin-bottom:16px;"><img src="logo.png" alt="TechEmpire" style="height: 44px; width: auto;"></a>
+        <p>Manutenção de dispositivos, suporte técnico e criação de sites. Tecnologia que funciona.</p>
+      </div>
       <div><h4>Site</h4><a href="servicos.html">Serviços</a><a href="manutencao.html">Manutenção preventiva</a><a href="sobre.html">Sobre</a><a href="contato.html">Contato</a></div>
       <div><h4>Sua conta</h4><a href="login.html">Entrar</a><a href="criar-conta.html">Criar conta</a><a href="recuperar-senha.html">Recuperar senha</a></div></div>
       <div class="copy">© ${new Date().getFullYear()} TechEmpire · Seus dados são tratados conforme a LGPD.</div>`;
   }
 }
-Act.sair = async () => { await sb.auth.signOut(); location.href = "index.html"; };
+
+window.fazerLogout = async (e) => {
+  if (e) e.preventDefault();
+  sessionStorage.removeItem('te_user_id');
+  sessionStorage.removeItem('te_user_email');
+  if (sb) await sb.auth.signOut();
+  window.location.href = "index.html";
+};
 
 async function boot() {
   const need = document.body.dataset.auth || "public";
   
   if (sb) {
-    // 1. Tenta pegar a sessão de forma rápida
     const { data } = await sb.auth.getSession(); 
     App.session = data.session;
     
-    // 2. Se estiver logado, busca o perfil
     if (App.session) { 
       const r = await sb.from("usuarios").select("*").eq("id", App.session.user.id).maybeSingle(); 
       App.perfil = r.data;
-      
-      if (App.perfil?.ativo === false) { 
-        await sb.auth.signOut(); 
-        location.href = "login.html?inativo=1"; 
-        return; 
-      } 
+      if (App.perfil?.ativo === false) { await sb.auth.signOut(); location.href = "login.html?inativo=1"; return; } 
     }
   }
 
-  // 3. Se a página precisa de login (client/admin) e não tem sessão, vai pro login.
-  if ((need === "client" || need === "admin") && !App.session) { 
-    location.href = "login.html?next=" + encodeURIComponent(location.pathname.split("/").pop() + location.search); 
-    return; 
-  }
+  if ((need === "client" || need === "admin") && !App.session) { location.href = "login.html?next=" + encodeURIComponent(location.pathname.split("/").pop() + location.search); return; }
+  if (need === "admin" && !App.perfil?.is_admin) { location.href = "painel.html"; return; }
+  if (need === "guest" && App.session && !location.hash.includes("type=recovery")) { location.href = App.perfil?.is_admin ? "admin.html" : "painel.html"; return; }
   
-  // 4. Se for admin e não tiver permissão, vai pro painel
-  if (need === "admin" && !App.perfil?.is_admin) { 
-    location.href = "painel.html"; 
-    return; 
-  }
-  
-  // 5. Se for guest e já estiver logado, pula para o painel correto
-  if (need === "guest" && App.session && !location.hash.includes("type=recovery")) { 
-    location.href = App.perfil?.is_admin ? "admin.html" : "painel.html"; 
-    return; 
-  }
-  
-  // Desenha o menu e carrega a página
   desenharChrome();
   const fn = Pages[document.body.dataset.page];
   if (fn) { 
@@ -129,8 +106,15 @@ async function boot() {
 /* ====================== PÁGINAS ====================== */
 const Pages = {};
 
-Pages.home = () => { const c = $("#cards-servicos"); if (c) c.innerHTML = SERVICOS.map(s => `<div class="card"><div class="ic">${s.icone}</div><h3>${esc(s.titulo)}</h3><p>${esc(s.texto)}</p></div>`).join(""); };
-Pages.servicos = () => { const el = $("#lista-servicos"); if(el) el.innerHTML = SERVICOS.map(s => `<div class="card"><div class="ic">${s.icone}</div><h3>${esc(s.titulo)}</h3><p>${esc(s.texto)}</p><p style="margin-top:14px"><a class="btn sm primary" href="novo-chamado.html?tipo=${s.cat}">Solicitar</a></p></div>`).join(""); };
+Pages.home = () => { 
+  const c = $("#cards-servicos"); 
+  if (c) c.innerHTML = SERVICOS.map(s => `<div class="card"><div class="ic">${s.icone}</div><h3>${esc(s.titulo)}</h3><p>${esc(s.texto)}</p></div>`).join(""); 
+};
+
+Pages.servicos = () => { 
+  const el = $("#lista-servicos"); 
+  if(el) el.innerHTML = SERVICOS.map(s => `<div class="card"><div class="ic">${s.icone}</div><h3>${esc(s.titulo)}</h3><p>${esc(s.texto)}</p><p style="margin-top:14px"><a class="btn sm primary" href="novo-chamado.html?tipo=${s.cat}">Solicitar</a></p></div>`).join(""); 
+};
 
 Pages.painel = async () => {
   const elOla = $("#ola");
