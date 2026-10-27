@@ -3,33 +3,179 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#07090b">
 <title>Contato — TechEmpire</title>
-<meta name="description" content="Fale com a TechEmpire.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<style>
+  .form-section { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin-bottom: 24px; }
+  .form-section h3 { border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 24px; font-family: var(--font-head); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 760px) { .form-grid { grid-template-columns: 1fr; } }
+  .full-width { grid-column: 1 / -1; }
+</style>
 </head>
 <body data-page="contato" data-auth="public">
 <header id="site-header"></header>
+
 <main class="wrap-main">
-<section class="hero" style="align-items:start">
-  <div><span class="badge">Contato</span><h1 style="font-size:clamp(38px,6vw,64px)">Vamos <em>conversar.</em></h1><p class="lead">Conte o que você precisa. Respondemos pelo e-mail ou WhatsApp que você informar ao lado.</p>
-  <p class="sub" style="margin-top:22px">Já é cliente? <a href="login.html" style="color:var(--lime)">Entre na sua conta</a> e converse direto pelo chat do seu chamado.</p></div>
-  <div class="panel" style="width:100%"><form id="f-contato" novalidate>
-    <label>Nome<input name="nome" required autocomplete="name"></label>
-    <div class="two"><label>E-mail<input name="email" type="email" autocomplete="email"></label><label>WhatsApp<input name="telefone" inputmode="tel" autocomplete="tel"></label></div>
-    <label>Serviço de interesse<select name="servico"><option value="">Selecione</option><option>Manutenção de computador</option><option>Assistência de celular</option><option>Suporte técnico</option><option>Manutenção preventiva</option><option>Criação de site</option><option>Outro</option></select></label>
-    <label>Mensagem<textarea name="mensagem" required></textarea></label>
-    <div class="msg" id="m-contato" role="alert"></div>
-    <button class="btn primary" type="submit">Enviar mensagem</button></form></div>
-</section>
+  <div style="max-width: 800px; margin: 0 auto;">
+    <div style="text-align: center; margin-bottom: 48px;">
+      <span class="badge">Fale Conosco</span>
+      <h1 style="font-size: clamp(32px, 5vw, 48px);">Como podemos <em>ajudar?</em></h1>
+      <p class="lead" style="margin: 0 auto;">Preencha o formulário abaixo e nossa equipe entrará em contato. Se preferir, você pode falar direto no WhatsApp.</p>
+      <div style="margin-top: 24px;">
+        <a href="https://wa.me/5533998414684?text=Ol%C3%A1%2C%20gostaria%20de%20falar%20com%20a%20TechEmpire." target="_blank" class="btn primary" style="background: #25D366; border-color: #25D366; color: #fff;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+          Chamar no WhatsApp
+        </a>
+      </div>
+    </div>
+
+    <form id="form-contato" class="form-section">
+      <div class="msg" id="msg-contato"></div>
+      
+      <div class="form-grid">
+        <div class="full-width">
+          <label>Nome Completo *</label>
+          <input type="text" id="nome" required placeholder="Seu nome">
+        </div>
+        <div>
+          <label>E-mail *</label>
+          <input type="email" id="email" required placeholder="seu@email.com">
+        </div>
+        <div>
+          <label>Telefone *</label>
+          <input type="tel" id="telefone" required placeholder="(00) 00000-0000">
+        </div>
+        <div>
+          <label>WhatsApp (opcional)</label>
+          <input type="tel" id="whatsapp" placeholder="(00) 00000-0000">
+        </div>
+        <div>
+          <label>Cidade *</label>
+          <input type="text" id="cidade" required placeholder="Sua cidade">
+        </div>
+
+        <div class="full-width" style="margin-top: 16px; border-top: 1px solid var(--border); padding-top: 24px;">
+          <label>Tipo de Solicitação *</label>
+          <select id="tipo" required>
+            <option value="">Selecione o serviço...</option>
+            <option value="manutencao">Manutenção de Computador</option>
+            <option value="celular">Assistência para Celular</option>
+            <option value="suporte">Suporte Técnico</option>
+            <option value="site">Criação de Site</option>
+            <option value="outro">Outro Serviço</option>
+          </select>
+        </div>
+
+        <div class="full-width">
+          <label>Assunto da Solicitação *</label>
+          <input type="text" id="assunto" required placeholder="Resuma o problema em uma frase">
+        </div>
+
+        <div class="full-width">
+          <label>Descrição Detalhada *</label>
+          <textarea id="descricao" rows="5" required placeholder="Descreva o problema ou o que você precisa. Se for um computador, informe marca e modelo."></textarea>
+        </div>
+
+        <div class="full-width">
+          <label>Preferência de Atendimento</label>
+          <select id="preferencia">
+            <option value="site">Pelo próprio site (chat)</option>
+            <option value="whatsapp">Pelo WhatsApp</option>
+            <option value="email">Por e-mail</option>
+          </select>
+        </div>
+
+        <div class="full-width">
+          <label>Fotos ou Arquivos (opcional)</label>
+          <input type="file" id="arquivos" multiple accept="image/*,.pdf">
+        </div>
+      </div>
+
+      <div style="margin-top: 32px;">
+        <button type="submit" class="btn primary" style="width: 100%; padding: 16px; font-size: 16px;" id="btn-enviar">Enviar Solicitação</button>
+      </div>
+    </form>
+  </div>
 </main>
+
 <footer id="site-footer"></footer>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="supabase-config.js"></script>
 <script src="data.js"></script>
 <script src="script.js"></script>
+
+<script>
+  document.getElementById('form-contato').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('btn-enviar');
+    const msg = document.getElementById('msg-contato');
+    
+    btn.disabled = true;
+    btn.textContent = "Enviando...";
+    msg.className = "msg";
+
+    const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
+    
+    const formData = {
+      cliente_nome: document.getElementById('nome').value.trim(),
+      cliente_email: document.getElementById('email').value.trim(),
+      cliente_telefone: document.getElementById('telefone').value.trim(),
+      whatsapp: document.getElementById('whatsapp').value.trim() || document.getElementById('telefone').value.trim(),
+      cidade: document.getElementById('cidade').value.trim(),
+      categoria: document.getElementById('tipo').value,
+      titulo: document.getElementById('assunto').value.trim(),
+      descricao: document.getElementById('descricao').value.trim(),
+      preferencia_contato: document.getElementById('preferencia').value,
+      status: "Nova chamada"
+    };
+
+    try {
+      // 1. Salva o chamado no Supabase (o protocolo é gerado automaticamente pelo banco)
+      const { data, error } = await db.from('chamados').insert([formData]).select('protocolo, id').single();
+
+      if (error) throw error;
+
+      // 2. Faz upload dos arquivos, se houver
+      const files = document.getElementById('arquivos').files;
+      if (files.length > 0) {
+        for (const file of files) {
+          const path = `${data.id}/${Date.now()}-${file.name.replace(/[^\w.\-]+/g, "_")}`;
+          await db.storage.from('anexos').upload(path, file);
+          await db.from('arquivos_chamados').insert({
+            chamado_id: data.id,
+            nome_original: file.name,
+            caminho_storage: path,
+            tipo_arquivo: file.type
+          });
+        }
+      }
+
+      // 3. Sucesso: Mostra mensagem e prepara o WhatsApp
+      msg.innerHTML = `
+        <div style="text-align: center; padding: 20px;">
+          <h3 style="color: var(--brand); margin-bottom: 16px;">Solicitação Enviada!</h3>
+          <p>Seu protocolo é: <b>${data.protocolo}</b></p>
+          <p style="margin-top: 16px;">Nossa equipe já foi notificada no painel.</p>
+          <p style="margin-top: 24px;">Se preferir, você pode continuar o atendimento agora pelo WhatsApp:</p>
+          <a href="https://wa.me/5533998414684?text=Ol%C3%A1!%20Acabei%20de%20abrir%20o%20protocolo%20${data.protocolo}%20no%20site.%20Preciso%20de%20ajuda." target="_blank" class="btn primary" style="margin-top: 16px; background: #25D366; border-color: #25D366; color: #fff;">Abrir WhatsApp</a>
+        </div>
+      `;
+      msg.className = "msg on ok";
+      document.getElementById('form-contato').reset();
+
+    } catch (err) {
+      console.error(err);
+      msg.textContent = "Ocorreu um erro ao enviar. Tente novamente ou chame no WhatsApp.";
+      msg.className = "msg on err";
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Enviar Solicitação";
+    }
+  });
+</script>
 </body>
 </html>
