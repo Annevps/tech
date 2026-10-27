@@ -6,7 +6,7 @@
 <title>Painel Administrativo — TechEmpire</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* CSS Premium Minimalista */
+  /* ================= RESET E VARIÁVEIS ================= */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --bg: #050505;
@@ -20,7 +20,7 @@
   a { text-decoration: none; color: inherit; }
   button { cursor: pointer; font-family: inherit; border: none; background: none; }
   
-  /* Sidebar */
+  /* ================= SIDEBAR ================= */
   .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); padding: 30px 24px; display: flex; flex-direction: column; flex-shrink: 0; }
   .logo { display: flex; align-items: center; gap: 12px; font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 40px; color: #fff; }
   .logo i { background: var(--brand); color: #000; width: 36px; height: 36px; border-radius: 8px; display: grid; place-items: center; font-style: normal; font-weight: 800; }
@@ -28,36 +28,57 @@
   .sidebar nav { display: flex; flex-direction: column; gap: 4px; }
   .sidebar a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; font-weight: 500; color: var(--text-muted); transition: 0.2s; font-size: 14px; cursor: pointer; }
   .sidebar a:hover, .sidebar a.active { background: rgba(0, 221, 181, 0.1); color: var(--brand); }
-  .sidebar .sair { margin-top: auto; color: #FF6464; }
+  .sidebar .sair { margin-top: auto; color: #FF6464; border-radius: 0; padding-top: 24px; }
 
-  /* Main */
+  /* ================= LAYOUT PRINCIPAL ================= */
   .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
   .topbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid var(--border); background: var(--bg); }
   .topbar h1 { font-family: 'Space Grotesk', sans-serif; font-size: 20px; }
-  .content { padding: 40px; overflow-y: auto; flex: 1; }
   
+  /* Área que divide a Tabela (esq) do Chat (dir) */
+  .content-wrapper { flex: 1; display: grid; grid-template-columns: 1fr 380px; gap: 24px; padding: 32px; overflow-y: auto; }
+  
+  .content { overflow: hidden; }
+  .tela { display: none; }
+  .tela.active { display: block; }
+
   /* Tabela */
   .table-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
   table { width: 100%; border-collapse: collapse; }
-  th { text-align: left; padding: 20px; font-size: 13px; color: var(--text-muted); border-bottom: 1px solid var(--border); font-weight: 500; }
+  th { text-align: left; padding: 16px 20px; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--border); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
   td { padding: 20px; border-bottom: 1px solid var(--border); font-size: 14px; }
-  tr:hover td { background: var(--surface-hover); }
-  .pill { display: inline-block; padding: 6px 12px; border-radius: 99px; font-size: 12px; font-weight: 500; background: rgba(0, 221, 181, 0.1); color: var(--brand); }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .pill { display: inline-block; padding: 6px 12px; border-radius: 99px; font-size: 12px; font-weight: 500; background: rgba(0, 221, 181, 0.1); color: var(--brand); border: 1px solid rgba(0, 221, 181, 0.2); }
   .btn-action { background: var(--brand); color: #000; padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 13px; transition: 0.2s; }
   .btn-action:hover { background: #00F5C8; }
+  .btn-sec { background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 13px; transition: 0.2s; margin-left: 8px; }
+  .btn-sec:hover { border-color: var(--brand); color: var(--brand); }
 
-  /* Modal Ficha Técnica */
+  /* ================= CHAT LATERAL ================= */
+  .chat-sidebar { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; display: flex; flex-direction: column; height: calc(100vh - 160px); position: sticky; top: 32px; }
+  .chat-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; background: rgba(0,0,0,0.2); border-radius: 16px 16px 0 0; }
+  .chat-header h4 { font-family: 'Space Grotesk', sans-serif; font-size: 16px; }
+  .chat-header span { color: var(--brand); font-size: 12px; }
+  .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+  .chat-msg { padding: 12px 16px; border-radius: 12px; font-size: 14px; max-width: 90%; line-height: 1.5; }
+  .chat-msg small { display: block; font-size: 10px; opacity: 0.7; margin-bottom: 4px; }
+  .chat-msg.ou { background: rgba(255,255,255,0.05); align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid var(--border); }
+  .chat-msg.me { background: var(--brand); color: #000; align-self: flex-end; border-bottom-right-radius: 2px; }
+  .chat-footer { padding: 16px; border-top: 1px solid var(--border); display: flex; gap: 10px; background: rgba(0,0,0,0.2); border-radius: 0 0 16px 16px; }
+  .chat-footer input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text-main); outline: none; }
+  .chat-footer input:focus { border-color: var(--brand); }
+  .chat-footer button { background: var(--brand); color: #000; padding: 0 20px; border-radius: 8px; font-weight: 600; }
+
+  /* ================= MODAL LAUDO ================= */
   .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
   .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; width: 95%; max-width: 700px; max-height: 90vh; display: flex; flex-direction: column; }
   .modal-header { padding: 24px 32px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
   .modal-header h2 { font-family: 'Space Grotesk', sans-serif; color: var(--brand); }
   .modal-body { padding: 32px; overflow-y: auto; display: grid; grid-template-columns: 1fr; gap: 20px; }
-  
   .form-group { margin-bottom: 16px; }
   .form-group label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; }
-  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: #fff; outline: none; font-family: 'Inter'; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: #fff; outline: none; }
   .form-group input:focus, .form-group textarea:focus { border-color: var(--brand); }
-  
   .modal-actions { padding: 24px 32px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; background: var(--bg); border-radius: 0 0 24px 24px; gap: 10px;}
   .btn-salvar { background: var(--brand); color: #000; padding: 12px 24px; border-radius: 8px; font-weight: 600; }
   .btn-whats { background: #25D366; color: #fff; padding: 12px 24px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
@@ -65,27 +86,66 @@
 </head>
 <body>
 
+  <!-- SIDEBAR -->
   <div class="sidebar">
     <a href="index.html" class="logo"><i>TE</i><span>Tech<b>Empire</b></span></a>
     <nav>
-      <a class="active" onclick="mudarAba('inicio', this)">📊 Início</a>
-      <a onclick="mudarAba('solicitacoes', this)">🎫 Solicitações</a>
+      <a class="active" onclick="mudarAba('solicitacoes', this)">🎫 Solicitações</a>
+      <a onclick="mudarAba('laudos', this)">📄 Laudos Técnicos</a>
       <a href="login.html" class="sair">Sair da conta</a>
     </nav>
   </div>
 
+  <!-- MAIN -->
   <div class="main">
     <div class="topbar">
-      <h1 id="page-title">Dashboard</h1>
+      <h1 id="page-title">Solicitações</h1>
     </div>
 
-    <div class="content">
-      <div class="table-box">
-        <div style="padding: 20px; border-bottom: 1px solid var(--border);">
-          <h3 style="font-family: 'Space Grotesk'; font-size: 18px;" id="titulo-tabela">Solicitações Recebidas</h3>
+    <!-- ÁREA DIVIDIDA: ESQUERDA (CONTEÚDO) E DIREITA (CHAT) -->
+    <div class="content-wrapper">
+      
+      <!-- CONTEÚDO DA ESQUERDA -->
+      <div class="content">
+        <!-- Tela de Solicitações -->
+        <div id="tela-solicitacoes" class="tela active">
+          <div class="table-box">
+            <div style="padding: 20px; border-bottom: 1px solid var(--border);">
+              <h3 style="font-family: 'Space Grotesk'; font-size: 18px;">Todas as Solicitações</h3>
+            </div>
+            <div id="tabela-solicitacoes"></div>
+          </div>
         </div>
-        <div id="tabela-container"></div>
+
+        <!-- Tela de Laudos Técnicos -->
+        <div id="tela-laudos" class="tela">
+          <div class="table-box">
+            <div style="padding: 20px; border-bottom: 1px solid var(--border);">
+              <h3 style="font-family: 'Space Grotesk'; font-size: 18px;">Laudos Emitidos e Pendentes</h3>
+            </div>
+            <div id="tabela-laudos"></div>
+          </div>
+        </div>
       </div>
+
+      <!-- CHAT LATERAL (DIREITA) -->
+      <div class="chat-sidebar">
+        <div class="chat-header">
+          <div style="width: 32px; height: 32px; background: var(--brand); border-radius: 50%; display: grid; place-items: center; color: #000; font-weight: bold;">👤</div>
+          <div>
+            <h4 id="chat-titulo">Selecione um chamado</h4>
+            <span id="chat-status">Aguardando...</span>
+          </div>
+        </div>
+        <div class="chat-body" id="chat-mensagens">
+          <p style="text-align: center; color: var(--text-muted); font-size: 14px;">Clique em "Chat" na tabela para conversar com o cliente.</p>
+        </div>
+        <form class="chat-footer" id="form-chat" style="display: none;">
+          <input type="text" id="input-msg" placeholder="Digite sua resposta..." required autocomplete="off">
+          <button type="submit">Enviar</button>
+        </form>
+      </div>
+
     </div>
   </div>
 
@@ -99,17 +159,17 @@
       
       <div class="modal-body">
         <div style="background: rgba(255,255,255,0.02); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px;">
-          <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 4px;">Problema relatado pelo cliente:</div>
+          <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 4px;">Problema relatado:</div>
           <div id="modal-descricao" style="font-size: 14px; line-height: 1.5;"></div>
         </div>
 
         <div class="form-group">
           <label>Diagnóstico Técnico</label>
-          <textarea id="laudo-diag" rows="3" placeholder="Ex: Placa-mãe com curto no circuito de alimentação."></textarea>
+          <textarea id="laudo-diag" rows="3" placeholder="Ex: Placa-mãe com curto..."></textarea>
         </div>
         <div class="form-group">
           <label>Solução Aplicada</label>
-          <textarea id="laudo-solucao" rows="3" placeholder="Ex: Substituição do capacitor C45 e limpeza interna."></textarea>
+          <textarea id="laudo-solucao" rows="3" placeholder="Ex: Substituição do capacitor..."></textarea>
         </div>
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
@@ -147,70 +207,152 @@
   <script src="supabase-config.js"></script>
   <script>
     const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
+    let idAdmin = null;
     let chamados = [];
-    let chamadoAberto = null;
+    let chamadoChatAtual = null;
+    let chamadoLaudoAtual = null;
 
     async function init() {
       const { data: { session } } = await db.auth.getSession();
       if (!session) { window.location.href = "login.html"; return; }
+      idAdmin = session.user.id;
 
+      await carregarDados();
+      renderizarSolicitacoes();
+    }
+
+    async function carregarDados() {
       const { data } = await db.from("chamados").select("*").order("criado_em", { ascending: false });
       chamados = data || [];
-      renderizarTabela();
     }
 
     function mudarAba(aba, el) {
       document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
       el.classList.add('active');
-      // Por enquanto, o menu Início e Solicitações fazem a mesma coisa neste MVP
+      
+      document.querySelectorAll('.tela').forEach(t => t.classList.remove('active'));
+      document.getElementById(`tela-${aba}`).classList.add('active');
+
+      if (aba === 'solicitacoes') {
+        document.getElementById('page-title').textContent = "Solicitações";
+        renderizarSolicitacoes();
+      } else if (aba === 'laudos') {
+        document.getElementById('page-title').textContent = "Laudos Técnicos";
+        renderizarLaudos();
+      }
     }
 
-    function renderizarTabela() {
+    // ================= TELA DE SOLICITAÇÕES =================
+    function renderizarSolicitacoes() {
       if (chamados.length === 0) {
-        document.getElementById("tabela-container").innerHTML = "<p style='padding: 24px; color: var(--text-muted);'>Nenhuma solicitação encontrada.</p>";
+        document.getElementById("tabela-solicitacoes").innerHTML = "<p style='padding: 24px; color: var(--text-muted);'>Nenhuma solicitação encontrada.</p>";
         return;
       }
 
-      let html = `<table><thead><tr><th>Protocolo</th><th>Cliente</th><th>Assunto</th><th>Status</th><th>Laudo</th></tr></thead><tbody>`;
+      let html = `<table><thead><tr><th>Protocolo</th><th>Cliente</th><th>Assunto</th><th>Status</th><th>Ações</th></tr></thead><tbody>`;
+      chamados.forEach(c => {
+        html += `<tr>
+          <td><b>${c.protocolo || 'Gerando...'}</b></td>
+          <td>${c.cliente_nome || 'Visitante'}</td>
+          <td>${c.titulo}</td>
+          <td><span class="pill">${c.status}</span></td>
+          <td>
+            <button class="btn-action" onclick="abrirChat('${c.id}')">Chat</button>
+            <button class="btn-sec" onclick="abrirLaudo('${c.id}')">Laudo</button>
+          </td>
+        </tr>`;
+      });
+      html += `</tbody></table>`;
+      document.getElementById("tabela-solicitacoes").innerHTML = html;
+    }
+
+    // ================= TELA DE LAUDOS =================
+    function renderizarLaudos() {
+      if (chamados.length === 0) {
+        document.getElementById("tabela-laudos").innerHTML = "<p style='padding: 24px; color: var(--text-muted);'>Nenhum laudo encontrado.</p>";
+        return;
+      }
+
+      let html = `<table><thead><tr><th>Protocolo</th><th>Cliente</th><th>Status do Laudo</th><th>Ação</th></tr></thead><tbody>`;
       chamados.forEach(c => {
         const temLaudo = c.laudo_tecnico ? "✅ Emitido" : "⏳ Pendente";
         html += `<tr>
           <td><b>${c.protocolo || 'N/A'}</b></td>
           <td>${c.cliente_nome || 'Visitante'}</td>
-          <td>${c.titulo}</td>
-          <td><span class="pill">${c.status}</span></td>
-          <td><button class="btn-action" onclick="abrirLaudo('${c.id}')">${temLaudo}</button></td>
+          <td>${temLaudo}</td>
+          <td><button class="btn-action" onclick="abrirLaudo('${c.id}')">Gerenciar Laudo</button></td>
         </tr>`;
       });
       html += `</tbody></table>`;
-      document.getElementById("tabela-container").innerHTML = html;
+      document.getElementById("tabela-laudos").innerHTML = html;
     }
 
-    function abrirLaudo(id) {
-      chamadoAberto = chamados.find(x => x.id === id);
-      if (!chamadoAberto) return;
+    // ================= CHAT LATERAL =================
+    async function abrirChat(id) {
+      chamadoChatAtual = chamados.find(x => x.id === id);
+      if (!chamadoChatAtual) return;
 
-      document.getElementById('modal-titulo').textContent = `Laudo: ${chamadoAberto.protocolo}`;
-      document.getElementById('modal-descricao').textContent = chamadoAberto.descricao;
+      document.getElementById('chat-titulo').textContent = chamadoChatAtual.cliente_nome || 'Visitante';
+      document.getElementById('chat-status').textContent = chamadoChatAtual.protocolo || 'S/N';
+      document.getElementById('form-chat').style.display = 'flex';
       
-      // Preenche se já existir um laudo salvo
-      const l = chamadoAberto.laudo_tecnico || {};
+      await carregarMensagens(id);
+    }
+
+    async function carregarMensagens(chamadoId) {
+      const chatBody = document.getElementById('chat-mensagens');
+      const { data } = await db.from('mensagens').select('*').eq('chamado_id', chamadoId).order('criado_em', { ascending: true });
+      
+      if (!data || data.length === 0) {
+        chatBody.innerHTML = `<p style="text-align:center; color:var(--text-muted);">Nenhuma mensagem ainda. Envie a primeira!</p>`;
+        return;
+      }
+
+      chatBody.innerHTML = data.map(msg => {
+        const isMe = msg.remetente_id === idAdmin;
+        const hora = new Date(msg.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        return `<div class="chat-msg ${isMe ? 'me' : 'ou'}"><small>${isMe ? 'Você' : 'Cliente'} · ${hora}</small>${msg.conteudo}</div>`;
+      }).join('');
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    document.getElementById('form-chat').onsubmit = async (e) => {
+      e.preventDefault();
+      if (!chamadoChatAtual) return;
+      const input = document.getElementById('input-msg');
+      const texto = input.value.trim();
+      if (!texto) return;
+
+      await db.from('mensagens').insert({ chamado_id: chamadoChatAtual.id, remetente_id: idAdmin, conteudo: texto });
+      input.value = '';
+      await carregarMensagens(chamadoChatAtual.id);
+    };
+
+    // ================= LAUDO =================
+    function abrirLaudo(id) {
+      chamadoLaudoAtual = chamados.find(x => x.id === id);
+      if (!chamadoLaudoAtual) return;
+
+      document.getElementById('modal-titulo').textContent = `Laudo: ${chamadoLaudoAtual.protocolo}`;
+      document.getElementById('modal-descricao').textContent = chamadoLaudoAtual.descricao;
+      
+      const l = chamadoLaudoAtual.laudo_tecnico || {};
       document.getElementById('laudo-diag').value = l.diagnostico || '';
       document.getElementById('laudo-solucao').value = l.solucao || '';
       document.getElementById('laudo-prazo').value = l.prazo || '';
       document.getElementById('laudo-valor').value = l.valor || '';
-      document.getElementById('laudo-status').value = chamadoAberto.status;
+      document.getElementById('laudo-status').value = chamadoLaudoAtual.status;
 
       document.getElementById('modal-laudo').style.display = 'flex';
     }
 
     function fecharModal() {
       document.getElementById('modal-laudo').style.display = 'none';
-      chamadoAberto = null;
+      chamadoLaudoAtual = null;
     }
 
     async function salvarLaudo() {
-      if (!chamadoAberto) return;
+      if (!chamadoLaudoAtual) return;
 
       const diag = document.getElementById('laudo-diag').value;
       const solucao = document.getElementById('laudo-solucao').value;
@@ -220,19 +362,16 @@
 
       const laudoObj = { diagnostico: diag, solucao: solucao, prazo: prazo, valor: valor };
 
-      // 1. Salva no Banco
       const { error } = await db.from("chamados").update({ 
-        laudo_tecnico: laudoObj,
-        status: status
-      }).eq("id", chamadoAberto.id);
+        laudo_tecnico: laudoObj, status: status 
+      }).eq("id", chamadoLaudoAtual.id);
 
       if (error) return alert("Erro ao salvar laudo: " + error.message);
 
-      // 2. Atualiza o botão do WhatsApp com a mensagem pronta
-      const fone = chamadoAberto.whatsapp || chamadoAberto.cliente_telefone;
+      const fone = chamadoLaudoAtual.whatsapp || chamadoLaudoAtual.cliente_telefone;
       if (fone) {
         const numLimpo = fone.replace(/\D/g, '');
-        const msg = `Olá, ${chamadoAberto.cliente_nome}! Segue o laudo técnico do seu chamado ${chamadoAberto.protocolo}:\n\n*Diagnóstico:* ${diag}\n*Solução:* ${solucao}\n*Prazo:* ${prazo}\n*Valor:* R$ ${valor}\n\nStatus atual: ${status}.\n\nVocê pode aprovar respondendo aqui ou acessando o site.`;
+        const msg = `Olá, ${chamadoLaudoAtual.cliente_nome}! Segue o laudo técnico do seu chamado ${chamadoLaudoAtual.protocolo}:\n\n*Diagnóstico:* ${diag}\n*Solução:* ${solucao}\n*Prazo:* ${prazo}\n*Valor:* R$ ${valor}\n\nStatus atual: ${status}.`;
         
         document.getElementById('btn-whatsapp').href = `https://wa.me/55${numLimpo}?text=${encodeURIComponent(msg)}`;
         document.getElementById('btn-whatsapp').style.display = 'inline-flex';
@@ -240,12 +379,13 @@
         document.getElementById('btn-whatsapp').style.display = 'none';
       }
 
-      alert("Laudo salvo com sucesso! O cliente já pode ver as informações no painel dele.");
+      alert("Laudo salvo com sucesso!");
+      await carregarDados();
       
-      // Recarrega os dados na tela
-      const { data } = await db.from("chamados").select("*").order("criado_em", { ascending: false });
-      chamados = data || [];
-      renderizarTabela();
+      // Atualiza a tabela atual
+      const abaAtiva = document.querySelector('.tela.active').id;
+      if (abaAtiva === 'tela-laudos') renderizarLaudos();
+      else renderizarSolicitacoes();
     }
 
     init();
