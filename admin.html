@@ -6,89 +6,119 @@
 <title>Painel Administrativo — TechEmpire</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* CSS Premium Minimalista */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --bg: #050505;
-    --surface: #0F1012;
+    --s1: #0F1012;
+    --s2: #1A1D21;
     --border: #222326;
     --text-main: #F5F5F5;
     --text-muted: #8C939D;
     --brand: #00DDB5;
+    --brand-dark: #00A884;
   }
   body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
   a { text-decoration: none; color: inherit; }
   button { cursor: pointer; font-family: inherit; border: none; background: none; }
   
   /* Sidebar */
-  .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); padding: 30px 24px; display: flex; flex-direction: column; flex-shrink: 0; }
-  .logo { display: flex; align-items: center; gap: 12px; font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 40px; color: #fff; }
-  .logo i { background: var(--brand); color: #000; width: 36px; height: 36px; border-radius: 8px; display: grid; place-items: center; font-style: normal; font-weight: 800; }
+  .sidebar { width: 240px; background: var(--s1); border-right: 1px solid var(--border); padding: 24px; display: flex; flex-direction: column; flex-shrink: 0; }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 40px; color: #fff; }
+  .logo i { background: var(--brand); color: #000; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; font-style: normal; font-weight: 800; }
   .logo b { color: var(--brand); }
+  
   .sidebar nav { display: flex; flex-direction: column; gap: 4px; }
-  .sidebar a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; font-weight: 500; color: var(--text-muted); transition: 0.2s; font-size: 14px; cursor: pointer; }
+  .sidebar a { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px; font-weight: 500; color: var(--text-muted); transition: 0.2s; font-size: 14px; cursor: pointer; }
   .sidebar a:hover, .sidebar a.active { background: rgba(0, 221, 181, 0.1); color: var(--brand); }
-  .sidebar .sair { margin-top: auto; color: #FF6464; border-radius: 0; padding-top: 24px; }
+  .sidebar a .badge { background: var(--brand); color: #000; border-radius: 99px; padding: 2px 6px; font-size: 10px; margin-left: auto; font-weight: 800; }
+  .sidebar .sair { margin-top: auto; color: #FF6464; }
+
+  .card-footer-logo { margin-top: 20px; background: var(--s2); padding: 16px; border-radius: 12px; border: 1px solid var(--border); font-size: 12px; color: var(--text-muted); }
+  .card-footer-logo b { color: #fff; display: block; font-size: 14px; margin-bottom: 4px; }
 
   /* Main */
   .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-  .topbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid var(--border); background: var(--bg); }
-  .topbar h1 { font-family: 'Space Grotesk', sans-serif; font-size: 20px; }
   
-  .content-wrapper { flex: 1; display: grid; grid-template-columns: 1fr 380px; gap: 24px; padding: 32px; overflow-y: auto; }
+  /* Topbar */
+  .topbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 32px; border-bottom: 1px solid var(--border); background: var(--bg); }
+  .search-box { background: var(--s1); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; width: 350px; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+  .search-box input { background: none; border: none; outline: none; color: #fff; width: 100%; font-size: 13px; }
+  .user-info { display: flex; align-items: center; gap: 20px; }
+  .notif-icon { position: relative; font-size: 20px; color: var(--text-muted); cursor: pointer; }
+  .notif-icon::after { content: ""; position: absolute; top: 0; right: 0; width: 8px; height: 8px; background: var(--brand); border-radius: 50%; }
+  .user-block { display: flex; align-items: center; gap: 12px; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--s2); display: grid; place-items: center; border: 1px solid var(--border); }
+
+  /* Área de Conteúdo (Dividida em Kanban e Anotações) */
+  .content-area { flex: 1; display: grid; grid-template-columns: 1fr 340px; overflow: hidden; }
   
-  .tela { display: none; }
-  .tela.active { display: block; }
+  /* Área Principal (Kanban) */
+  .main-content { padding: 32px; overflow-y: auto; display: flex; flex-direction: column; }
+  
+  .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+  .page-header .texts span { color: var(--brand); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; display: block; }
+  .page-header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; }
+  .page-header p { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
+  
+  .btn-new { background: var(--brand); color: #000; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 8px; }
 
-  /* Tabela */
-  .table-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
-  table { width: 100%; border-collapse: collapse; }
-  th { text-align: left; padding: 16px 20px; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--border); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
-  td { padding: 20px; border-bottom: 1px solid var(--border); font-size: 14px; }
-  tr:hover td { background: rgba(255,255,255,0.02); }
-  .pill { display: inline-block; padding: 6px 12px; border-radius: 99px; font-size: 12px; font-weight: 500; background: rgba(0, 221, 181, 0.1); color: var(--brand); border: 1px solid rgba(0, 221, 181, 0.2); }
-  .btn-action { background: var(--brand); color: #000; padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 13px; transition: 0.2s; }
-  .btn-action:hover { background: #00F5C8; }
-  .btn-sec { background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 13px; transition: 0.2s; margin-left: 8px; }
-  .btn-sec:hover { border-color: var(--brand); color: var(--brand); }
+  /* 4 Cards de Resumo */
+  .summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+  .summary-card { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 12px; }
+  .summary-card .icon { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-size: 18px; }
+  .summary-card .icon.green { background: rgba(0, 221, 181, 0.1); color: var(--brand); }
+  .summary-card .icon.blue { background: rgba(100, 150, 255, 0.1); color: #6496FF; }
+  .summary-card .icon.yellow { background: rgba(255, 200, 50, 0.1); color: #FFC832; }
+  .summary-card .icon.gray { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); }
+  .summary-card .info h3 { font-size: 20px; font-family: 'Space Grotesk'; line-height: 1; }
+  .summary-card .info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
-  /* ================= KANBAN (ORGANIZAÇÃO) ================= */
-  .kanban-board { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px; height: calc(100vh - 180px); }
-  .kanban-col { min-width: 280px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; }
-  .kanban-col h4 { font-family: 'Space Grotesk', sans-serif; font-size: 15px; color: var(--text-muted); margin-bottom: 16px; text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
-  .kanban-card { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; cursor: grab; transition: 0.2s; }
-  .kanban-card:hover { border-color: var(--brand); transform: translateY(-2px); }
-  .kanban-card .tag { font-size: 11px; color: var(--brand); font-weight: 600; margin-bottom: 4px; display: block; }
-  .kanban-card b { display: block; font-size: 14px; margin-bottom: 8px; color: #fff; }
+  /* Kanban Board */
+  .kanban-board { display: flex; gap: 16px; flex: 1; overflow-x: auto; }
+  .kanban-col { min-width: 260px; flex: 1; background: transparent; }
+  .kanban-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; font-size: 13px; font-weight: 600; color: var(--text-main); }
+  .kanban-header .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .kanban-header .count { color: var(--text-muted); }
+  
+  .kanban-cards { display: flex; flex-direction: column; gap: 12px; }
+  .kanban-card { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; position: relative; cursor: pointer; transition: 0.2s; }
+  .kanban-card:hover { border-color: var(--brand); }
+  
+  .k-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .k-icon { width: 32px; height: 32px; background: rgba(255, 255, 255, 0.03); border-radius: 8px; display: grid; place-items: center; font-size: 16px; }
+  .k-tag { font-size: 10px; color: var(--text-muted); font-family: monospace; }
+  
+  .k-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  .k-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+  
+  .k-card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 12px; }
+  .k-date { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+  .k-pill { font-size: 10px; font-weight: 600; padding: 4px 8px; border-radius: 4px; }
+  .k-pill.novo { background: rgba(0, 221, 181, 0.1); color: var(--brand); }
+  .k-pill.exec { background: rgba(100, 150, 255, 0.1); color: #6496FF; }
 
-  /* ================= CHAT LATERAL ================= */
-  .chat-sidebar { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; display: flex; flex-direction: column; height: calc(100vh - 160px); position: sticky; top: 32px; }
-  .chat-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; background: rgba(0,0,0,0.2); border-radius: 16px 16px 0 0; }
-  .chat-header h4 { font-family: 'Space Grotesk', sans-serif; font-size: 16px; }
-  .chat-header span { color: var(--brand); font-size: 12px; }
-  .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
-  .chat-msg { padding: 12px 16px; border-radius: 12px; font-size: 14px; max-width: 90%; line-height: 1.5; }
-  .chat-msg small { display: block; font-size: 10px; opacity: 0.7; margin-bottom: 4px; }
-  .chat-msg.ou { background: rgba(255,255,255,0.05); align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid var(--border); }
-  .chat-msg.me { background: var(--brand); color: #000; align-self: flex-end; border-bottom-right-radius: 2px; }
-  .chat-footer { padding: 16px; border-top: 1px solid var(--border); display: flex; gap: 10px; background: rgba(0,0,0,0.2); border-radius: 0 0 16px 16px; }
-  .chat-footer input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text-main); outline: none; }
-  .chat-footer input:focus { border-color: var(--brand); }
-  .chat-footer button { background: var(--brand); color: #000; padding: 0 20px; border-radius: 8px; font-weight: 600; }
+  /* Estado Vazio das Colunas */
+  .empty-col { border: 1px dashed var(--border); border-radius: 12px; padding: 40px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px; color: var(--text-muted); font-size: 12px; }
+  .empty-col svg { width: 24px; height: 24px; margin-bottom: 12px; opacity: 0.5; }
 
-  /* ================= MODAL ================= */
+  /* Painel de Anotações (Direita) */
+  .sidebar-notes { background: var(--s1); border-left: 1px solid var(--border); padding: 24px; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; }
+  .notes-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: 600; font-size: 15px; }
+  
+  .note-input-box { background: var(--s2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 24px; }
+  .note-input-box textarea { width: 100%; background: transparent; border: none; color: #fff; outline: none; resize: none; font-size: 13px; font-family: 'Inter'; height: 60px; margin-bottom: 12px; }
+  .note-tools { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px; color: var(--text-muted); }
+  .note-tools .icons { display: flex; gap: 12px; cursor: pointer; }
+  .btn-save-note { background: var(--brand); color: #000; padding: 6px 16px; border-radius: 6px; font-weight: 600; font-size: 12px; }
+
+  .notes-list-title { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 16px; }
+  .note-item { background: var(--s2); border-radius: 8px; padding: 16px; margin-bottom: 12px; position: relative; border-left: 3px solid var(--brand); }
+  .note-meta { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-bottom: 8px; }
+  .note-text { font-size: 12px; line-height: 1.5; color: #ddd; }
+  
+  /* Modal */
   .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
-  .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; width: 95%; max-width: 700px; max-height: 90vh; display: flex; flex-direction: column; }
-  .modal-header { padding: 24px 32px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-  .modal-header h2 { font-family: 'Space Grotesk', sans-serif; color: var(--brand); }
-  .modal-body { padding: 32px; overflow-y: auto; display: grid; grid-template-columns: 1fr; gap: 20px; }
-  .form-group { margin-bottom: 16px; }
-  .form-group label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; }
-  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: #fff; outline: none; }
-  .form-group input:focus, .form-group textarea:focus { border-color: var(--brand); }
-  .modal-actions { padding: 24px 32px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; background: var(--bg); border-radius: 0 0 24px 24px; gap: 10px;}
-  .btn-salvar { background: var(--brand); color: #000; padding: 12px 24px; border-radius: 8px; font-weight: 600; }
-  .btn-whats { background: #25D366; color: #fff; padding: 12px 24px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
+  .modal-box { background: var(--s1); border: 1px solid var(--border); border-radius: 24px; width: 95%; max-width: 600px; padding: 32px; }
 </style>
 </head>
 <body>
@@ -97,135 +127,106 @@
   <div class="sidebar">
     <a href="index.html" class="logo"><i>TE</i><span>Tech<b>Empire</b></span></a>
     <nav>
-      <a class="active" onclick="mudarAba('solicitacoes', this)">🎫 Solicitações</a>
-      <a onclick="mudarAba('organizacao', this)">📋 Organização</a>
-      <a onclick="mudarAba('laudos', this)">📄 Laudos / Projetos</a>
-      <a href="login.html" class="sair">Sair da conta</a>
+      <a href="#" class="active">🏠 Início</a>
+      <a href="#">🎫 Chamados</a>
+      <a href="#">💬 Mensagens <span class="badge">3</span></a>
+      <a href="#">💳 Pagamentos</a>
+      <a href="#">👥 Clientes</a>
+      <a href="#">🎯 Leads</a>
+      <a href="#">🛡️ Usuários</a>
+      <a href="login.html" class="sair">🚪 Sair da conta</a>
     </nav>
+    <div class="card-footer-logo">
+      <b>TechEmpire</b>
+      Tecnologia que resolve.
+    </div>
   </div>
 
   <!-- MAIN -->
   <div class="main">
+    
+    <!-- TOPBAR -->
     <div class="topbar">
-      <h1 id="page-title">Solicitações</h1>
-    </div>
-
-    <div class="content-wrapper" id="content-wrapper">
-      
-      <!-- CONTEÚDO DA ESQUERDA -->
-      <div class="content">
-        <!-- Tela de Solicitações -->
-        <div id="tela-solicitacoes" class="tela active">
-          <div class="table-box">
-            <div style="padding: 20px; border-bottom: 1px solid var(--border);">
-              <h3 style="font-family: 'Space Grotesk'; font-size: 18px;">Todas as Solicitações</h3>
-            </div>
-            <div id="tabela-solicitacoes"></div>
-          </div>
-        </div>
-
-        <!-- Tela de Laudos / Projetos -->
-        <div id="tela-laudos" class="tela">
-          <div class="table-box">
-            <div style="padding: 20px; border-bottom: 1px solid var(--border);">
-              <h3 style="font-family: 'Space Grotesk'; font-size: 18px;">Documentos e Laudos</h3>
-            </div>
-            <div id="tabela-laudos"></div>
-          </div>
-        </div>
-
-        <!-- Tela de Organização (Kanban) -->
-        <div id="tela-organizacao" class="tela">
-          <div class="kanban-board" id="kanban-board">
-            <!-- Colunas injetadas via JS -->
-          </div>
-        </div>
+      <div class="search-box">
+        <span>🔍</span>
+        <input type="text" placeholder="Buscar projetos, clientes ou protocolos...">
       </div>
-
-      <!-- CHAT LATERAL (DIREITA) -->
-      <div class="chat-sidebar" id="chat-sidebar">
-        <div class="chat-header">
-          <div style="width: 32px; height: 32px; background: var(--brand); border-radius: 50%; display: grid; place-items: center; color: #000; font-weight: bold;">👤</div>
+      <div class="user-info">
+        <div class="notif-icon">🔔</div>
+        <div class="user-block">
+          <div class="avatar">👤</div>
           <div>
-            <h4 id="chat-titulo">Selecione um chamado</h4>
-            <span id="chat-status">Aguardando...</span>
+            <div style="font-size: 13px; font-weight: 600;">Administrador</div>
+            <div style="font-size: 11px; color: var(--brand);">Painel administrativo</div>
           </div>
+          <span style="font-size: 12px; color: var(--text-muted);">▼</span>
         </div>
-        <div class="chat-body" id="chat-mensagens">
-          <p style="text-align: center; color: var(--text-muted); font-size: 14px;">Clique em "Chat" na tabela para conversar com o cliente.</p>
-        </div>
-        <form class="chat-footer" id="form-chat" style="display: none;">
-          <input type="text" id="input-msg" placeholder="Digite sua resposta..." required autocomplete="off">
-          <button type="submit">Enviar</button>
-        </form>
       </div>
-
     </div>
-  </div>
 
-  <!-- MODAL DOCUMENTO (Laudo ou Briefing) -->
-  <div class="modal" id="modal-laudo">
-    <div class="modal-box">
-      <div class="modal-header">
-        <h2 id="modal-titulo">Gerenciar Documento</h2>
-        <button onclick="fecharModal()" style="font-size: 24px; color: var(--text-muted);">✕</button>
-      </div>
+    <!-- CONTENT AREA -->
+    <div class="content-area">
       
-      <div class="modal-body">
-        <div style="background: rgba(255,255,255,0.02); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px;">
-          <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 4px;">Descrição do cliente:</div>
-          <div id="modal-descricao" style="font-size: 14px; line-height: 1.5;"></div>
+      <!-- ESQUERDA: KANBAN -->
+      <div class="main-content">
+        <div class="page-header">
+          <div class="texts">
+            <span>Painel Administrativo</span>
+            <h1>Organização de Projetos</h1>
+            <p>Acompanhe e gerencie todos os projetos e chamados em andamento.</p>
+          </div>
+          <button class="btn-new" onclick="alert('Abrir modal para novo projeto manual')">+ Novo projeto</button>
         </div>
 
-        <!-- Campos para Manutenção -->
-        <div id="campos-manutencao">
-          <div class="form-group">
-            <label>Diagnóstico Técnico</label>
-            <textarea id="laudo-diag" rows="3" placeholder="Ex: Placa-mãe com curto..."></textarea>
+        <!-- Cards de Resumo -->
+        <div class="summary-cards">
+          <div class="summary-card">
+            <div class="icon green">📁</div>
+            <div class="info"><h3 id="sum-novos">0</h3><p>Novos pedidos</p></div>
           </div>
-          <div class="form-group">
-            <label>Solução Aplicada</label>
-            <textarea id="laudo-solucao" rows="3" placeholder="Ex: Substituição do capacitor..."></textarea>
+          <div class="summary-card">
+            <div class="icon blue">⚙️</div>
+            <div class="info"><h3 id="sum-execucao">0</h3><p>Em execução</p></div>
+          </div>
+          <div class="summary-card">
+            <div class="icon yellow">👤</div>
+            <div class="info"><h3 id="sum-aguardando">0</h3><p>Aguardando cliente</p></div>
+          </div>
+          <div class="summary-card">
+            <div class="icon gray">✓</div>
+            <div class="info"><h3 id="sum-concluidos">0</h3><p>Concluídos</p></div>
           </div>
         </div>
 
-        <!-- Campos para Site -->
-        <div id="campos-site" style="display: none;">
-          <div class="form-group">
-            <label>Briefing e Escopo do Projeto</label>
-            <textarea id="proj-escopo" rows="4" placeholder="Descreva o que será feito no site..."></textarea>
-          </div>
-          <div class="form-group">
-            <label>Link do Protótipo / Preview</label>
-            <input type="url" id="proj-link" placeholder="https://preview.exemplo.com">
-          </div>
+        <!-- Kanban -->
+        <div class="kanban-board" id="kanban-board">
+          <!-- Injetado via JS -->
+        </div>
+      </div>
+
+      <!-- DIREITA: ANOTAÇÕES -->
+      <div class="sidebar-notes">
+        <div class="notes-header">
+          <span>📝 Anotações</span>
+          <span style="cursor:pointer; color: var(--text-muted);">⤢</span>
         </div>
         
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-          <div class="form-group">
-            <label>Prazo de Entrega</label>
-            <input type="text" id="laudo-prazo" placeholder="Ex: 3 dias úteis">
-          </div>
-          <div class="form-group">
-            <label>Valor do Serviço (R$)</label>
-            <input type="number" id="laudo-valor" step="0.01" placeholder="0.00">
+        <div class="note-input-box">
+          <textarea id="note-text" placeholder="Digite sua anotação..."></textarea>
+          <div class="note-tools">
+            <div class="icons">
+              <span>🖼️</span> <span>📎</span> <span>🔗</span>
+            </div>
+            <button class="btn-save-note" onclick="salvarAnotacao()">Salvar</button>
           </div>
         </div>
 
-        <div class="form-group">
-          <label>Status do Atendimento</label>
-          <select id="laudo-status">
-            <option value="Aguardando aprovação do orçamento">Aguardando aprovação do orçamento</option>
-            <option value="Em andamento">Em andamento</option>
-            <option value="Concluída">Concluída</option>
-          </select>
+        <div class="notes-list-title">Anotações recentes</div>
+        <div id="notes-list">
+          <!-- Injetado via JS -->
         </div>
       </div>
 
-      <div class="modal-actions">
-        <button class="btn-salvar" onclick="salvarDocumento()">Salvar e Notificar Cliente</button>
-        <a href="#" id="btn-whatsapp" target="_blank" class="btn-whats">Enviar WhatsApp</a>
-      </div>
     </div>
   </div>
 
@@ -235,237 +236,146 @@
     const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
     let idAdmin = null;
     let chamados = [];
-    let chamadoChatAtual = null;
-    let chamadoDocAtual = null;
 
     async function init() {
       const { data: { session } } = await db.auth.getSession();
       if (!session) { window.location.href = "login.html"; return; }
       idAdmin = session.user.id;
+      
       await carregarDados();
-      renderizarSolicitacoes();
+      await carregarAnotacoes();
     }
 
     async function carregarDados() {
       const { data } = await db.from("chamados").select("*").order("criado_em", { ascending: false });
       chamados = data || [];
+      renderizarDashboard();
     }
 
-    function mudarAba(aba, el) {
-      document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
-      el.classList.add('active');
-      
-      document.querySelectorAll('.tela').forEach(t => t.classList.remove('active'));
-      document.getElementById(`tela-${aba}`).classList.add('active');
+    function renderizarDashboard() {
+      // Atualiza Cards de Resumo
+      const novos = chamados.filter(c => c.status === 'Nova chamada').length;
+      const execucao = chamados.filter(c => c.status === 'Em andamento').length;
+      const aguardando = chamados.filter(c => c.status === 'Aguardando aprovação do orçamento' || c.status === 'Aguardando informações do cliente').length;
+      const concluidos = chamados.filter(c => c.status === 'Concluída').length;
 
-      // Esconde/Mostra o chat dependendo da aba
-      const chat = document.getElementById('chat-sidebar');
-      if (aba === 'organizacao') {
-        chat.style.display = 'none';
-        document.getElementById('content-wrapper').style.gridTemplateColumns = '1fr';
-      } else {
-        chat.style.display = 'flex';
-        document.getElementById('content-wrapper').style.gridTemplateColumns = '1fr 380px';
-      }
+      document.getElementById('sum-novos').textContent = novos;
+      document.getElementById('sum-execucao').textContent = execucao;
+      document.getElementById('sum-aguardando').textContent = aguardando;
+      document.getElementById('sum-concluidos').textContent = concluidos;
 
-      document.getElementById('page-title').textContent = 
-        aba === 'solicitacoes' ? "Solicitações" : 
-        aba === 'organizacao' ? "Organização de Projetos" : "Laudos / Briefings";
-
-      if (aba === 'solicitacoes') renderizarSolicitacoes();
-      if (aba === 'laudos') renderizarLaudos();
-      if (aba === 'organizacao') renderizarKanban();
-    }
-
-    // ================= SOLICITAÇÕES =================
-    function renderizarSolicitacoes() {
-      let html = `<table><thead><tr><th>Protocolo</th><th>Cliente</th><th>Serviço</th><th>Status</th><th>Ações</th></tr></thead><tbody>`;
-      chamados.forEach(c => {
-        const isSite = c.categoria && c.categoria.toLowerCase().includes('site');
-        html += `<tr>
-          <td><b>${c.protocolo || 'Gerando...'}</b></td>
-          <td>${c.cliente_nome || 'Visitante'}</td>
-          <td>${isSite ? '💻 Site' : '🔧 Manutenção'}</td>
-          <td><span class="pill">${c.status}</span></td>
-          <td>
-            <button class="btn-action" onclick="abrirChat('${c.id}')">Chat</button>
-            <button class="btn-sec" onclick="abrirDocumento('${c.id}', ${isSite})">${isSite ? 'Briefing' : 'Laudo'}</button>
-          </td>
-        </tr>`;
-      });
-      html += `</tbody></table>`;
-      document.getElementById("tabela-solicitacoes").innerHTML = html;
-    }
-
-    // ================= KANBAN (ORGANIZAÇÃO) =================
-    function renderizarKanban() {
+      // Monta Kanban
       const colunas = [
-        { id: 'Nova chamada', titulo: '🟢 Novos Pedidos' },
-        { id: 'Em andamento', titulo: '🔵 Em Execução' },
-        { id: 'Aguardando aprovação do orçamento', titulo: '🟡 Aguardando Cliente' },
-        { id: 'Concluída', titulo: '⚪ Concluídos' }
+        { id: 'Nova chamada', title: 'Novos pedidos', color: 'var(--brand)', count: novos },
+        { id: 'Em andamento', title: 'Em execução', color: '#6496FF', count: execucao },
+        { id: 'Aguardando', title: 'Aguardando cliente', color: '#FFC832', count: aguardando },
+        { id: 'Concluída', title: 'Concluídos', color: 'var(--text-muted)', count: concluidos }
       ];
 
-      let html = '';
+      let kanbanHTML = '';
       colunas.forEach(col => {
-        const cards = chamados.filter(c => c.status === col.id);
-        html += `<div class="kanban-col">
-          <h4>${col.titulo} (${cards.length})</h4>`;
-          
-        cards.forEach(c => {
-          const isSite = c.categoria && c.categoria.toLowerCase().includes('site');
-          html += `<div class="kanban-card" onclick="abrirDocumento('${c.id}', ${isSite})">
-            <span class="tag">${c.protocolo || 'S/N'}</span>
-            <b>${c.cliente_nome || 'Visitante'}</b>
-            <div style="font-size: 12px; color: var(--text-muted);">${c.titulo}</div>
-          </div>`;
-        });
-        
-        html += `</div>`;
+        kanbanHTML += `
+          <div class="kanban-col">
+            <div class="kanban-header">
+              <div class="dot" style="background: ${col.color}"></div>
+              ${col.title} <span class="count">(${col.count})</span>
+            </div>
+            <div class="kanban-cards">
+        `;
+
+        let filtrados = [];
+        if (col.id === 'Aguardando') filtrados = chamados.filter(c => c.status === 'Aguardando aprovação do orçamento' || c.status === 'Aguardando informações do cliente');
+        else filtrados = chamados.filter(c => c.status === col.id);
+
+        if (filtrados.length === 0) {
+          kanbanHTML += `
+            <div class="empty-col">
+              ${col.id === 'Em andamento' ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'}
+              <p style="margin-top: 12px; font-weight: 500;">Nenhum projeto ${col.title.toLowerCase()}</p>
+              <p style="margin-top: 4px; opacity: 0.7;">Quando um projeto for ${col.id === 'Nova chamada' ? 'criado' : 'atualizado'}, ele aparecerá aqui.</p>
+            </div>
+          `;
+        } else {
+          filtrados.forEach(c => {
+            const isSite = c.categoria && c.categoria.toLowerCase().includes('site');
+            const icon = isSite ? '💻' : '🔧';
+            const desc = c.titulo || 'Sem descrição';
+            const dateStr = new Date(c.criado_em).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', ' às');
+            
+            // Define a cor do pill
+            let pillClass = 'novo'; let pillText = 'Novo';
+            if (col.id === 'Em andamento') { pillClass = 'exec'; pillText = 'Execução'; }
+            if (col.id === 'Concluída') { pillClass = 'gray'; pillText = 'Concluído'; }
+
+            kanbanHTML += `
+              <div class="kanban-card" onclick="abrirModal('${c.id}')">
+                <div class="k-card-top">
+                  <div class="k-icon">${icon}</div>
+                  <div class="k-tag">${c.protocolo || 'S/N'}</div>
+                </div>
+                <div class="k-title">${c.cliente_nome || 'Visitante'}</div>
+                <div class="k-desc">${desc}</div>
+                <div class="k-card-footer">
+                  <div class="k-date">🕒 ${dateStr}</div>
+                  <div class="k-pill ${pillClass}">${pillText}</div>
+                </div>
+              </div>
+            `;
+          });
+        }
+
+        kanbanHTML += `</div></div>`;
       });
-      
-      document.getElementById("kanban-board").innerHTML = html;
+
+      document.getElementById('kanban-board').innerHTML = kanbanHTML;
     }
 
-    // ================= LAUDOS / BRIEFINGS =================
-    function renderizarLaudos() {
-      let html = `<table><thead><tr><th>Protocolo</th><th>Cliente</th><th>Tipo</th><th>Status</th><th>Ação</th></tr></thead><tbody>`;
-      chamados.forEach(c => {
-        const isSite = c.categoria && c.categoria.toLowerCase().includes('site');
-        const temDoc = isSite ? c.detalhes_projeto : c.laudo_tecnico;
-        const statusDoc = temDoc ? "✅ Emitido" : "⏳ Pendente";
-        
-        html += `<tr>
-          <td><b>${c.protocolo || 'N/A'}</b></td>
-          <td>${c.cliente_nome || 'Visitante'}</td>
-          <td>${isSite ? 'Site' : 'Manutenção'}</td>
-          <td>${statusDoc}</td>
-          <td><button class="btn-action" onclick="abrirDocumento('${c.id}', ${isSite})">Gerenciar</button></td>
-        </tr>`;
-      });
-      html += `</tbody></table>`;
-      document.getElementById("tabela-laudos").innerHTML = html;
+    // ================= ANOTAÇÕES =================
+    async function salvarAnotacao() {
+      const texto = document.getElementById('note-text').value.trim();
+      if (!texto) return;
+      
+      await db.from('anotacoes').insert({ admin_id: idAdmin, texto: texto });
+      document.getElementById('note-text').value = '';
+      await carregarAnotacoes();
     }
 
-    // ================= MODAL DINÂMICO =================
-    function abrirDocumento(id, isSite) {
-      chamadoDocAtual = chamados.find(x => x.id === id);
-      if (!chamadoDocAtual) return;
-
-      document.getElementById('modal-titulo').textContent = isSite ? 'Briefing do Projeto' : 'Laudo Técnico';
-      document.getElementById('modal-descricao').textContent = chamadoDocAtual.descricao;
-      
-      // Alterna os campos visíveis
-      document.getElementById('campos-manutencao').style.display = isSite ? 'none' : 'block';
-      document.getElementById('campos-site').style.display = isSite ? 'block' : 'none';
-
-      if (isSite) {
-        const p = chamadoDocAtual.detalhes_projeto || {};
-        document.getElementById('proj-escopo').value = p.escopo || '';
-        document.getElementById('proj-link').value = p.link || '';
-      } else {
-        const l = chamadoDocAtual.laudo_tecnico || {};
-        document.getElementById('laudo-diag').value = l.diagnostico || '';
-        document.getElementById('laudo-solucao').value = l.solucao || '';
-      }
-
-      const l = chamadoDocAtual.laudo_tecnico || {};
-      const p = chamadoDocAtual.detalhes_projeto || {};
-      document.getElementById('laudo-prazo').value = l.prazo || p.prazo || '';
-      document.getElementById('laudo-valor').value = l.valor || p.valor || '';
-      document.getElementById('laudo-status').value = chamadoDocAtual.status;
-
-      document.getElementById('modal-laudo').style.display = 'flex';
-    }
-
-    function fecharModal() {
-      document.getElementById('modal-laudo').style.display = 'none';
-      chamadoDocAtual = null;
-    }
-
-    async function salvarDocumento() {
-      if (!chamadoDocAtual) return;
-      const isSite = chamadoDocAtual.categoria && chamadoDocAtual.categoria.toLowerCase().includes('site');
-      
-      const prazo = document.getElementById('laudo-prazo').value;
-      const valor = document.getElementById('laudo-valor').value;
-      const status = document.getElementById('laudo-status').value;
-
-      let updateData = { status: status };
-
-      if (isSite) {
-        updateData.detalhes_projeto = {
-          escopo: document.getElementById('proj-escopo').value,
-          link: document.getElementById('proj-link').value,
-          prazo: prazo,
-          valor: valor
-        };
-      } else {
-        updateData.laudo_tecnico = {
-          diagnostico: document.getElementById('laudo-diag').value,
-          solucao: document.getElementById('laudo-solucao').value,
-          prazo: prazo,
-          valor: valor
-        };
-      }
-
-      const { error } = await db.from("chamados").update(updateData).eq("id", chamadoDocAtual.id);
-      if (error) return alert("Erro ao salvar: " + error.message);
-
-      // Atualiza o link do WhatsApp
-      const fone = chamadoDocAtual.whatsapp || chamadoDocAtual.cliente_telefone;
-      if (fone) {
-        const numLimpo = fone.replace(/\D/g, '');
-        const msg = `Olá, ${chamadoDocAtual.cliente_nome}! Atualizamos seu chamado ${chamadoDocAtual.protocolo}.\nPrazo: ${prazo}\nValor: R$ ${valor}\nStatus: ${status}`;
-        document.getElementById('btn-whatsapp').href = `https://wa.me/55${numLimpo}?text=${encodeURIComponent(msg)}`;
-      }
-
-      alert("Documento salvo com sucesso!");
-      await carregarDados();
-      
-      // Atualiza a tela que está aberta
-      const abaAtiva = document.querySelector('.tela.active').id;
-      if (abaAtiva === 'tela-laudos') renderizarLaudos();
-      else if (abaAtiva === 'tela-organizacao') renderizarKanban();
-      else renderizarSolicitacoes();
-    }
-
-    // ================= CHAT =================
-    async function abrirChat(id) {
-      chamadoChatAtual = chamados.find(x => x.id === id);
-      if (!chamadoChatAtual) return;
-
-      document.getElementById('chat-titulo').textContent = chamadoChatAtual.cliente_nome || 'Visitante';
-      document.getElementById('chat-status').textContent = chamadoChatAtual.protocolo || 'S/N';
-      document.getElementById('form-chat').style.display = 'flex';
-      
-      const { data } = await db.from('mensagens').select('*').eq('chamado_id', id).order('criado_em', { ascending: true });
-      const chatBody = document.getElementById('chat-mensagens');
+    async function carregarAnotacoes() {
+      const { data } = await db.from('anotacoes').select('*').order('criado_em', { ascending: false }).limit(5);
+      const lista = document.getElementById('notes-list');
       
       if (!data || data.length === 0) {
-        chatBody.innerHTML = `<p style="text-align:center; color:var(--text-muted);">Nenhuma mensagem ainda.</p>`;
+        lista.innerHTML = '<p style="font-size: 12px; color: var(--text-muted);">Nenhuma anotação recente.</p>';
         return;
       }
 
-      chatBody.innerHTML = data.map(msg => {
-        const isMe = msg.remetente_id === idAdmin;
-        const hora = new Date(msg.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-        return `<div class="chat-msg ${isMe ? 'me' : 'ou'}"><small>${isMe ? 'Você' : 'Cliente'} · ${hora}</small>${msg.conteudo}</div>`;
+      lista.innerHTML = data.map(n => {
+        const date = new Date(n.criado_em);
+        const hoje = new Date();
+        let dataStr = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        if (date.toDateString() === hoje.toDateString()) dataStr = `Hoje, ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+
+        return `
+          <div class="note-item">
+            <div class="note-meta">
+              <span style="color: var(--brand);">● ${dataStr}</span>
+              <span style="cursor:pointer;">⋮</span>
+            </div>
+            <div class="note-text">${n.texto}</div>
+          </div>
+        `;
       }).join('');
-      chatBody.scrollTop = chatBody.scrollHeight;
     }
 
-    document.getElementById('form-chat').onsubmit = async (e) => {
-      e.preventDefault();
-      if (!chamadoChatAtual) return;
-      const input = document.getElementById('input-msg');
-      const texto = input.value.trim();
-      if (!texto) return;
-
-      await db.from('mensagens').insert({ chamado_id: chamadoChatAtual.id, remetente_id: idAdmin, conteudo: texto });
-      input.value = '';
-      await abrirChat(chamadoChatAtual.id);
-    };
+    // Função simples de modal para clicar no card (pode ser expandida depois)
+    function abrirModal(id) {
+      const c = chamados.find(x => x.id === id);
+      if (!c) return;
+      const novoStatus = prompt(`Status atual: ${c.status}\n\nDigite o novo status (Nova chamada, Em andamento, Aguardando, Concluída):`, c.status);
+      if (novoStatus) {
+        db.from("chamados").update({ status: novoStatus }).eq("id", id).then(() => carregarDados());
+      }
+    }
 
     init();
   </script>
