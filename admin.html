@@ -32,7 +32,6 @@
   .sidebar nav { display: flex; flex-direction: column; gap: 4px; }
   .sidebar a { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px; font-weight: 500; color: var(--text-muted); transition: 0.2s; font-size: 14px; cursor: pointer; }
   .sidebar a:hover, .sidebar a.active { background: rgba(0, 221, 181, 0.1); color: var(--brand); }
-  .sidebar a .badge { background: var(--brand); color: #000; border-radius: 99px; padding: 2px 6px; font-size: 10px; margin-left: auto; font-weight: 800; }
   .sidebar .sair { margin-top: auto; color: var(--err); }
 
   .card-footer-logo { margin-top: 20px; background: var(--s2); padding: 16px; border-radius: 12px; border: 1px solid var(--border); font-size: 12px; color: var(--text-muted); }
@@ -41,20 +40,17 @@
   /* ================= MAIN ================= */
   .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
   
-  /* Topbar */
   .topbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 32px; border-bottom: 1px solid var(--border); background: var(--bg); }
   .search-box { background: var(--s1); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; width: 350px; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
   .search-box input { background: none; border: none; outline: none; color: #fff; width: 100%; font-size: 13px; }
   .user-info { display: flex; align-items: center; gap: 20px; }
   .notif-icon { position: relative; font-size: 20px; color: var(--text-muted); cursor: pointer; }
-  .notif-icon::after { content: ""; position: absolute; top: 0; right: 0; width: 8px; height: 8px; background: var(--brand); border-radius: 50%; }
   .user-block { display: flex; align-items: center; gap: 12px; }
   .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--s2); display: grid; place-items: center; border: 1px solid var(--border); }
 
   /* ================= ÁREA DE CONTEÚDO ================= */
   .content-area { flex: 1; display: grid; grid-template-columns: 1fr 340px; overflow: hidden; }
   
-  /* Área Principal */
   .main-content { padding: 32px; overflow-y: auto; display: flex; flex-direction: column; }
   
   .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
@@ -64,18 +60,21 @@
   
   .btn-new { background: var(--brand); color: #000; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 8px; }
 
-  /* Telas (Controle de exibição) */
   .tela { display: none; flex-direction: column; flex: 1; }
   .tela.active { display: flex; }
 
-  /* Tabela de Chamados / Clientes */
-  .table-box { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-top: 16px;}
+  /* Tabelas */
+  .table-box { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-top: 16px; width: 100%; }
   table { width: 100%; border-collapse: collapse; }
   th { text-align: left; padding: 16px; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--border); font-weight: 500; }
   td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; }
   tr:hover td { background: rgba(255,255,255,0.02); }
   .pill { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; background: rgba(0, 221, 181, 0.1); color: var(--brand); }
-  
+  .btn-acao { background: var(--brand); color: #000; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; transition: 0.2s; }
+  .btn-acao:hover { background: #00F5C8; }
+  .btn-sec { background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; margin-left: 5px; transition: 0.2s; }
+  .btn-sec:hover { border-color: var(--brand); color: var(--brand); }
+
   /* Kanban */
   .summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
   .summary-card { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 12px; }
@@ -103,11 +102,9 @@
   .k-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
   .k-card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 12px; }
   .k-date { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
-  .k-pill { font-size: 10px; font-weight: 600; padding: 4px 8px; border-radius: 4px; }
-  .k-pill.novo { background: rgba(0, 221, 181, 0.1); color: var(--brand); }
-  .k-pill.exec { background: rgba(100, 150, 255, 0.1); color: #6496FF; }
+  .k-pill { font-size: 10px; font-weight: 600; padding: 4px 8px; border-radius: 4px; background: rgba(0, 221, 181, 0.1); color: var(--brand); }
 
-  .empty-col { border: 1px dashed var(--border); border-radius: 12px; padding: 40px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px; color: var(--text-muted); font-size: 12px; }
+  .empty-col { border: 1px dashed var(--border); border-radius: 12px; padding: 40px 20px; text-align: center; color: var(--text-muted); font-size: 12px; }
 
   /* Painel de Anotações */
   .sidebar-notes { background: var(--s1); border-left: 1px solid var(--border); padding: 24px; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; }
@@ -115,29 +112,29 @@
   .note-input-box { background: var(--s2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 24px; }
   .note-input-box textarea { width: 100%; background: transparent; border: none; color: #fff; outline: none; resize: none; font-size: 13px; font-family: 'Inter'; height: 60px; margin-bottom: 12px; }
   .note-tools { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px; color: var(--text-muted); }
-  .note-tools .icons { display: flex; gap: 12px; cursor: pointer; }
   .btn-save-note { background: var(--brand); color: #000; padding: 6px 16px; border-radius: 6px; font-weight: 600; font-size: 12px; }
 
   .notes-list-title { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 16px; }
   .note-item { background: var(--s2); border-radius: 8px; padding: 16px; margin-bottom: 12px; position: relative; border-left: 3px solid var(--brand); display: flex; justify-content: space-between; }
-  .note-item .content { flex: 1; }
   .note-meta { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-bottom: 8px; }
   .note-text { font-size: 12px; line-height: 1.5; color: #ddd; }
   .btn-del-note { color: var(--err); cursor: pointer; font-size: 16px; padding: 0 4px; opacity: 0.5; transition: 0.2s; }
   .btn-del-note:hover { opacity: 1; }
 
-  /* MODAL GERAL */
+  /* MODAIS GERAIS */
   .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
-  .modal-box { background: var(--s1); border: 1px solid var(--border); border-radius: 16px; width: 95%; max-width: 500px; padding: 32px; display: flex; flex-direction: column; gap: 16px; }
+  .modal-box { background: var(--s1); border: 1px solid var(--border); border-radius: 16px; width: 95%; max-width: 500px; padding: 32px; display: flex; flex-direction: column; gap: 16px; max-height: 90vh; overflow-y: auto; }
   .modal-box h2 { font-family: 'Space Grotesk'; color: var(--brand); font-size: 20px; margin-bottom: 8px;}
-  .modal-box label { font-size: 12px; color: var(--text-muted); margin-bottom: -8px; display: block;}
-  .modal-box input, .modal-box select { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: #fff; outline: none;}
-  .modal-actions { display: flex; justify-content: space-between; margin-top: 16px; }
-  .btn-modal { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; }
+  .form-group { margin-bottom: 8px; }
+  .form-group label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block;}
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: #fff; outline: none; font-family: 'Inter';}
+  .form-group input:focus, .form-group textarea:focus { border-color: var(--brand); }
+  .modal-actions { display: flex; justify-content: space-between; margin-top: 16px; gap: 10px;}
+  .btn-modal { padding: 12px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; }
   .btn-modal.primary { background: var(--brand); color: #000; }
   .btn-modal.danger { background: var(--err); color: #fff; }
   .btn-modal.secondary { background: transparent; border: 1px solid var(--border); color: #fff; }
-
+  .btn-modal.whatsapp { background: #25D366; color: #fff; }
 </style>
 </head>
 <body>
@@ -148,6 +145,7 @@
     <nav>
       <a id="nav-inicio" class="active" onclick="mudarAba('inicio')">🏠 Início</a>
       <a id="nav-chamados" onclick="mudarAba('chamados')">🎫 Chamados</a>
+      <a id="nav-laudos" onclick="mudarAba('laudos')">📄 Laudos Técnicos</a>
       <a id="nav-clientes" onclick="mudarAba('clientes')">👥 Clientes</a>
       <a href="login.html" class="sair">🚪 Sair da conta</a>
     </nav>
@@ -160,18 +158,12 @@
   <!-- MAIN -->
   <div class="main">
     <div class="topbar">
-      <div class="search-box">
-        <span>🔍</span>
-        <input type="text" placeholder="Buscar...">
-      </div>
+      <div class="search-box"><span>🔍</span><input type="text" placeholder="Buscar..."></div>
       <div class="user-info">
         <div class="notif-icon">🔔</div>
         <div class="user-block">
           <div class="avatar">👤</div>
-          <div>
-            <div style="font-size: 13px; font-weight: 600;">Administrador</div>
-            <div style="font-size: 11px; color: var(--brand);">Painel</div>
-          </div>
+          <div><div style="font-size: 13px; font-weight: 600;">Administrador</div><div style="font-size: 11px; color: var(--brand);">Painel</div></div>
         </div>
       </div>
     </div>
@@ -183,9 +175,8 @@
           <div class="texts">
             <span id="page-subtitle">Painel Administrativo</span>
             <h1 id="page-title">Organização de Projetos</h1>
-            <p id="page-desc">Acompanhe e gerencie todos os projetos e chamados em andamento.</p>
+            <p id="page-desc">Acompanhe e gerencie todos os projetos e chamados.</p>
           </div>
-          <button class="btn-new" id="btn-novo-projeto" style="display: none;" onclick="alert('Em breve')">+ Novo projeto</button>
         </div>
 
         <!-- TELA: INÍCIO (KANBAN) -->
@@ -199,17 +190,27 @@
           <div class="kanban-board" id="kanban-board"></div>
         </div>
 
-        <!-- TELA: CHAMADOS (TABELA) -->
+        <!-- TELA: CHAMADOS -->
         <div id="tela-chamados" class="tela">
           <div class="table-box">
             <table>
-              <thead><tr><th>Protocolo</th><th>Cliente</th><th>Assunto</th><th>Status</th><th>Ação</th></tr></thead>
+              <thead><tr><th>Protocolo</th><th>Cliente</th><th>Assunto</th><th>Status</th><th>Ações</th></tr></thead>
               <tbody id="tabela-chamados-body"></tbody>
             </table>
           </div>
         </div>
 
-        <!-- TELA: CLIENTES (TABELA) -->
+        <!-- TELA: LAUDOS -->
+        <div id="tela-laudos" class="tela">
+          <div class="table-box">
+            <table>
+              <thead><tr><th>Protocolo</th><th>Cliente</th><th>Status do Laudo</th><th>Ação</th></tr></thead>
+              <tbody id="tabela-laudos-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TELA: CLIENTES -->
         <div id="tela-clientes" class="tela">
           <div class="table-box">
             <table>
@@ -227,7 +228,7 @@
         <div class="note-input-box">
           <textarea id="note-text" placeholder="Digite sua anotação..."></textarea>
           <div class="note-tools">
-            <div class="icons"><span>🖼️</span> <span>📎</span></div>
+            <div style="font-size: 18px; cursor: pointer;">📎</div>
             <button class="btn-save-note" onclick="salvarAnotacao()">Salvar</button>
           </div>
         </div>
@@ -243,23 +244,73 @@
       <h2>Gerenciar Chamado</h2>
       <input type="hidden" id="edit-id">
       
-      <label>Cliente</label>
-      <input type="text" id="edit-cliente" disabled style="opacity: 0.6;">
+      <div class="form-group">
+        <label>Cliente</label>
+        <input type="text" id="edit-cliente" disabled style="opacity: 0.6;">
+      </div>
       
-      <label>Status do Atendimento</label>
-      <select id="edit-status">
-        <option value="Nova chamada">Nova chamada</option>
-        <option value="Em andamento">Em andamento</option>
-        <option value="Aguardando aprovação do orçamento">Aguardando cliente</option>
-        <option value="Concluída">Concluída</option>
-      </select>
+      <div class="form-group">
+        <label>Status do Atendimento</label>
+        <select id="edit-status">
+          <option value="Nova chamada">Nova chamada</option>
+          <option value="Em andamento">Em andamento</option>
+          <option value="Aguardando aprovação do orçamento">Aguardando cliente</option>
+          <option value="Concluída">Concluída</option>
+        </select>
+      </div>
       
       <div class="modal-actions">
         <button class="btn-modal danger" onclick="excluirChamado()">Excluir</button>
         <div style="display: flex; gap: 10px;">
-          <button class="btn-modal secondary" onclick="fecharModal()">Cancelar</button>
+          <button class="btn-modal secondary" onclick="fecharModal('modal-chamado')">Cancelar</button>
           <button class="btn-modal primary" onclick="salvarChamado()">Salvar</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE LAUDO TÉCNICO -->
+  <div class="modal" id="modal-laudo">
+    <div class="modal-box">
+      <h2 id="modal-laudo-titulo">Emitir Laudo</h2>
+      <div style="background: rgba(255,255,255,0.02); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px;">
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Problema relatado:</div>
+        <div id="modal-laudo-desc" style="font-size: 13px; line-height: 1.5;"></div>
+      </div>
+
+      <div class="form-group">
+        <label>Diagnóstico Técnico</label>
+        <textarea id="laudo-diag" rows="3" placeholder="Ex: Placa-mãe com curto..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Solução Aplicada</label>
+        <textarea id="laudo-solucao" rows="3" placeholder="Ex: Substituição do capacitor..."></textarea>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="form-group">
+          <label>Prazo</label>
+          <input type="text" id="laudo-prazo" placeholder="Ex: 3 dias">
+        </div>
+        <div class="form-group">
+          <label>Valor (R$)</label>
+          <input type="number" id="laudo-valor" step="0.01" placeholder="0.00">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Status</label>
+        <select id="laudo-status">
+          <option value="Aguardando aprovação do orçamento">Aguardando aprovação do orçamento</option>
+          <option value="Em andamento">Em andamento</option>
+          <option value="Concluída">Concluída</option>
+        </select>
+      </div>
+
+      <div class="modal-actions" style="flex-direction: column; gap: 10px;">
+        <button class="btn-modal primary" style="width: 100%;" onclick="salvarLaudo()">Salvar e Notificar Cliente</button>
+        <a href="#" id="btn-laudo-whatsapp" target="_blank" class="btn-modal whatsapp" style="width: 100%; text-align: center; display: none;">Enviar por WhatsApp</a>
+        <button class="btn-modal secondary" style="width: 100%;" onclick="fecharModal('modal-laudo')">Cancelar</button>
       </div>
     </div>
   </div>
@@ -271,6 +322,7 @@
     let idAdmin = null;
     let chamados = [];
     let clientes = [];
+    let laudoAtual = null;
 
     async function init() {
       const { data: { session } } = await db.auth.getSession();
@@ -279,7 +331,7 @@
       
       await carregarDados();
       await carregarAnotacoes();
-      mudarAba('inicio'); // Inicia no Kanban
+      mudarAba('inicio');
     }
 
     async function carregarDados() {
@@ -291,39 +343,37 @@
       
       renderizarKanban();
       renderizarTabelaChamados();
+      renderizarTabelaLaudos();
       renderizarTabelaClientes();
     }
 
     // ================= NAVEGAÇÃO =================
     function mudarAba(aba) {
-      // Atualiza classe do menu
       document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
       const el = document.getElementById('nav-' + aba);
       if(el) el.classList.add('active');
 
-      // Atualiza textos do topo
       const title = document.getElementById('page-title');
       const desc = document.getElementById('page-desc');
-      const btn = document.getElementById('btn-novo-projeto');
       
-      // Mostra a tela correta
       document.querySelectorAll('.tela').forEach(t => t.classList.remove('active'));
       document.getElementById('tela-' + aba).classList.add('active');
 
       if (aba === 'inicio') {
         title.textContent = 'Organização de Projetos';
         desc.textContent = 'Acompanhe e gerencie todos os projetos e chamados.';
-        btn.style.display = 'block';
         renderizarKanban();
       } else if (aba === 'chamados') {
         title.textContent = 'Todos os Chamados';
         desc.textContent = 'Lista completa de pedidos de clientes.';
-        btn.style.display = 'none';
         renderizarTabelaChamados();
+      } else if (aba === 'laudos') {
+        title.textContent = 'Laudos Técnicos';
+        desc.textContent = 'Gerencie os laudos de manutenção.';
+        renderizarTabelaLaudos();
       } else if (aba === 'clientes') {
         title.textContent = 'Base de Clientes';
         desc.textContent = 'Pessoas cadastradas no sistema.';
-        btn.style.display = 'none';
         renderizarTabelaClientes();
       }
     }
@@ -364,11 +414,11 @@
             const isSite = c.categoria && c.categoria.toLowerCase().includes('site');
             const dateStr = new Date(c.criado_em).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
             html += `
-              <div class="kanban-card" onclick="abrirModal('${c.id}')">
+              <div class="kanban-card" onclick="abrirModalChamado('${c.id}')">
                 <div class="k-card-top"><div class="k-icon">${isSite ? '💻' : '🔧'}</div><div class="k-tag">${c.protocolo || 'S/N'}</div></div>
                 <div class="k-title">${c.cliente_nome || 'Visitante'}</div>
                 <div class="k-desc">${c.titulo || 'Sem descrição'}</div>
-                <div class="k-card-footer"><div class="k-date">🕒 ${dateStr}</div><div class="k-pill novo">${c.status}</div></div>
+                <div class="k-card-footer"><div class="k-date">🕒 ${dateStr}</div><div class="k-pill">${c.status}</div></div>
               </div>`;
           });
         }
@@ -386,106 +436,29 @@
           <td>${c.cliente_nome || 'Visitante'}</td>
           <td>${c.titulo}</td>
           <td><span class="pill">${c.status}</span></td>
-          <td><button class="btn-modal primary" style="padding: 6px 12px; font-size: 12px;" onclick="abrirModal('${c.id}')">Gerenciar</button></td>
+          <td>
+            <button class="btn-acao" onclick="abrirModalChamado('${c.id}')">Gerenciar</button>
+          </td>
         </tr>`;
       });
       document.getElementById('tabela-chamados-body').innerHTML = html;
     }
 
+    function renderizarTabelaLaudos() {
+      let html = '';
+      chamados.filter(c => !c.categoria || !c.categoria.toLowerCase().includes('site')).forEach(c => {
+        const temLaudo = c.laudo_tecnico ? "✅ Emitido" : "⏳ Pendente";
+        html += `<tr>
+          <td>${c.protocolo || 'S/N'}</td>
+          <td>${c.cliente_nome || 'Visitante'}</td>
+          <td>${temLaudo}</td>
+          <td><button class="btn-sec" onclick="abrirModalLaudo('${c.id}')">Gerenciar Laudo</button></td>
+        </tr>`;
+      });
+      document.getElementById('tabela-laudos-body').innerHTML = html || "<tr><td colspan='4' style='text-align:center;'>Nenhum laudo pendente.</td></tr>";
+    }
+
     function renderizarTabelaClientes() {
       let html = '';
       clientes.forEach(c => {
-        const dataCad = c.criado_em ? new Date(c.criado_em).toLocaleDateString('pt-BR') : '—';
-        html += `<tr>
-          <td>${c.nome}</td>
-          <td>${c.email}</td>
-          <td>${c.telefone || '—'}</td>
-          <td>${dataCad}</td>
-        </tr>`;
-      });
-      document.getElementById('tabela-clientes-body').innerHTML = html;
-    }
-
-    // ================= MODAL DE AÇÃO (EDITAR/EXCLUIR) =================
-    function abrirModal(id) {
-      const c = chamados.find(x => x.id === id);
-      if (!c) return;
-
-      document.getElementById('edit-id').value = c.id;
-      document.getElementById('edit-cliente').value = c.cliente_nome || 'Visitante';
-      document.getElementById('edit-status').value = c.status;
-
-      document.getElementById('modal-chamado').style.display = 'flex';
-    }
-
-    function fecharModal() {
-      document.getElementById('modal-chamado').style.display = 'none';
-    }
-
-    async function salvarChamado() {
-      const id = document.getElementById('edit-id').value;
-      const novoStatus = document.getElementById('edit-status').value;
-
-      const { error } = await db.from("chamados").update({ status: novoStatus }).eq("id", id);
-      if (error) return alert("Erro: " + error.message);
-
-      fecharModal();
-      await carregarDados();
-    }
-
-    async function excluirChamado() {
-      const id = document.getElementById('edit-id').value;
-      if (!confirm("Tem certeza que deseja excluir este chamado? Essa ação não pode ser desfeita.")) return;
-
-      const { error } = await db.from("chamados").delete().eq("id", id);
-      if (error) return alert("Erro: " + error.message);
-
-      fecharModal();
-      await carregarDados();
-    }
-
-    // ================= ANOTAÇÕES =================
-    async function salvarAnotacao() {
-      const texto = document.getElementById('note-text').value.trim();
-      if (!texto) return;
-      
-      await db.from('anotacoes').insert({ admin_id: idAdmin, texto: texto });
-      document.getElementById('note-text').value = '';
-      await carregarAnotacoes();
-    }
-
-    async function carregarAnotacoes() {
-      const { data } = await db.from('anotacoes').select('*').order('criado_em', { ascending: false });
-      const lista = document.getElementById('notes-list');
-      
-      if (!data || data.length === 0) {
-        lista.innerHTML = '<p style="font-size: 12px; color: var(--text-muted);">Nenhuma anotação.</p>';
-        return;
-      }
-
-      lista.innerHTML = data.map(n => {
-        const date = new Date(n.criado_em);
-        const dataStr = `Hoje, ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
-
-        return `
-          <div class="note-item">
-            <div class="content">
-              <div class="note-meta"><span style="color: var(--brand);">● ${dataStr}</span></div>
-              <div class="note-text">${n.texto}</div>
-            </div>
-            <button class="btn-del-note" onclick="excluirAnotacao('${n.id}')" title="Excluir anotação">🗑️</button>
-          </div>
-        `;
-      }).join('');
-    }
-
-    async function excluirAnotacao(id) {
-      if (!confirm("Apagar esta anotação?")) return;
-      await db.from('anotacoes').delete().eq('id', id);
-      await carregarAnotacoes();
-    }
-
-    init();
-  </script>
-</body>
-</html>
+        const dataCad = c.criado_em ? new Date(c.c
