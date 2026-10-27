@@ -24,6 +24,21 @@ function ocupado(form, on) { const b = form.querySelector("button[type=submit]")
 function cpfValido(c) { c = digitos(c); if (c.length !== 11 || /^(\d)\1+$/.test(c)) return false; for (const t of [9, 10]) { let s = 0; for (let i = 0; i < t; i++) s += +c[i] * (t + 1 - i); if ((s * 10) % 11 % 10 !== +c[t]) return false; } return true; }
 const proximaSegura = n => /^[a-z\-]+\.html(\?[\w=&\-]*)?$/i.test(n || "") ? n : null;
 
+/* ====================== LOGOUT GLOBAL ====================== */
+window.fazerLogout = async (e) => {
+  if (e) e.preventDefault();
+  
+  // Limpa a memória local
+  sessionStorage.removeItem('te_user_id');
+  sessionStorage.removeItem('te_user_email');
+  
+  // Faz o logout no Supabase
+  if (sb) await sb.auth.signOut();
+  
+  // Redireciona para a home
+  window.location.href = "index.html";
+};
+
 async function comClientes(linhas) { 
   const ids = [...new Set(linhas.map(l => l.cliente_id).filter(Boolean))]; if (!ids.length) return linhas;
   const { data } = await sb.from("usuarios").select("id,nome,email").in("id", ids); const m = Object.fromEntries((data || []).map(u => [u.id, u]));
@@ -45,7 +60,7 @@ function desenharChrome() {
     headerEl.innerHTML = `<div class="bar-in"><a class="logo" href="index.html" aria-label="TechEmpire — início"><i>TE</i><span>Tech<b>Empire</b></span></a>
      <button class="menu" aria-expanded="false" aria-label="Abrir menu">☰</button>
      <nav id="nav">${l("index.html", "Início")}${l("servicos.html", "Serviços")}${l("manutencao.html", "Manutenção")}${l("sobre.html", "Sobre")}${l("contato.html", "Contato")}
-     ${logado ? `${adm ? l("admin.html", "Admin") : ""}${l("painel.html", "Meu painel")}${l("perfil.html", "Perfil")}<button class="btn sm" data-act="sair">Sair</button>`
+     ${logado ? `${adm ? l("admin.html", "Admin") : ""}${l("painel.html", "Meu painel")}${l("perfil.html", "Perfil")}<a href="#" class="btn sm" onclick="fazerLogout(event)">Sair</a>`
        : `<a class="btn sm" href="login.html">Entrar</a><a class="btn sm primary" href="criar-conta.html">Criar conta</a>`}</nav></div>`;
     $(".menu").onclick = e => { const n = $("#nav").classList.toggle("open"); e.currentTarget.setAttribute("aria-expanded", n); };
   }
@@ -81,8 +96,7 @@ async function boot() {
     }
   }
 
-  // 3. O SEGREDO PARA ACABAR COM O LOOP:
-  // Se a página precisa de login (client/admin) e não tem sessão, vai pro login.
+  // 3. Se a página precisa de login (client/admin) e não tem sessão, vai pro login.
   if ((need === "client" || need === "admin") && !App.session) { 
     location.href = "login.html?next=" + encodeURIComponent(location.pathname.split("/").pop() + location.search); 
     return; 
@@ -119,18 +133,22 @@ Pages.home = () => { const c = $("#cards-servicos"); if (c) c.innerHTML = SERVIC
 Pages.servicos = () => { const el = $("#lista-servicos"); if(el) el.innerHTML = SERVICOS.map(s => `<div class="card"><div class="ic">${s.icone}</div><h3>${esc(s.titulo)}</h3><p>${esc(s.texto)}</p><p style="margin-top:14px"><a class="btn sm primary" href="novo-chamado.html?tipo=${s.cat}">Solicitar</a></p></div>`).join(""); };
 
 Pages.painel = async () => {
-  $("#ola").textContent = App.perfil?.nome ? "Olá, " + App.perfil.nome.split(" ")[0] + "." : "";
+  const elOla = $("#ola");
+  if (elOla) elOla.textContent = App.perfil?.nome ? "Olá, " + App.perfil.nome.split(" ")[0] + "." : "";
+  
   const carregar = async () => {
     const { data, error } = await sb.from("chamados").select("id,numero,categoria,titulo,status,criado_em").eq("cliente_id", App.session.user.id).order("criado_em", { ascending: false });
-    if (error) { $("#lista").innerHTML = '<p class="empty">Erro ao carregar.</p>'; return; }
+    if (error) { const l = $("#lista"); if (l) l.innerHTML = '<p class="empty">Erro ao carregar.</p>'; return; }
     
-    // KPIs
     const abertos = data.filter(c => !["Concluída", "Cancelada"].includes(c.status)).length;
-    $("#kpis").innerHTML = [[data.length, "Chamados"], [abertos, "Em aberto"], [data.length - abertos, "Finalizados"], [0, "Novas msgs"]].map(([n, l]) => `<div class="k"><b>${n}</b><span>${l}</span></div>`).join("");
+    const kpisEl = $("#kpis");
+    if (kpisEl) kpisEl.innerHTML = [[data.length, "Chamados"], [abertos, "Em aberto"], [data.length - abertos, "Finalizados"], [0, "Novas msgs"]].map(([n, l]) => `<div class="k"><b>${n}</b><span>${l}</span></div>`).join("");
     
-    // Tabela
-    $("#lista").innerHTML = data.length ? tabela(["Nº", "Serviço", "Título", "Status", "Data"], data.map(c => `<tr class="go" data-act="abrir" data-id="${c.id}"><td><a href="chamado.html?id=${c.id}">${num(c.numero)}</a></td><td>${c.categoria === "site" ? "Site" : "Manutenção"}</td><td>${esc(c.titulo)}</td><td>${pill(c.status)}</td><td>${fmtData(c.criado_em)}</td></tr>`))
-      : '<p class="empty">Você ainda não tem chamados.</p>';
+    const listaEl = $("#lista");
+    if (listaEl) {
+      listaEl.innerHTML = data.length ? tabela(["Nº", "Serviço", "Título", "Status", "Data"], data.map(c => `<tr class="go" data-act="abrir" data-id="${c.id}"><td><a href="chamado.html?id=${c.id}">${num(c.numero)}</a></td><td>${c.categoria === "site" ? "Site" : "Manutenção"}</td><td>${esc(c.titulo)}</td><td>${pill(c.status)}</td><td>${fmtData(c.criado_em)}</td></tr>`))
+        : '<p class="empty">Você ainda não tem chamados.</p>';
+    }
   };
   Act.abrir = d => location.href = "chamado.html?id=" + d.id;
   await carregar(); 
@@ -160,35 +178,40 @@ Pages.perfil = () => {
 Pages.chamado = async () => {
   const id = qs("id"); 
   const { data: c } = await sb.from("chamados").select("*").eq("id", id).maybeSingle();
-  if (!c) { $("#conteudo").innerHTML = '<p class="empty">Chamado não encontrado.</p>'; return; }
+  if (!c) { const el = $("#conteudo"); if (el) el.innerHTML = '<p class="empty">Chamado não encontrado.</p>'; return; }
   if (qs("novo")) msg("m-topo", `Chamado ${num(c.numero)} registrado!`, true);
   
-  $("#conteudo").innerHTML = `
-    <p><a href="painel.html">← Voltar</a></p>
-    <h2>${num(c.numero)} · ${esc(c.titulo)}</h2>
-    <p>${pill(c.status)} <span class="sub">Aberto em ${fmtData(c.criado_em)}</span></p>
-    <div class="box"><h3>Sua solicitação</h3><p style="white-space:pre-wrap">${esc(c.descricao)}</p></div>
-    <div class="box"><h3>💬 Conversa com a TechEmpire</h3><div id="chat-container"></div></div>
-  `;
+  const el = $("#conteudo");
+  if (el) {
+    el.innerHTML = `
+      <p><a href="painel.html">← Voltar</a></p>
+      <h2>${num(c.numero)} · ${esc(c.titulo)}</h2>
+      <p>${pill(c.status)} <span class="sub">Aberto em ${fmtData(c.criado_em)}</span></p>
+      <div class="box"><h3>Sua solicitação</h3><p style="white-space:pre-wrap">${esc(c.descricao)}</p></div>
+      <div class="box"><h3>💬 Conversa com a TechEmpire</h3><div id="chat-container"></div></div>
+    `;
+  }
 
-  // Lógica do chat na tela do chamado (já integrada)
   const chatBody = $("<div class='chat-body' id='chat-msgs' style='height:300px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; background:#0a0d0f; padding:15px; border-radius:8px;'><p style='text-align:center;'>Carregando chat...</p></div>");
   const inputMsg = $("<input type='text' placeholder='Digite sua mensagem...' style='flex:1; padding:10px; border-radius:8px; border:1px solid #444; background:#06080a; color:#fff;'>");
   const form = $("<form style='display:flex; gap:10px; margin-top:10px;'></form>");
   const btn = $("<button type='submit' style='background:#b4f03c; color:#000; border:none; padding:10px 20px; border-radius:8px; font-weight:bold;'>Enviar</button>");
   
   form.append(inputMsg, btn);
-  $("#chat-container").append(chatBody, form);
+  const chatContainer = $("#chat-container");
+  if (chatContainer) chatContainer.append(chatBody, form);
 
   async function carregarMsgs() {
     const { data } = await sb.from('mensagens').select('*').eq('chamado_id', id).order('criado_em', { ascending: true });
-    if (!data || data.length === 0) { chatBody.innerHTML = "<p style='color:#97a0a6; text-align:center;'>Nenhuma mensagem ainda.</p>"; return; }
+    if (!data || data.length === 0) { if (chatBody) chatBody.innerHTML = "<p style='color:#97a0a6; text-align:center;'>Nenhuma mensagem ainda.</p>"; return; }
     
-    chatBody.innerHTML = data.map(m => {
-      const isMe = m.remetente_id === App.session.user.id;
-      return `<div style="background:${isMe ? '#b4f03c' : '#1a1e22'}; color:${isMe ? '#000' : '#fff'}; padding:10px 15px; border-radius:12px; align-self:${isMe ? 'flex-end' : 'flex-start'}; max-width:80%;"><small style="display:block; opacity:0.7; font-size:10px;">${isMe ? 'Você' : 'TechEmpire'}</small>${m.conteudo}</div>`;
-    }).join('');
-    chatBody.scrollTop = chatBody.scrollHeight;
+    if (chatBody) {
+      chatBody.innerHTML = data.map(m => {
+        const isMe = m.remetente_id === App.session.user.id;
+        return `<div style="background:${isMe ? '#b4f03c' : '#1a1e22'}; color:${isMe ? '#000' : '#fff'}; padding:10px 15px; border-radius:12px; align-self:${isMe ? 'flex-end' : 'flex-start'}; max-width:80%;"><small style="display:block; opacity:0.7; font-size:10px;">${isMe ? 'Você' : 'TechEmpire'}</small>${m.conteudo}</div>`;
+      }).join('');
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
   }
 
   form.onsubmit = async (e) => {
