@@ -461,4 +461,144 @@
     function renderizarTabelaClientes() {
       let html = '';
       clientes.forEach(c => {
-        const dataCad = c.criado_em ? new Date(c.c
+        const dataCad = c.criado_em ? new Date(c.criado_em).toLocaleDateString('pt-BR') : '—';
+        html += `<tr>
+          <td>${c.nome}</td>
+          <td>${c.email}</td>
+          <td>${c.telefone || '—'}</td>
+          <td>${dataCad}</td>
+        </tr>`;
+      });
+      document.getElementById('tabela-clientes-body').innerHTML = html || "<tr><td colspan='4' style='text-align:center;'>Nenhum cliente cadastrado.</td></tr>";
+    }
+
+    // ================= MODAL CHAMADO (STATUS/EXCLUIR) =================
+    function abrirModalChamado(id) {
+      const c = chamados.find(x => x.id === id);
+      if (!c) return;
+
+      document.getElementById('edit-id').value = c.id;
+      document.getElementById('edit-cliente').value = c.cliente_nome || 'Visitante';
+      document.getElementById('edit-status').value = c.status;
+
+      document.getElementById('modal-chamado').style.display = 'flex';
+    }
+
+    async function salvarChamado() {
+      const id = document.getElementById('edit-id').value;
+      const novoStatus = document.getElementById('edit-status').value;
+
+      const { error } = await db.from("chamados").update({ status: novoStatus }).eq("id", id);
+      if (error) return alert("Erro: " + error.message);
+
+      fecharModal('modal-chamado');
+      await carregarDados();
+    }
+
+    async function excluirChamado() {
+      const id = document.getElementById('edit-id').value;
+      if (!confirm("Excluir este chamado?")) return;
+
+      await db.from("chamados").delete().eq("id", id);
+      fecharModal('modal-chamado');
+      await carregarDados();
+    }
+
+    // ================= MODAL LAUDO =================
+    function abrirModalLaudo(id) {
+      laudoAtual = chamados.find(x => x.id === id);
+      if (!laudoAtual) return;
+
+      document.getElementById('modal-laudo-titulo').textContent = `Laudo: ${laudoAtual.protocolo}`;
+      document.getElementById('modal-laudo-desc').textContent = laudoAtual.descricao;
+
+      const l = laudoAtual.laudo_tecnico || {};
+      document.getElementById('laudo-diag').value = l.diagnostico || '';
+      document.getElementById('laudo-solucao').value = l.solucao || '';
+      document.getElementById('laudo-prazo').value = l.prazo || '';
+      document.getElementById('laudo-valor').value = l.valor || '';
+      document.getElementById('laudo-status').value = laudoAtual.status;
+      
+      document.getElementById('btn-laudo-whatsapp').style.display = 'none';
+      document.getElementById('modal-laudo').style.display = 'flex';
+    }
+
+    async function salvarLaudo() {
+      if (!laudoAtual) return;
+
+      const diag = document.getElementById('laudo-diag').value;
+      const solucao = document.getElementById('laudo-solucao').value;
+      const prazo = document.getElementById('laudo-prazo').value;
+      const valor = document.getElementById('laudo-valor').value;
+      const status = document.getElementById('laudo-status').value;
+
+      const laudoObj = { diagnostico: diag, solucao: solucao, prazo: prazo, valor: valor };
+
+      const { error } = await db.from("chamados").update({ 
+        laudo_tecnico: laudoObj, status: status 
+      }).eq("id", laudoAtual.id);
+
+      if (error) return alert("Erro ao salvar: " + error.message);
+
+      // Atualiza o botão do WhatsApp
+      const fone = laudoAtual.whatsapp || laudoAtual.cliente_telefone;
+      if (fone) {
+        const numLimpo = fone.replace(/\D/g, '');
+        const msg = `Olá, ${laudoAtual.cliente_nome}! Segue o laudo do seu chamado ${laudoAtual.protocolo}:\n\n*Diagnóstico:* ${diag}\n*Solução:* ${solucao}\n*Prazo:* ${prazo}\n*Valor:* R$ ${valor}`;
+        
+        const btnWpp = document.getElementById('btn-laudo-whatsapp');
+        btnWpp.href = `https://wa.me/55${numLimpo}?text=${encodeURIComponent(msg)}`;
+        btnWpp.style.display = 'block';
+      }
+
+      alert("Laudo salvo com sucesso! Use o botão do WhatsApp para enviar ao cliente.");
+      await carregarDados();
+    }
+
+    // ================= ANOTAÇÕES =================
+    async function salvarAnotacao() {
+      const texto = document.getElementById('note-text').value.trim();
+      if (!texto) return;
+      await db.from('anotacoes').insert({ admin_id: idAdmin, texto: texto });
+      document.getElementById('note-text').value = '';
+      await carregarAnotacoes();
+    }
+
+    async function carregarAnotacoes() {
+      const { data } = await db.from('anotacoes').select('*').order('criado_em', { ascending: false });
+      const lista = document.getElementById('notes-list');
+      
+      if (!data || data.length === 0) {
+        lista.innerHTML = '<p style="font-size: 12px; color: var(--text-muted);">Nenhuma anotação.</p>';
+        return;
+      }
+
+      lista.innerHTML = data.map(n => {
+        const date = new Date(n.criado_em);
+        const dataStr = `Hoje, ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+        return `
+          <div class="note-item">
+            <div class="content">
+              <div class="note-meta"><span style="color: var(--brand);">● ${dataStr}</span></div>
+              <div class="note-text">${n.texto}</div>
+            </div>
+            <button class="btn-del-note" onclick="excluirAnotacao('${n.id}')" title="Excluir anotação">🗑️</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function excluirAnotacao(id) {
+      if (!confirm("Apagar esta anotação?")) return;
+      await db.from('anotacoes').delete().eq('id', id);
+      await carregarAnotacoes();
+    }
+
+    function fecharModal(idModal) {
+      document.getElementById(idModal).style.display = 'none';
+    }
+
+    init();
+  </script>
+</body>
+</html>
