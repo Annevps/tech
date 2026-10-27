@@ -4,427 +4,92 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Painel Administrativo — TechEmpire</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* ================= RESET E VARIÁVEIS ================= */
+  /* ================= ESTÉTICA PREMIUM ================= */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #0B0D0F;
-    --s1: #121518;
-    --s2: #1A1D21;
-    --s3: #22262b;
-    --line: #2a2d31;
-    --line2: #3a3f44;
+    --bg: #07090b;
+    --s1: rgba(18, 21, 24, 0.7);
+    --s2: rgba(26, 29, 33, 0.8);
+    --s3: rgba(30, 34, 39, 0.9);
+    --line: rgba(255, 255, 255, 0.08);
+    --line2: rgba(255, 255, 255, 0.15);
     --ink: #FFFFFF;
-    --muted: #BFC3C7;
-    --lime: #00DDB5; /* Novo Turquesa */
+    --muted: #9ba1a6;
+    --turquesa: #00DDB5;
     --err: #ff7b6b;
   }
-  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); display: flex; height: 100vh; overflow: hidden; }
+  body { 
+    background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); display: flex; height: 100vh; overflow: hidden;
+    background-image: radial-gradient(ellipse at 50% -20%, rgba(0, 221, 181, 0.15), transparent 50%), linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 100% 100%, 40px 40px, 40px 40px;
+  }
   a { text-decoration: none; color: inherit; }
   button { cursor: pointer; font-family: inherit; border: none; }
   
-  /* ================= SIDEBAR ================= */
-  .sidebar { width: 260px; background: var(--s1); border-right: 1px solid var(--line); padding: 24px; display: flex; flex-direction: column; flex-shrink: 0; }
-  .logo { display: flex; align-items: center; gap: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: bold; margin-bottom: 40px; }
-  .logo i { background: var(--lime); color: #000; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; font-style: normal; }
-  .logo b { color: var(--lime); }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .animate-in { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+
+  /* SIDEBAR */
+  .sidebar { width: 260px; background: var(--s1); backdrop-filter: blur(20px); border-right: 1px solid var(--line); padding: 30px 24px; display: flex; flex-direction: column; flex-shrink: 0; }
+  .logo { display: flex; align-items: center; gap: 12px; font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 40px; }
+  .logo i { background: var(--turquesa); color: #000; width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; font-style: normal; box-shadow: 0 0 20px rgba(0, 221, 181, 0.4); }
+  .logo b { color: var(--turquesa); }
   .sidebar nav { display: flex; flex-direction: column; gap: 6px; }
-  .sidebar a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; font-weight: 500; color: var(--muted); transition: 0.2s; }
-  .sidebar a:hover, .sidebar a.active { background: rgba(0, 221, 181, 0.1); color: var(--lime); }
-  .sidebar .sair { margin-top: auto; color: var(--err); border-top: 1px solid var(--line); padding-top: 20px; }
+  .sidebar a { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 12px; font-weight: 500; color: var(--muted); transition: 0.3s; cursor: pointer; font-size: 15px; border: 1px solid transparent; }
+  .sidebar a:hover { color: var(--ink); background: rgba(255,255,255,0.03); }
+  .sidebar a.active { background: rgba(0, 221, 181, 0.1); color: var(--turquesa); border-color: rgba(0, 221, 181, 0.2); box-shadow: inset 0 0 20px rgba(0,221,181,0.05); }
+  .sidebar .sair { margin-top: auto; color: var(--err); border-top: 1px solid var(--line); border-radius: 0; padding-top: 24px; }
+  
+  /* MAIN */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid var(--line); background: var(--s1); backdrop-filter: blur(20px); }
+  .search-bar { background: rgba(0,0,0,0.3); border: 1px solid var(--line2); border-radius: 99px; padding: 12px 24px; color: var(--ink); width: 300px; outline: none; transition: 0.3s; }
+  .search-bar:focus { border-color: var(--turquesa); box-shadow: 0 0 0 3px rgba(0,221,181,0.1); }
+  .user-info { display: flex; align-items: center; gap: 16px; }
+  .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--turquesa); color: #000; display: grid; place-items: center; font-weight: 800; font-size: 18px; }
 
-  /* ================= MAIN E TOPBAR ================= */
-  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-  .topbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 32px; border-bottom: 1px solid var(--line); background: var(--s1); }
-  .search-bar { background: var(--bg); border: 1px solid var(--line2); border-radius: 99px; padding: 10px 20px; color: var(--ink); width: 300px; outline: none; }
-  .user-info { display: flex; align-items: center; gap: 12px; }
-  .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--lime); color: #000; display: grid; place-items: center; font-weight: bold; font-size: 18px; }
-
-  /* ================= CONTEÚDO ================= */
-  .content { flex: 1; display: grid; grid-template-columns: 1fr 400px; gap: 24px; padding: 32px; overflow-y: auto; }
-  .dashboard-area { display: flex; flex-direction: column; gap: 24px; }
+  .content { flex: 1; display: grid; grid-template-columns: 1fr 400px; gap: 30px; padding: 40px; overflow-y: auto; }
+  .dashboard-area { display: flex; flex-direction: column; gap: 30px; }
   
   /* KPIs */
-  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .kpi { background: var(--s2); border: 1px solid var(--line2); border-radius: 16px; padding: 20px; position: relative; }
-  .kpi h3 { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
-  .kpi b { font-family: 'Space Grotesk', sans-serif; font-size: 32px; color: var(--ink); }
-  .kpi::after { content: ""; position: absolute; bottom: 0; left: 20px; right: 20px; height: 3px; background: var(--lime); border-radius: 3px 3px 0 0; opacity: 0.5; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .kpi { background: var(--s2); backdrop-filter: blur(12px); border: 1px solid var(--line); border-radius: 20px; padding: 24px; position: relative; overflow: hidden; transition: transform 0.3s; }
+  .kpi:hover { transform: translateY(-4px); border-color: var(--line2); }
+  .kpi::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--turquesa), transparent); opacity: 0.8; }
+  .kpi h3 { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; font-weight: 600; }
+  .kpi b { font-family: 'Montserrat', sans-serif; font-size: 38px; color: var(--ink); line-height: 1; }
 
   /* Tabela */
-  .table-box { background: var(--s2); border: 1px solid var(--line2); border-radius: 16px; overflow: hidden; }
-  .table-header { padding: 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
-  .table-header h3 { font-family: 'Space Grotesk', sans-serif; font-size: 18px; }
+  .table-box { background: var(--s2); backdrop-filter: blur(12px); border: 1px solid var(--line); border-radius: 24px; overflow: hidden; }
+  .table-header { padding: 24px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
+  .table-header h3 { font-family: 'Montserrat', sans-serif; font-size: 20px; }
   table { width: 100%; border-collapse: collapse; }
-  th { text-align: left; padding: 16px; font-size: 12px; color: var(--muted); text-transform: uppercase; border-bottom: 1px solid var(--line); }
-  td { padding: 16px; border-bottom: 1px solid var(--line); font-size: 14px; }
+  th { text-align: left; padding: 16px 24px; font-size: 12px; color: var(--muted); text-transform: uppercase; border-bottom: 1px solid var(--line); letter-spacing: 1px; }
+  td { padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 15px; vertical-align: middle; }
   tr:hover td { background: rgba(255,255,255,0.02); }
-  .pill { background: rgba(0, 221, 181, 0.15); color: var(--lime); padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: bold; border: 1px solid rgba(0, 221, 181, 0.3); }
-  .btn-acao { background: var(--lime); color: #000; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; transition: 0.2s; }
-  .btn-acao:hover { background: #00F5C8; transform: translateY(-1px); }
-  .btn-sec { background: var(--s3); color: var(--ink); padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; transition: 0.2s; border: 1px solid var(--line2); }
-  .btn-sec:hover { border-color: var(--muted); }
+  .pill { background: rgba(0, 221, 181, 0.1); color: var(--turquesa); padding: 6px 14px; border-radius: 99px; font-size: 13px; font-weight: 600; border: 1px solid rgba(0, 221, 181, 0.2); display: inline-block; }
+  .btn-acao { background: var(--turquesa); color: #000; padding: 8px 16px; border-radius: 10px; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 15px rgba(0, 221, 181, 0.2); }
+  .btn-acao:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 221, 181, 0.4); background: #00F5C8; }
+  .btn-sec { background: rgba(255,255,255,0.05); color: var(--ink); padding: 8px 16px; border-radius: 10px; font-weight: 600; font-size: 13px; border: 1px solid var(--line2); transition: 0.3s; }
+  .btn-sec:hover { background: rgba(255,255,255,0.1); }
 
-  /* ================= CHAT LATERAL ================= */
-  .chat-sidebar { background: var(--s2); border: 1px solid var(--line2); border-radius: 16px; display: flex; flex-direction: column; height: calc(100vh - 120px); position: sticky; top: 32px; }
-  .chat-header { padding: 20px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 12px; background: var(--s3); border-radius: 16px 16px 0 0; }
-  .chat-header h4 { font-size: 16px; }
-  .chat-header span { color: var(--lime); font-size: 12px; }
-  .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; background: var(--s1); }
-  .chat-msg { padding: 12px 16px; border-radius: 12px; font-size: 14px; max-width: 90%; line-height: 1.5; }
+  /* CHAT LATERAL */
+  .chat-sidebar { background: var(--s2); backdrop-filter: blur(12px); border: 1px solid var(--line); border-radius: 24px; display: flex; flex-direction: column; height: calc(100vh - 160px); position: sticky; top: 40px; }
+  .chat-header { padding: 24px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 16px; background: var(--s3); border-radius: 24px 24px 0 0; }
+  .chat-header h4 { font-family: 'Montserrat', sans-serif; font-size: 16px; }
+  .chat-header span { color: var(--turquesa); font-size: 12px; font-weight: 600; }
+  .chat-body { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+  .chat-msg { padding: 14px 20px; border-radius: 16px; font-size: 14px; max-width: 90%; line-height: 1.5; }
   .chat-msg small { display: block; font-size: 10px; opacity: 0.7; margin-bottom: 4px; }
-  .chat-msg.ou { background: var(--s3); align-self: flex-start; border-bottom-left-radius: 2px; }
-  .chat-msg.me { background: var(--lime); color: #000; align-self: flex-end; border-bottom-right-radius: 2px; }
-  .chat-footer { padding: 16px; border-top: 1px solid var(--line); display: flex; gap: 10px; background: var(--s2); border-radius: 0 0 16px 16px; }
-  .chat-footer input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid var(--line2); background: var(--bg); color: var(--ink); outline: none; }
-  .chat-footer button { background: var(--lime); color: #000; padding: 0 20px; border-radius: 8px; font-weight: bold; }
+  .chat-msg.ou { background: var(--s3); align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid var(--line); }
+  .chat-msg.me { background: var(--turquesa); color: #000; align-self: flex-end; border-bottom-right-radius: 2px; }
+  .chat-footer { padding: 20px; border-top: 1px solid var(--line); display: flex; gap: 12px; background: var(--s3); border-radius: 0 0 24px 24px; }
+  .chat-footer input { flex: 1; padding: 14px; border-radius: 12px; border: 1px solid var(--line2); background: rgba(0,0,0,0.3); color: var(--ink); outline: none; transition: 0.3s; }
+  .chat-footer input:focus { border-color: var(--turquesa); }
+  .chat-footer button { background: var(--turquesa); color: #000; padding: 0 24px; border-radius: 12px; font-weight: 700; transition: 0.3s; }
+  .chat-footer button:hover { background: #00F5C8; }
 
-  /* ================= MODAL ================= */
-  .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-  .modal-box { background: var(--s2); border: 1px solid var(--line2); border-radius: 16px; width: 90%; max-width: 600px; padding: 32px; }
-  .modal-box h2 { font-family: 'Space Grotesk', sans-serif; color: var(--lime); margin-bottom: 20px; }
-  .form-group { margin-bottom: 16px; }
-  .form-group label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; }
-  .form-group select { width: 100%; padding: 12px; border-radius: 8px; background: var(--bg); border: 1px solid var(--line2); color: var(--ink); }
-  .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
-  .btn-salvar { background: var(--lime); color: #000; padding: 12px 24px; border-radius: 8px; font-weight: bold; }
-  .btn-fechar { background: var(--s3); color: var(--ink); padding: 12px 24px; border-radius: 8px; font-weight: bold; }
-  
-  /* ================= NOTIFICAÇÕES ================= */
-  .notification-bell { position: relative; cursor: pointer; font-size: 22px; margin-right: 20px; display: flex; align-items: center; }
-  .notification-badge { position: absolute; top: -5px; right: -8px; background: var(--err); color: #fff; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 99px; display: none; }
-  .notification-dropdown { position: absolute; top: 40px; right: 0; width: 300px; background: var(--s2); border: 1px solid var(--line2); border-radius: 12px; padding: 15px; display: none; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-  .notification-dropdown.active { display: block; }
-  .notification-item { padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--muted); }
-  
-  @media (max-width: 1024px) { .content { grid-template-columns: 1fr; } .chat-sidebar { display: none !important; } }
-</style>
-</head>
-<body>
-
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <a href="index.html" class="logo"><i>TE</i><span>Tech<b>Empire</b></span></a>
-    <nav>
-      <a href="#" class="active" onclick="mudarAba('inicio', this)">📊 Início</a>
-      <a href="#" onclick="mudarAba('chamados', this)">🎫 Chamados</a>
-      <a href="#" onclick="mudarAba('clientes', this)">👥 Clientes</a>
-      <a href="#" onclick="mudarAba('leads', this)">🎯 Leads</a>
-      <a href="#" onclick="mudarAba('usuarios', this)">🛡️ Usuários</a>
-      <a href="login.html" class="sair">Sair da conta</a>
-    </nav>
-  </div>
-
-  <!-- MAIN -->
-  <div class="main">
-    <div class="topbar">
-      <input type="text" class="search-bar" placeholder="Buscar chamados ou clientes...">
-      <div class="user-info">
-        <!-- NOTIFICAÇÕES -->
-        <div class="notification-bell" onclick="toggleNotificacoes(event)">
-          🔔
-          <span class="notification-badge" id="notif-badge">0</span>
-          <div class="notification-dropdown" id="notif-dropdown">
-            <h4 style="margin-bottom: 10px; color: var(--lime);">Notificações</h4>
-            <div id="notif-lista"><p style="font-size: 12px; color: var(--muted);">Nenhuma notificação nova.</p></div>
-          </div>
-        </div>
-        <div style="text-align: right;">
-          <div style="font-weight: bold; font-size: 14px;" id="admin-nome">Admin</div>
-          <div style="color: var(--lime); font-size: 12px;">Administrador</div>
-        </div>
-        <div class="avatar">A</div>
-      </div>
-    </div>
-
-    <div class="content">
-      <!-- ÁREA DINÂMICA -->
-      <div class="dashboard-area" id="area-dinamica">
-        <div class="kpis" id="kpis-container"></div>
-        <div class="table-box">
-          <div class="table-header">
-            <h3 id="titulo-tabela">Chamados Recentes</h3>
-          </div>
-          <div id="tabela-container"></div>
-        </div>
-      </div>
-
-      <!-- CHAT LATERAL -->
-      <div class="chat-sidebar" id="painel-chat" style="display: flex;">
-        <div class="chat-header">
-          <div class="avatar" style="width: 32px; height: 32px; font-size: 14px;">👤</div>
-          <div>
-            <h4 id="chat-titulo">Selecione um chamado</h4>
-            <span id="chat-status">Aguardando...</span>
-          </div>
-        </div>
-        <div class="chat-body" id="chat-mensagens">
-          <p style="text-align: center; color: var(--muted); font-size: 14px;">Clique em "Chat" na tabela para conversar.</p>
-        </div>
-        <form class="chat-footer" id="form-chat" style="display: none;">
-          <input type="text" id="input-msg" placeholder="Digite sua resposta..." required autocomplete="off">
-          <button type="submit">Enviar</button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL DE DETALHES -->
-  <div class="modal" id="modal-detalhes">
-    <div class="modal-box">
-      <h2 id="modal-titulo">Detalhes do Chamado</h2>
-      <div class="form-group">
-        <label>Status do Atendimento</label>
-        <select id="edit-status">
-          <option value="Nova chamada">Nova chamada</option>
-          <option value="Aguardando análise">Aguardando análise</option>
-          <option value="Em andamento">Em andamento</option>
-          <option value="Concluída">Concluída</option>
-          <option value="Cancelada">Cancelada</option>
-        </select>
-      </div>
-      <div class="modal-actions">
-        <button class="btn-fechar" onclick="fecharModal()">Fechar</button>
-        <button class="btn-salvar" onclick="salvarStatus()">Salvar Alterações</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-config.js"></script>
-  <script>
-    const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
-    let idAdmin = null;
-    let chamadoSelecionado = null;
-    let todosChamados = [];
-    let todosClientes = [];
-    let todosLeads = [];
-
-    // Inicialização
-    async function init() {
-      const { data: { session } } = await db.auth.getSession();
-      if (!session) { window.location.href = "login.html"; return; }
-      idAdmin = session.user.id;
-
-      const { data: perfil } = await db.from("usuarios").select("nome").eq("id", idAdmin).single();
-      if (perfil) document.getElementById("admin-nome").textContent = perfil.nome;
-
-      // Carrega os dados iniciais
-      await carregarDadosGlobais();
-      
-      // Inicia na aba de início
-      document.querySelector('.sidebar a').classList.add('active');
-      renderizarInicio();
-
-      carregarNotificacoes();
-
-      db.channel('notificacoes-live')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notificacoes', filter: `usuario_id=eq.${idAdmin}` }, () => {
-          carregarNotificacoes();
-        }).subscribe();
-    }
-
-    async function carregarDadosGlobais() {
-      // Puxa tudo do banco para agilizar a navegação
-      const { data: c } = await db.from("chamados").select("*").order("criado_em", { ascending: false });
-      todosChamados = c || [];
-      
-      const { data: cl } = await db.from("usuarios").select("*").eq("is_admin", false).order("nome");
-      todosClientes = cl || [];
-
-      const { data: l } = await db.from("formleads").select("*").order("criado_em", { ascending: false });
-      todosLeads = l || [];
-    }
-
-    // ================= NOTIFICAÇÕES =================
-    function toggleNotificacoes(event) {
-      event.stopPropagation();
-      document.getElementById('notif-dropdown').classList.toggle('active');
-    }
-    document.addEventListener('click', () => {
-      document.getElementById('notif-dropdown').classList.remove('active');
-    });
-
-    async function carregarNotificacoes() {
-      const { data } = await db.from("notificacoes").select("*").eq("usuario_id", idAdmin).eq("lida", false).order("criado_em", { ascending: false });
-      const badge = document.getElementById('notif-badge');
-      const lista = document.getElementById('notif-lista');
-      if (data && data.length > 0) {
-        badge.style.display = 'block';
-        badge.textContent = data.length;
-        lista.innerHTML = data.map(n => `<div class="notification-item">${n.mensagem}</div>`).join('');
-      } else {
-        badge.style.display = 'none';
-        lista.innerHTML = '<p style="font-size: 12px; color: var(--muted);">Nenhuma notificação nova.</p>';
-      }
-    }
-
-    // ================= NAVEGAÇÃO =================
-    async function mudarAba(aba, el) {
-      document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
-      el.classList.add('active');
-      await carregarDadosGlobais();
-
-      if (aba === 'inicio') renderizarInicio();
-      if (aba === 'chamados') renderizarChamados();
-      if (aba === 'clientes') renderizarClientes();
-      if (aba === 'leads') renderizarLeads();
-      if (aba === 'usuarios') renderizarUsuarios();
-    }
-
-    // ================= RENDERIZAÇÃO DAS TELAS =================
-
-    function renderizarInicio() {
-      document.getElementById('titulo-tabela').textContent = "Chamados Recentes";
-      
-      const abertos = todosChamados.filter(c => c.status !== 'Concluída' && c.status !== 'Cancelada').length;
-      const pendentes = todosChamados.filter(c => c.status === 'Nova chamada').length;
-      const concluidos = todosChamados.filter(c => c.status === 'Concluída').length;
-
-      document.getElementById("kpis-container").innerHTML = `
-        <div class="kpi"><h3>Chamados Ativos</h3><b>${abertos}</b></div>
-        <div class="kpi"><h3>Pendentes</h3><b>${pendentes}</b></div>
-        <div class="kpi"><h3>Concluídos</h3><b>${concluidos}</b></div>
-        <div class="kpi"><h3>Total Clientes</h3><b>${todosClientes.length}</b></div>
-      `;
-
-      // Mostra apenas os 5 mais recentes
-      montarTabelaChamados(todosChamados.slice(0, 5));
-    }
-
-    function renderizarChamados() {
-      document.getElementById('titulo-tabela').textContent = "Todos os Chamados";
-      document.getElementById("kpis-container").innerHTML = ''; // Esconde KPIs
-      montarTabelaChamados(todosChamados);
-    }
-
-    function montarTabelaChamados(lista) {
-      if (lista.length > 0) {
-        let html = `<table><thead><tr><th>Nº</th><th>Título</th><th>Status</th><th>Ações</th></tr></thead><tbody>`;
-        lista.forEach(c => {
-          html += `<tr>
-            <td>TE-${String(c.numero).padStart(6, '0')}</td>
-            <td>${c.titulo}</td>
-            <td><span class="pill">${c.status}</span></td>
-            <td>
-              <button class="btn-acao" onclick="abrirChat('${c.id}', '${c.titulo}', '${c.status}')">Chat</button>
-              <button class="btn-sec" onclick="abrirModal('${c.id}', '${c.status}')">Status</button>
-            </td>
-          </tr>`;
-        });
-        html += `</tbody></table>`;
-        document.getElementById("tabela-container").innerHTML = html;
-      } else {
-        document.getElementById("tabela-container").innerHTML = "<p style='padding: 20px; color: var(--muted);'>Nenhum chamado encontrado.</p>";
-      }
-    }
-
-    function renderizarClientes() {
-      document.getElementById('titulo-tabela').textContent = "Base de Clientes";
-      document.getElementById("kpis-container").innerHTML = ''; 
-      
-      let html = `<table><thead><tr><th>Nome</th><th>E-mail</th><th>Telefone</th><th>CPF</th></tr></thead><tbody>`;
-      todosClientes.forEach(c => {
-        html += `<tr>
-          <td>${c.nome}</td>
-          <td>${c.email}</td>
-          <td>${c.telefone || '—'}</td>
-          <td>${c.cpf || '—'}</td>
-        </tr>`;
-      });
-      html += `</tbody></table>`;
-      document.getElementById("tabela-container").innerHTML = html;
-    }
-
-    function renderizarLeads() {
-      document.getElementById('titulo-tabela').textContent = "Leads do Site";
-      document.getElementById("kpis-container").innerHTML = ''; 
-      
-      if (todosLeads.length === 0) {
-        document.getElementById("tabela-container").innerHTML = "<p style='padding: 20px; color: var(--muted);'>Nenhum lead recebido ainda.</p>";
-        return;
-      }
-
-      let html = `<table><thead><tr><th>Nome</th><th>Contato</th><th>Mensagem</th><th>Data</th></tr></thead><tbody>`;
-      todosLeads.forEach(l => {
-        html += `<tr>
-          <td>${l.nome}</td>
-          <td>${l.email || l.telefone || '—'}</td>
-          <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${l.observacoes || '—'}</td>
-          <td>${new Date(l.criado_em).toLocaleDateString('pt-BR')}</td>
-        </tr>`;
-      });
-      html += `</tbody></table>`;
-      document.getElementById("tabela-container").innerHTML = html;
-    }
-
-    function renderizarUsuarios() {
-      document.getElementById('titulo-tabela').textContent = "Administradores";
-      document.getElementById("kpis-container").innerHTML = ''; 
-      document.getElementById("tabela-container").innerHTML = "<p style='padding: 20px; color: var(--muted);'>Módulo de permissões em breve.</p>";
-    }
-
-    // ================= MODAL E AÇÕES =================
-    function abrirModal(id, status) {
-      chamadoSelecionado = id;
-      document.getElementById('edit-status').value = status;
-      document.getElementById('modal-detalhes').style.display = 'flex';
-    }
-    function fecharModal() {
-      document.getElementById('modal-detalhes').style.display = 'none';
-    }
-    async function salvarStatus() {
-      const novoStatus = document.getElementById('edit-status').value;
-      await db.from("chamados").update({ status: novoStatus }).eq("id", chamadoSelecionado);
-      fecharModal();
-      await carregarDadosGlobais();
-      renderizarInicio();
-    }
-
-    // ================= CHAT =================
-    async function abrirChat(id, titulo, status) {
-      chamadoSelecionado = id;
-      document.getElementById('chat-titulo').textContent = titulo;
-      document.getElementById('chat-status').textContent = status;
-      document.getElementById('form-chat').style.display = 'flex';
-      
-      await db.from('notificacoes').update({ lida: true }).eq('chamado_id', id).eq('usuario_id', idAdmin);
-      carregarNotificacoes();
-      
-      await carregarMensagens(id);
-    }
-
-    async function carregarMensagens(chamadoId) {
-      const chatBody = document.getElementById('chat-mensagens');
-      const { data } = await db.from('mensagens').select('*').eq('chamado_id', chamadoId).order('criado_em', { ascending: true });
-      
-      if (!data || data.length === 0) {
-        chatBody.innerHTML = `<p style="text-align:center; color:var(--muted);">Nenhuma mensagem ainda.</p>`;
-        return;
-      }
-
-      chatBody.innerHTML = data.map(msg => {
-        const isMe = msg.remetente_id === idAdmin;
-        const hora = new Date(msg.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-        return `<div class="chat-msg ${isMe ? 'me' : 'ou'}"><small>${isMe ? 'Você' : 'Cliente'} · ${hora}</small>${msg.conteudo}</div>`;
-      }).join('');
-      chatBody.scrollTop = chatBody.scrollHeight;
-    }
-
-    document.getElementById('form-chat').onsubmit = async (e) => {
-      e.preventDefault();
-      if (!chamadoSelecionado) return;
-      const input = document.getElementById('input-msg');
-      const texto = input.value.trim();
-      if (!texto) return;
-
-      await db.from('mensagens').insert({ chamado_id: chamadoSelecionado, remetente_id: idAdmin, conteudo: texto });
-      input.value = '';
-      await carregarMensagens(chamadoSelecionado);
-    };
-
-    init();
-  </script>
-</body>
-</html>
+  /* MODAL */
+  .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background:
