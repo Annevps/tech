@@ -6,6 +6,7 @@
 <title>Painel Administrativo — TechEmpire</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+  /* ================= RESET E VARIÁVEIS ================= */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --bg: #050505;
@@ -16,12 +17,13 @@
     --text-muted: #8C939D;
     --brand: #00DDB5;
     --brand-dark: #00A884;
+    --err: #FF6464;
   }
   body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
   a { text-decoration: none; color: inherit; }
   button { cursor: pointer; font-family: inherit; border: none; background: none; }
   
-  /* Sidebar */
+  /* ================= SIDEBAR ================= */
   .sidebar { width: 240px; background: var(--s1); border-right: 1px solid var(--border); padding: 24px; display: flex; flex-direction: column; flex-shrink: 0; }
   .logo { display: flex; align-items: center; gap: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 40px; color: #fff; }
   .logo i { background: var(--brand); color: #000; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; font-style: normal; font-weight: 800; }
@@ -31,12 +33,12 @@
   .sidebar a { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px; font-weight: 500; color: var(--text-muted); transition: 0.2s; font-size: 14px; cursor: pointer; }
   .sidebar a:hover, .sidebar a.active { background: rgba(0, 221, 181, 0.1); color: var(--brand); }
   .sidebar a .badge { background: var(--brand); color: #000; border-radius: 99px; padding: 2px 6px; font-size: 10px; margin-left: auto; font-weight: 800; }
-  .sidebar .sair { margin-top: auto; color: #FF6464; }
+  .sidebar .sair { margin-top: auto; color: var(--err); }
 
   .card-footer-logo { margin-top: 20px; background: var(--s2); padding: 16px; border-radius: 12px; border: 1px solid var(--border); font-size: 12px; color: var(--text-muted); }
   .card-footer-logo b { color: #fff; display: block; font-size: 14px; margin-bottom: 4px; }
 
-  /* Main */
+  /* ================= MAIN ================= */
   .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
   
   /* Topbar */
@@ -49,10 +51,10 @@
   .user-block { display: flex; align-items: center; gap: 12px; }
   .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--s2); display: grid; place-items: center; border: 1px solid var(--border); }
 
-  /* Área de Conteúdo (Dividida em Kanban e Anotações) */
+  /* ================= ÁREA DE CONTEÚDO ================= */
   .content-area { flex: 1; display: grid; grid-template-columns: 1fr 340px; overflow: hidden; }
   
-  /* Área Principal (Kanban) */
+  /* Área Principal */
   .main-content { padding: 32px; overflow-y: auto; display: flex; flex-direction: column; }
   
   .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
@@ -62,7 +64,19 @@
   
   .btn-new { background: var(--brand); color: #000; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 8px; }
 
-  /* 4 Cards de Resumo */
+  /* Telas (Controle de exibição) */
+  .tela { display: none; flex-direction: column; flex: 1; }
+  .tela.active { display: flex; }
+
+  /* Tabela de Chamados / Clientes */
+  .table-box { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-top: 16px;}
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: 16px; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--border); font-weight: 500; }
+  td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .pill { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; background: rgba(0, 221, 181, 0.1); color: var(--brand); }
+  
+  /* Kanban */
   .summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
   .summary-card { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 12px; }
   .summary-card .icon { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-size: 18px; }
@@ -73,7 +87,6 @@
   .summary-card .info h3 { font-size: 20px; font-family: 'Space Grotesk'; line-height: 1; }
   .summary-card .info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
-  /* Kanban Board */
   .kanban-board { display: flex; gap: 16px; flex: 1; overflow-x: auto; }
   .kanban-col { min-width: 260px; flex: 1; background: transparent; }
   .kanban-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; font-size: 13px; font-weight: 600; color: var(--text-main); }
@@ -81,30 +94,24 @@
   .kanban-header .count { color: var(--text-muted); }
   
   .kanban-cards { display: flex; flex-direction: column; gap: 12px; }
-  .kanban-card { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; position: relative; cursor: pointer; transition: 0.2s; }
+  .kanban-card { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; cursor: pointer; transition: 0.2s; }
   .kanban-card:hover { border-color: var(--brand); }
-  
   .k-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
   .k-icon { width: 32px; height: 32px; background: rgba(255, 255, 255, 0.03); border-radius: 8px; display: grid; place-items: center; font-size: 16px; }
   .k-tag { font-size: 10px; color: var(--text-muted); font-family: monospace; }
-  
   .k-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
   .k-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
-  
   .k-card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 12px; }
   .k-date { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
   .k-pill { font-size: 10px; font-weight: 600; padding: 4px 8px; border-radius: 4px; }
   .k-pill.novo { background: rgba(0, 221, 181, 0.1); color: var(--brand); }
   .k-pill.exec { background: rgba(100, 150, 255, 0.1); color: #6496FF; }
 
-  /* Estado Vazio das Colunas */
   .empty-col { border: 1px dashed var(--border); border-radius: 12px; padding: 40px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px; color: var(--text-muted); font-size: 12px; }
-  .empty-col svg { width: 24px; height: 24px; margin-bottom: 12px; opacity: 0.5; }
 
-  /* Painel de Anotações (Direita) */
+  /* Painel de Anotações */
   .sidebar-notes { background: var(--s1); border-left: 1px solid var(--border); padding: 24px; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; }
   .notes-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: 600; font-size: 15px; }
-  
   .note-input-box { background: var(--s2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 24px; }
   .note-input-box textarea { width: 100%; background: transparent; border: none; color: #fff; outline: none; resize: none; font-size: 13px; font-family: 'Inter'; height: 60px; margin-bottom: 12px; }
   .note-tools { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px; color: var(--text-muted); }
@@ -112,13 +119,25 @@
   .btn-save-note { background: var(--brand); color: #000; padding: 6px 16px; border-radius: 6px; font-weight: 600; font-size: 12px; }
 
   .notes-list-title { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 16px; }
-  .note-item { background: var(--s2); border-radius: 8px; padding: 16px; margin-bottom: 12px; position: relative; border-left: 3px solid var(--brand); }
+  .note-item { background: var(--s2); border-radius: 8px; padding: 16px; margin-bottom: 12px; position: relative; border-left: 3px solid var(--brand); display: flex; justify-content: space-between; }
+  .note-item .content { flex: 1; }
   .note-meta { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-bottom: 8px; }
   .note-text { font-size: 12px; line-height: 1.5; color: #ddd; }
-  
-  /* Modal */
-  .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
-  .modal-box { background: var(--s1); border: 1px solid var(--border); border-radius: 24px; width: 95%; max-width: 600px; padding: 32px; }
+  .btn-del-note { color: var(--err); cursor: pointer; font-size: 16px; padding: 0 4px; opacity: 0.5; transition: 0.2s; }
+  .btn-del-note:hover { opacity: 1; }
+
+  /* MODAL GERAL */
+  .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+  .modal-box { background: var(--s1); border: 1px solid var(--border); border-radius: 16px; width: 95%; max-width: 500px; padding: 32px; display: flex; flex-direction: column; gap: 16px; }
+  .modal-box h2 { font-family: 'Space Grotesk'; color: var(--brand); font-size: 20px; margin-bottom: 8px;}
+  .modal-box label { font-size: 12px; color: var(--text-muted); margin-bottom: -8px; display: block;}
+  .modal-box input, .modal-box select { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: #fff; outline: none;}
+  .modal-actions { display: flex; justify-content: space-between; margin-top: 16px; }
+  .btn-modal { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; }
+  .btn-modal.primary { background: var(--brand); color: #000; }
+  .btn-modal.danger { background: var(--err); color: #fff; }
+  .btn-modal.secondary { background: transparent; border: 1px solid var(--border); color: #fff; }
+
 </style>
 </head>
 <body>
@@ -127,13 +146,9 @@
   <div class="sidebar">
     <a href="index.html" class="logo"><i>TE</i><span>Tech<b>Empire</b></span></a>
     <nav>
-      <a href="#" class="active">🏠 Início</a>
-      <a href="#">🎫 Chamados</a>
-      <a href="#">💬 Mensagens <span class="badge">3</span></a>
-      <a href="#">💳 Pagamentos</a>
-      <a href="#">👥 Clientes</a>
-      <a href="#">🎯 Leads</a>
-      <a href="#">🛡️ Usuários</a>
+      <a id="nav-inicio" class="active" onclick="mudarAba('inicio')">🏠 Início</a>
+      <a id="nav-chamados" onclick="mudarAba('chamados')">🎫 Chamados</a>
+      <a id="nav-clientes" onclick="mudarAba('clientes')">👥 Clientes</a>
       <a href="login.html" class="sair">🚪 Sair da conta</a>
     </nav>
     <div class="card-footer-logo">
@@ -144,12 +159,10 @@
 
   <!-- MAIN -->
   <div class="main">
-    
-    <!-- TOPBAR -->
     <div class="topbar">
       <div class="search-box">
         <span>🔍</span>
-        <input type="text" placeholder="Buscar projetos, clientes ou protocolos...">
+        <input type="text" placeholder="Buscar...">
       </div>
       <div class="user-info">
         <div class="notif-icon">🔔</div>
@@ -157,76 +170,97 @@
           <div class="avatar">👤</div>
           <div>
             <div style="font-size: 13px; font-weight: 600;">Administrador</div>
-            <div style="font-size: 11px; color: var(--brand);">Painel administrativo</div>
+            <div style="font-size: 11px; color: var(--brand);">Painel</div>
           </div>
-          <span style="font-size: 12px; color: var(--text-muted);">▼</span>
         </div>
       </div>
     </div>
 
-    <!-- CONTENT AREA -->
     <div class="content-area">
-      
-      <!-- ESQUERDA: KANBAN -->
       <div class="main-content">
+        
         <div class="page-header">
           <div class="texts">
-            <span>Painel Administrativo</span>
-            <h1>Organização de Projetos</h1>
-            <p>Acompanhe e gerencie todos os projetos e chamados em andamento.</p>
+            <span id="page-subtitle">Painel Administrativo</span>
+            <h1 id="page-title">Organização de Projetos</h1>
+            <p id="page-desc">Acompanhe e gerencie todos os projetos e chamados em andamento.</p>
           </div>
-          <button class="btn-new" onclick="alert('Abrir modal para novo projeto manual')">+ Novo projeto</button>
+          <button class="btn-new" id="btn-novo-projeto" style="display: none;" onclick="alert('Em breve')">+ Novo projeto</button>
         </div>
 
-        <!-- Cards de Resumo -->
-        <div class="summary-cards">
-          <div class="summary-card">
-            <div class="icon green">📁</div>
-            <div class="info"><h3 id="sum-novos">0</h3><p>Novos pedidos</p></div>
+        <!-- TELA: INÍCIO (KANBAN) -->
+        <div id="tela-inicio" class="tela active">
+          <div class="summary-cards">
+            <div class="summary-card"><div class="icon green">📁</div><div class="info"><h3 id="sum-novos">0</h3><p>Novos pedidos</p></div></div>
+            <div class="summary-card"><div class="icon blue">⚙️</div><div class="info"><h3 id="sum-execucao">0</h3><p>Em execução</p></div></div>
+            <div class="summary-card"><div class="icon yellow">👤</div><div class="info"><h3 id="sum-aguardando">0</h3><p>Aguardando cliente</p></div></div>
+            <div class="summary-card"><div class="icon gray">✓</div><div class="info"><h3 id="sum-concluidos">0</h3><p>Concluídos</p></div></div>
           </div>
-          <div class="summary-card">
-            <div class="icon blue">⚙️</div>
-            <div class="info"><h3 id="sum-execucao">0</h3><p>Em execução</p></div>
-          </div>
-          <div class="summary-card">
-            <div class="icon yellow">👤</div>
-            <div class="info"><h3 id="sum-aguardando">0</h3><p>Aguardando cliente</p></div>
-          </div>
-          <div class="summary-card">
-            <div class="icon gray">✓</div>
-            <div class="info"><h3 id="sum-concluidos">0</h3><p>Concluídos</p></div>
+          <div class="kanban-board" id="kanban-board"></div>
+        </div>
+
+        <!-- TELA: CHAMADOS (TABELA) -->
+        <div id="tela-chamados" class="tela">
+          <div class="table-box">
+            <table>
+              <thead><tr><th>Protocolo</th><th>Cliente</th><th>Assunto</th><th>Status</th><th>Ação</th></tr></thead>
+              <tbody id="tabela-chamados-body"></tbody>
+            </table>
           </div>
         </div>
 
-        <!-- Kanban -->
-        <div class="kanban-board" id="kanban-board">
-          <!-- Injetado via JS -->
+        <!-- TELA: CLIENTES (TABELA) -->
+        <div id="tela-clientes" class="tela">
+          <div class="table-box">
+            <table>
+              <thead><tr><th>Nome</th><th>E-mail</th><th>Telefone</th><th>Data de Cadastro</th></tr></thead>
+              <tbody id="tabela-clientes-body"></tbody>
+            </table>
+          </div>
         </div>
+
       </div>
 
       <!-- DIREITA: ANOTAÇÕES -->
       <div class="sidebar-notes">
-        <div class="notes-header">
-          <span>📝 Anotações</span>
-          <span style="cursor:pointer; color: var(--text-muted);">⤢</span>
-        </div>
-        
+        <div class="notes-header"><span>📝 Anotações</span></div>
         <div class="note-input-box">
           <textarea id="note-text" placeholder="Digite sua anotação..."></textarea>
           <div class="note-tools">
-            <div class="icons">
-              <span>🖼️</span> <span>📎</span> <span>🔗</span>
-            </div>
+            <div class="icons"><span>🖼️</span> <span>📎</span></div>
             <button class="btn-save-note" onclick="salvarAnotacao()">Salvar</button>
           </div>
         </div>
-
         <div class="notes-list-title">Anotações recentes</div>
-        <div id="notes-list">
-          <!-- Injetado via JS -->
+        <div id="notes-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE GERENCIAMENTO DE CHAMADO -->
+  <div class="modal" id="modal-chamado">
+    <div class="modal-box">
+      <h2>Gerenciar Chamado</h2>
+      <input type="hidden" id="edit-id">
+      
+      <label>Cliente</label>
+      <input type="text" id="edit-cliente" disabled style="opacity: 0.6;">
+      
+      <label>Status do Atendimento</label>
+      <select id="edit-status">
+        <option value="Nova chamada">Nova chamada</option>
+        <option value="Em andamento">Em andamento</option>
+        <option value="Aguardando aprovação do orçamento">Aguardando cliente</option>
+        <option value="Concluída">Concluída</option>
+      </select>
+      
+      <div class="modal-actions">
+        <button class="btn-modal danger" onclick="excluirChamado()">Excluir</button>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn-modal secondary" onclick="fecharModal()">Cancelar</button>
+          <button class="btn-modal primary" onclick="salvarChamado()">Salvar</button>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -236,6 +270,7 @@
     const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
     let idAdmin = null;
     let chamados = [];
+    let clientes = [];
 
     async function init() {
       const { data: { session } } = await db.auth.getSession();
@@ -244,90 +279,169 @@
       
       await carregarDados();
       await carregarAnotacoes();
+      mudarAba('inicio'); // Inicia no Kanban
     }
 
     async function carregarDados() {
-      const { data } = await db.from("chamados").select("*").order("criado_em", { ascending: false });
-      chamados = data || [];
-      renderizarDashboard();
+      const { data: c } = await db.from("chamados").select("*").order("criado_em", { ascending: false });
+      chamados = c || [];
+      
+      const { data: cl } = await db.from("usuarios").select("*").eq("is_admin", false);
+      clientes = cl || [];
+      
+      renderizarKanban();
+      renderizarTabelaChamados();
+      renderizarTabelaClientes();
     }
 
-    function renderizarDashboard() {
-      // Atualiza Cards de Resumo
+    // ================= NAVEGAÇÃO =================
+    function mudarAba(aba) {
+      // Atualiza classe do menu
+      document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
+      const el = document.getElementById('nav-' + aba);
+      if(el) el.classList.add('active');
+
+      // Atualiza textos do topo
+      const title = document.getElementById('page-title');
+      const desc = document.getElementById('page-desc');
+      const btn = document.getElementById('btn-novo-projeto');
+      
+      // Mostra a tela correta
+      document.querySelectorAll('.tela').forEach(t => t.classList.remove('active'));
+      document.getElementById('tela-' + aba).classList.add('active');
+
+      if (aba === 'inicio') {
+        title.textContent = 'Organização de Projetos';
+        desc.textContent = 'Acompanhe e gerencie todos os projetos e chamados.';
+        btn.style.display = 'block';
+        renderizarKanban();
+      } else if (aba === 'chamados') {
+        title.textContent = 'Todos os Chamados';
+        desc.textContent = 'Lista completa de pedidos de clientes.';
+        btn.style.display = 'none';
+        renderizarTabelaChamados();
+      } else if (aba === 'clientes') {
+        title.textContent = 'Base de Clientes';
+        desc.textContent = 'Pessoas cadastradas no sistema.';
+        btn.style.display = 'none';
+        renderizarTabelaClientes();
+      }
+    }
+
+    // ================= RENDERIZAÇÃO: KANBAN =================
+    function renderizarKanban() {
       const novos = chamados.filter(c => c.status === 'Nova chamada').length;
-      const execucao = chamados.filter(c => c.status === 'Em andamento').length;
-      const aguardando = chamados.filter(c => c.status === 'Aguardando aprovação do orçamento' || c.status === 'Aguardando informações do cliente').length;
-      const concluidos = chamados.filter(c => c.status === 'Concluída').length;
+      const exec = chamados.filter(c => c.status === 'Em andamento').length;
+      const aguard = chamados.filter(c => c.status === 'Aguardando aprovação do orçamento' || c.status === 'Aguardando informações do cliente').length;
+      const concl = chamados.filter(c => c.status === 'Concluída').length;
 
       document.getElementById('sum-novos').textContent = novos;
-      document.getElementById('sum-execucao').textContent = execucao;
-      document.getElementById('sum-aguardando').textContent = aguardando;
-      document.getElementById('sum-concluidos').textContent = concluidos;
+      document.getElementById('sum-execucao').textContent = exec;
+      document.getElementById('sum-aguardando').textContent = aguard;
+      document.getElementById('sum-concluidos').textContent = concl;
 
-      // Monta Kanban
       const colunas = [
         { id: 'Nova chamada', title: 'Novos pedidos', color: 'var(--brand)', count: novos },
-        { id: 'Em andamento', title: 'Em execução', color: '#6496FF', count: execucao },
-        { id: 'Aguardando', title: 'Aguardando cliente', color: '#FFC832', count: aguardando },
-        { id: 'Concluída', title: 'Concluídos', color: 'var(--text-muted)', count: concluidos }
+        { id: 'Em andamento', title: 'Em execução', color: '#6496FF', count: exec },
+        { id: 'Aguardando', title: 'Aguardando cliente', color: '#FFC832', count: aguard },
+        { id: 'Concluída', title: 'Concluídos', color: 'var(--text-muted)', count: concl }
       ];
 
-      let kanbanHTML = '';
+      let html = '';
       colunas.forEach(col => {
-        kanbanHTML += `
-          <div class="kanban-col">
-            <div class="kanban-header">
-              <div class="dot" style="background: ${col.color}"></div>
-              ${col.title} <span class="count">(${col.count})</span>
-            </div>
-            <div class="kanban-cards">
-        `;
-
         let filtrados = [];
         if (col.id === 'Aguardando') filtrados = chamados.filter(c => c.status === 'Aguardando aprovação do orçamento' || c.status === 'Aguardando informações do cliente');
         else filtrados = chamados.filter(c => c.status === col.id);
 
+        html += `<div class="kanban-col">
+          <div class="kanban-header"><div class="dot" style="background: ${col.color}"></div>${col.title} <span class="count">(${col.count})</span></div>
+          <div class="kanban-cards">`;
+
         if (filtrados.length === 0) {
-          kanbanHTML += `
-            <div class="empty-col">
-              ${col.id === 'Em andamento' ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'}
-              <p style="margin-top: 12px; font-weight: 500;">Nenhum projeto ${col.title.toLowerCase()}</p>
-              <p style="margin-top: 4px; opacity: 0.7;">Quando um projeto for ${col.id === 'Nova chamada' ? 'criado' : 'atualizado'}, ele aparecerá aqui.</p>
-            </div>
-          `;
+          html += `<div class="empty-col"><p>Nenhum projeto aqui.</p></div>`;
         } else {
           filtrados.forEach(c => {
             const isSite = c.categoria && c.categoria.toLowerCase().includes('site');
-            const icon = isSite ? '💻' : '🔧';
-            const desc = c.titulo || 'Sem descrição';
-            const dateStr = new Date(c.criado_em).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', ' às');
-            
-            // Define a cor do pill
-            let pillClass = 'novo'; let pillText = 'Novo';
-            if (col.id === 'Em andamento') { pillClass = 'exec'; pillText = 'Execução'; }
-            if (col.id === 'Concluída') { pillClass = 'gray'; pillText = 'Concluído'; }
-
-            kanbanHTML += `
+            const dateStr = new Date(c.criado_em).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+            html += `
               <div class="kanban-card" onclick="abrirModal('${c.id}')">
-                <div class="k-card-top">
-                  <div class="k-icon">${icon}</div>
-                  <div class="k-tag">${c.protocolo || 'S/N'}</div>
-                </div>
+                <div class="k-card-top"><div class="k-icon">${isSite ? '💻' : '🔧'}</div><div class="k-tag">${c.protocolo || 'S/N'}</div></div>
                 <div class="k-title">${c.cliente_nome || 'Visitante'}</div>
-                <div class="k-desc">${desc}</div>
-                <div class="k-card-footer">
-                  <div class="k-date">🕒 ${dateStr}</div>
-                  <div class="k-pill ${pillClass}">${pillText}</div>
-                </div>
-              </div>
-            `;
+                <div class="k-desc">${c.titulo || 'Sem descrição'}</div>
+                <div class="k-card-footer"><div class="k-date">🕒 ${dateStr}</div><div class="k-pill novo">${c.status}</div></div>
+              </div>`;
           });
         }
-
-        kanbanHTML += `</div></div>`;
+        html += `</div></div>`;
       });
+      document.getElementById('kanban-board').innerHTML = html;
+    }
 
-      document.getElementById('kanban-board').innerHTML = kanbanHTML;
+    // ================= RENDERIZAÇÃO: TABELAS =================
+    function renderizarTabelaChamados() {
+      let html = '';
+      chamados.forEach(c => {
+        html += `<tr>
+          <td>${c.protocolo || 'S/N'}</td>
+          <td>${c.cliente_nome || 'Visitante'}</td>
+          <td>${c.titulo}</td>
+          <td><span class="pill">${c.status}</span></td>
+          <td><button class="btn-modal primary" style="padding: 6px 12px; font-size: 12px;" onclick="abrirModal('${c.id}')">Gerenciar</button></td>
+        </tr>`;
+      });
+      document.getElementById('tabela-chamados-body').innerHTML = html;
+    }
+
+    function renderizarTabelaClientes() {
+      let html = '';
+      clientes.forEach(c => {
+        const dataCad = c.criado_em ? new Date(c.criado_em).toLocaleDateString('pt-BR') : '—';
+        html += `<tr>
+          <td>${c.nome}</td>
+          <td>${c.email}</td>
+          <td>${c.telefone || '—'}</td>
+          <td>${dataCad}</td>
+        </tr>`;
+      });
+      document.getElementById('tabela-clientes-body').innerHTML = html;
+    }
+
+    // ================= MODAL DE AÇÃO (EDITAR/EXCLUIR) =================
+    function abrirModal(id) {
+      const c = chamados.find(x => x.id === id);
+      if (!c) return;
+
+      document.getElementById('edit-id').value = c.id;
+      document.getElementById('edit-cliente').value = c.cliente_nome || 'Visitante';
+      document.getElementById('edit-status').value = c.status;
+
+      document.getElementById('modal-chamado').style.display = 'flex';
+    }
+
+    function fecharModal() {
+      document.getElementById('modal-chamado').style.display = 'none';
+    }
+
+    async function salvarChamado() {
+      const id = document.getElementById('edit-id').value;
+      const novoStatus = document.getElementById('edit-status').value;
+
+      const { error } = await db.from("chamados").update({ status: novoStatus }).eq("id", id);
+      if (error) return alert("Erro: " + error.message);
+
+      fecharModal();
+      await carregarDados();
+    }
+
+    async function excluirChamado() {
+      const id = document.getElementById('edit-id').value;
+      if (!confirm("Tem certeza que deseja excluir este chamado? Essa ação não pode ser desfeita.")) return;
+
+      const { error } = await db.from("chamados").delete().eq("id", id);
+      if (error) return alert("Erro: " + error.message);
+
+      fecharModal();
+      await carregarDados();
     }
 
     // ================= ANOTAÇÕES =================
@@ -341,40 +455,34 @@
     }
 
     async function carregarAnotacoes() {
-      const { data } = await db.from('anotacoes').select('*').order('criado_em', { ascending: false }).limit(5);
+      const { data } = await db.from('anotacoes').select('*').order('criado_em', { ascending: false });
       const lista = document.getElementById('notes-list');
       
       if (!data || data.length === 0) {
-        lista.innerHTML = '<p style="font-size: 12px; color: var(--text-muted);">Nenhuma anotação recente.</p>';
+        lista.innerHTML = '<p style="font-size: 12px; color: var(--text-muted);">Nenhuma anotação.</p>';
         return;
       }
 
       lista.innerHTML = data.map(n => {
         const date = new Date(n.criado_em);
-        const hoje = new Date();
-        let dataStr = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-        if (date.toDateString() === hoje.toDateString()) dataStr = `Hoje, ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+        const dataStr = `Hoje, ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
 
         return `
           <div class="note-item">
-            <div class="note-meta">
-              <span style="color: var(--brand);">● ${dataStr}</span>
-              <span style="cursor:pointer;">⋮</span>
+            <div class="content">
+              <div class="note-meta"><span style="color: var(--brand);">● ${dataStr}</span></div>
+              <div class="note-text">${n.texto}</div>
             </div>
-            <div class="note-text">${n.texto}</div>
+            <button class="btn-del-note" onclick="excluirAnotacao('${n.id}')" title="Excluir anotação">🗑️</button>
           </div>
         `;
       }).join('');
     }
 
-    // Função simples de modal para clicar no card (pode ser expandida depois)
-    function abrirModal(id) {
-      const c = chamados.find(x => x.id === id);
-      if (!c) return;
-      const novoStatus = prompt(`Status atual: ${c.status}\n\nDigite o novo status (Nova chamada, Em andamento, Aguardando, Concluída):`, c.status);
-      if (novoStatus) {
-        db.from("chamados").update({ status: novoStatus }).eq("id", id).then(() => carregarDados());
-      }
+    async function excluirAnotacao(id) {
+      if (!confirm("Apagar esta anotação?")) return;
+      await db.from('anotacoes').delete().eq('id', id);
+      await carregarAnotacoes();
     }
 
     init();
