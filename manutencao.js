@@ -1,7 +1,7 @@
 /* Página de manutenção preventiva e detectiva: PC em 3D (three.js) */
 Pages.manutencao = () => {
   const PARTES = {
-    fans:  { nome: "Ventoinhas e filtros", prev: ["Limpeza a cada 3 meses", "Verificar filtros"], det: ["Ruídos anormais", "Verificar rotação"] },
+    fans:  { nome: "Ventoinhas e filtros", prev: ["Limpeza a cada 3 meses", "Verificar filtros de poeira"], det: ["Ruídos anormais", "Verificar rotação sob carga"] },
     cpu:   { nome: "Processador e pasta térmica", prev: ["Troca a cada 1-2 anos", "Limpar dissipador"], det: ["Monitorar temperatura", "Quedas de desempenho"] },
     ram:   { nome: "Memória RAM", prev: ["Limpar contatos", "Não misturar frequências"], det: ["Teste de memória", "Travamentos e telas azuis"] },
     gpu:   { nome: "Placa de vídeo", prev: ["Limpar ventoinhas", "Atualizar drivers"], det: ["Temperatura em jogos", "Artefatos na tela"] },
@@ -10,7 +10,7 @@ Pages.manutencao = () => {
   };
 
   const lista = $("#parts"), info = $("#info"), stage = $("#stage");
-  if(!lista) return; // Se não for a página de manutenção, aborta
+  if(!lista) return;
   
   lista.innerHTML = Object.entries(PARTES).map(([k, p]) => `<button type="button" data-k="${k}" aria-pressed="false">${esc(p.nome)}</button>`).join("");
 
@@ -32,21 +32,23 @@ Pages.manutencao = () => {
   renderer.domElement.style.touchAction = "pan-y";
 
   const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(35, 1, .1, 100); 
-  cam.position.set(0, .5, 14);
+  cam.position.set(0, .5, 15);
 
-  // Iluminação Realista
-  scene.add(new THREE.AmbientLight(0xffffff, .6)); 
-  const dl = new THREE.DirectionalLight(0xffffff, 1.2); dl.position.set(5, 10, 7); scene.add(dl);
-  const pl = new THREE.PointLight(0x00DDB5, 1.5, 20); pl.position.set(-3, 0, 5); scene.add(pl); // Luz Turquesa
+  // Iluminação para dar realismo
+  scene.add(new THREE.AmbientLight(0xffffff, .4)); 
+  const dl = new THREE.DirectionalLight(0xffffff, 1.5); dl.position.set(5, 10, 7); scene.add(dl);
+  const pl = new THREE.PointLight(0x00DDB5, 2, 20); pl.position.set(-3, 2, 5); scene.add(pl); // Luz Turquesa
 
   const pc = new THREE.Group(); scene.add(pc); 
-  const hit = [], porParte = {}, fans = [], marcadores = {};
+  const hit = [], porParte = {}, fans = [];
 
   // Materiais Premium
-  const M = (c, o = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: .3, metalness: .7, ...o });
-  const cMetal = 0x2a2d30, cDark = 0x121518, cTurq = 0x00DDB5;
+  const matMetal = new THREE.MeshStandardMaterial({ color: 0x2a2d30, roughness: .4, metalness: .8 });
+  const matDark = new THREE.MeshStandardMaterial({ color: 0x121518, roughness: .6, metalness: .5 });
+  const matGlass = new THREE.MeshPhysicalMaterial({ color: 0xffffff, transparent: true, opacity: 0.05, roughness: 0.1, metalness: 0.1, clearcoat: 1, side: THREE.DoubleSide });
+  const matGreen = new THREE.MeshStandardMaterial({ color: 0x00DDB5, emissive: 0x00DDB5, emissiveIntensity: 0.6 });
 
-  const caixa = (w, h, d, c, x, y, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M(c)); m.position.set(x, y, z); return m; };
+  const caixa = (w, h, d, mat, x, y, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); return m; };
   
   function marcar(k, obj) { 
     obj.traverse(o => { if (o.isMesh) { o.userData.k = k; hit.push(o); (porParte[k] = porParte[k] || []).push(o); } }); 
@@ -55,54 +57,64 @@ Pages.manutencao = () => {
 
   function fan(r, axisX) { 
     const g = new THREE.Group(), blades = new THREE.Group();
-    g.add(new THREE.Mesh(new THREE.TorusGeometry(r, r * .05, 12, 32), M(cDark)));
+    g.add(new THREE.Mesh(new THREE.TorusGeometry(r, r * .06, 12, 32), matDark));
     for (let i = 0; i < 7; i++) { 
-      const b = new THREE.Mesh(new THREE.BoxGeometry(r * .8, r * .3, .02), M(0x3a3f44, { metalness: .9, roughness: .1 })); 
+      const b = new THREE.Mesh(new THREE.BoxGeometry(r * .85, r * .35, .02), new THREE.MeshStandardMaterial({ color: 0x3a3f44, roughness: .2, metalness: .9 })); 
       const a = i / 7 * Math.PI * 2; 
       b.position.set(Math.cos(a) * r * .5, Math.sin(a) * r * .5, 0); 
       b.rotation.z = a + .35; blades.add(b); 
     }
-    const hub = new THREE.Mesh(new THREE.CylinderGeometry(r * .25, r * .25, .04, 16), M(cTurq, {emissive: cTurq, emissiveIntensity: 0.5})); 
-    hub.rotation.x = Math.PI / 2; blades.add(hub); g.add(blades); fans.push(blades); if (axisX) g.rotation.y = Math.PI / 2; return g; 
+    const hub = new THREE.Mesh(new THREE.CylinderGeometry(r * .25, r * .25, .05, 16), matGreen); 
+    hub.rotation.x = Math.PI / 2; blades.add(hub); g.add(blades); fans.push(blades); 
+    if (axisX) g.rotation.y = Math.PI / 2; 
+    return g; 
   }
 
-  const W = 2.6, H = 5.0, D = 4.8;
+  const W = 2.8, H = 5.4, D = 5.2;
 
-  // Gabinete Translúcido
-  pc.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(W, H, D)), new THREE.LineBasicMaterial({ color: cTurq, transparent: true, opacity: .6 })));
-  pc.add(new THREE.Mesh(new THREE.BoxGeometry(W, H, D), new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: .03, side: THREE.DoubleSide, depthWrite: false })));
+  // Gabinete Translúcido (Vidro Temperado)
+  pc.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(W, H, D)), new THREE.LineBasicMaterial({ color: 0x00DDB5, transparent: true, opacity: .4 })));
+  pc.add(new THREE.Mesh(new THREE.BoxGeometry(W, H, D), matGlass));
   
   // Placa-mãe
-  pc.add(caixa(.1, 4.2, 4.0, 0x0e1114, -1.2, .2, .2));
+  pc.add(caixa(.1, 4.6, 4.4, matDark, -1.3, .2, .2));
 
   // CPU e Watercooler
   const cpuG = new THREE.Group(); 
-  cpuG.add(caixa(.6, 1.0, 1.0, 0xaab4bc, -.85, 1.2, .25)); 
-  const wf = fan(.45, true); wf.position.set(-.45, 1.2, .25); cpuG.add(wf);
+  cpuG.add(caixa(.7, 1.1, 1.1, matMetal, -.9, 1.3, .3)); 
+  const wf = fan(.5, true); wf.position.set(-.5, 1.3, .3); cpuG.add(wf);
   marcar("cpu", cpuG);
 
-  // RAM
+  // RAM (com LEDs)
   const ramG = new THREE.Group(); 
-  [-1.0, -1.4, -1.8].forEach(z => { ramG.add(caixa(.14, 1.0, .2, 0x3a3f44, -1.0, 1.3, z)); ramG.add(caixa(.15, .1, .22, cTurq, -1.0, 1.75, z)); }); 
+  [-1.1, -1.5, -1.9].forEach(z => { 
+    ramG.add(caixa(.15, 1.1, .2, matDark, -1.1, 1.4, z)); 
+    ramG.add(caixa(.16, .1, .22, matGreen, -1.1, 1.9, z)); 
+  }); 
   marcar("ram", ramG);
 
-  // GPU
+  // Placa de Vídeo (GPU)
   const gpuG = new THREE.Group(); 
-  gpuG.add(caixa(.7, .6, 3.5, 0x15181b, -.8, -.6, .3)); 
-  [-.6, 1.0].forEach(z => { const f = fan(.5, true); f.position.set(-.4, -.6, z); gpuG.add(f); }); 
+  gpuG.add(caixa(.8, .7, 3.8, matMetal, -.9, -.7, .3)); 
+  [-.7, 1.1].forEach(z => { const f = fan(.55, true); f.position.set(-.5, -.7, z); gpuG.add(f); }); 
   marcar("gpu", gpuG);
 
-  // Fans
+  // Ventoinhas do gabinete (Frontal)
   const fanG = new THREE.Group(); 
-  [[1.2, 2.4], [-.6, 2.4]].forEach(([y, z]) => { const f = fan(.9, false); f.position.set(.2, y, z); fanG.add(f); }); 
+  [[1.3, 2.6], [-.7, 2.6], [1.3, 0.8]].forEach(([y, z]) => { const f = fan(1.0, false); f.position.set(.3, y, z); fanG.add(f); }); 
   marcar("fans", fanG);
 
-  // PSU e SSD
-  marcar("psu", caixa(2.2, 1.0, 2.5, 0x23282d, 0, -2.2, -.9));
-  const ssdG = new THREE.Group(); ssdG.add(caixa(.5, 1.0, .2, 0x1A1D21, .8, .5, -1.8)); ssdG.add(caixa(.51, .1, .21, cTurq, .8, .9, -1.8)); marcar("disco", ssdG);
+  // Fonte (PSU)
+  marcar("psu", caixa(2.4, 1.1, 2.8, matDark, 0, -2.4, -.9));
 
-  // Interatividade (Drag & Click)
-  let rotY = -1.1, rotX = .14, vel = 0, arrasta = false, lx = 0, ly = 0, moveu = 0, parado = 0, visivel = true; 
+  // SSD
+  const ssdG = new THREE.Group(); 
+  ssdG.add(caixa(.6, 1.1, .2, matMetal, .9, .6, -2.0)); 
+  ssdG.add(caixa(.61, .1, .21, matGreen, .9, 1.0, -2.0)); 
+  marcar("disco", ssdG);
+
+  // Interatividade
+  let rotY = -1.2, rotX = .15, vel = 0, arrasta = false, lx = 0, ly = 0, moveu = 0, parado = 0, visivel = true; 
   const el = renderer.domElement, ray = new THREE.Raycaster(), v2 = new THREE.Vector2();
   const reduz = matchMedia("(prefers-reduced-motion:reduce)").matches;
 
