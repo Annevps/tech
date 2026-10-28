@@ -5,65 +5,88 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Acompanhar Atendimento — TechEmpire</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
-  .consulta-container { max-width: 600px; margin: 80px auto; background: var(--s1); padding: 40px; border-radius: 24px; border: 1px solid var(--line2); box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; }
-  .consulta-container h1 { font-family: 'Space Grotesk'; font-size: 32px; margin-bottom: 8px; color: var(--ink); }
-  .consulta-container h1 em { color: var(--lime); font-style: normal; }
-  .consulta-container p { color: var(--muted); margin-bottom: 32px; }
-  .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
-  .input-group input { flex: 1; padding: 16px; border-radius: 12px; border: 1px solid var(--line2); background: var(--bg); color: var(--ink); font-size: 16px; text-align: center; text-transform: uppercase; }
-  .input-group button { padding: 0 24px; border-radius: 12px; background: var(--lime); color: #fff; font-weight: bold; cursor: pointer; border: none; }
+  /* Estilos para a página de acompanhamento */
+  .consulta-box { max-width: 600px; margin: 60px auto; text-align: center; }
+  .consulta-box h1 { font-family: 'Space Grotesk'; font-size: 42px; margin-bottom: 12px; }
+  .consulta-box h1 em { color: var(--lime); font-style: normal; }
+  .consulta-box p { color: var(--muted); margin-bottom: 40px; }
   
-  /* Timeline */
-  .timeline { margin-top: 40px; text-align: left; display: none; }
-  .timeline-item { display: flex; gap: 16px; margin-bottom: 24px; position: relative; }
-  .timeline-item::before { content: ""; position: absolute; left: 11px; top: 24px; bottom: -24px; width: 2px; background: var(--line2); }
-  .timeline-item:last-child::before { display: none; }
-  .timeline-dot { width: 24px; height: 24px; border-radius: 50%; background: var(--bg); border: 2px solid var(--line2); display: grid; place-items: center; z-index: 1; flex-shrink: 0; }
-  .timeline-item.done .timeline-dot { background: var(--lime); border-color: var(--lime); color: #fff; }
-  .timeline-content h4 { font-size: 16px; margin-bottom: 4px; color: var(--ink); }
-  .timeline-content p { font-size: 14px; color: var(--muted); margin: 0; }
-  .timeline-item.done .timeline-content h4 { color: var(--lime2); }
+  .input-group { display: flex; gap: 12px; max-width: 400px; margin: 0 auto; }
+  .input-group input { flex: 1; padding: 16px 20px; border-radius: 12px; border: 1px solid var(--line2); background: var(--s1); color: var(--ink); font-size: 16px; text-transform: uppercase; text-align: center; }
+  .input-group button { padding: 0 32px; border-radius: 12px; background: var(--lime); color: #fff; font-weight: 700; font-size: 16px; border: none; cursor: pointer; transition: 0.3s; }
+  .input-group button:hover { background: var(--lime2); transform: translateY(-2px); }
+
+  /* Área do resultado (oculta até buscar) */
+  #resultado { display: none; margin-top: 60px; text-align: left; }
+  
+  .grid-resultado { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 40px; }
+  .card-info { background: var(--s1); border: 1px solid var(--line); border-radius: 16px; padding: 24px; }
+  .card-info h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 16px; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+  .card-info p { margin-bottom: 8px; font-size: 15px; color: var(--ink); }
+  .card-info strong { color: var(--muted); font-size: 13px; display: block; margin-bottom: 2px; font-weight: 500; }
+
+  .status-box { background: rgba(143, 210, 31, 0.05); border: 1px solid var(--lime); border-radius: 16px; padding: 24px; text-align: center; }
+  .status-box h2 { font-family: 'Space Grotesk'; font-size: 28px; color: var(--lime2); margin-bottom: 8px; }
+  .status-box p { color: var(--muted); font-size: 14px; }
+
+  .btn-pdf { display: inline-flex; align-items: center; gap: 8px; background: var(--ink); color: #fff; padding: 14px 24px; border-radius: 8px; font-weight: 600; margin-top: 24px; text-decoration: none; transition: 0.3s; }
+  .btn-pdf:hover { background: #333; transform: translateY(-2px); }
+
+  @media (max-width: 768px) { .grid-resultado { grid-template-columns: 1fr; } .input-group { flex-direction: column; } .input-group button { padding: 16px; } }
 </style>
 </head>
 <body data-page="public" data-auth="public">
 <header id="site-header"></header>
 
 <main class="wrap-main">
-  <div class="consulta-container">
+  <div class="consulta-box">
     <h1>Acompanhe seu <em>Atendimento</em></h1>
-    <p>Digite o número do protocolo que você recebeu.</p>
+    <p>Digite o número do protocolo que você recebeu ao abrir o chamado.</p>
     
-    <div id="form-busca">
-      <div class="input-group">
-        <input type="text" id="protocolo" placeholder="TE-20231025-0001">
-        <button onclick="buscar()">Buscar</button>
+    <div class="input-group">
+      <input type="text" id="protocolo" placeholder="TE-20261028-0001">
+      <button onclick="buscar()">Buscar</button>
+    </div>
+    <div id="msg-consulta" class="msg" style="max-width: 400px; margin: 20px auto;"></div>
+  </div>
+
+  <!-- Área que mostra os dados do chamado -->
+  <div id="resultado">
+    <div class="status-box">
+      <h2 id="res-status">Carregando...</h2>
+      <p id="res-protocolo"></p>
+    </div>
+
+    <div class="grid-resultado">
+      <div class="card-info">
+        <h3>Informações do Cliente</h3>
+        <strong>Nome</strong> <p id="res-nome"></p>
+        <strong>E-mail</strong> <p id="res-email"></p>
+        <strong>Telefone</strong> <p id="res-telefone"></p>
+      </div>
+      
+      <div class="card-info">
+        <h3>Detalhes do Chamado</h3>
+        <strong>Serviço</strong> <p id="res-servico"></p>
+        <strong>Assunto</strong> <p id="res-titulo"></p>
+        <strong>Descrição</strong> <p id="res-descricao"></p>
+        <strong>Data de Abertura</strong> <p id="res-data"></p>
       </div>
     </div>
-    
-    <div id="msg-consulta" class="msg" style="margin-top: 20px;"></div>
 
-    <div id="resultado" class="timeline">
-      <h3 id="res-protocolo" style="font-family: 'Space Grotesk'; margin-bottom: 24px;"></h3>
-      
-      <div class="timeline-item done">
-        <div class="timeline-dot">✓</div>
-        <div class="timeline-content"><h4>Chamado Recebido</h4><p id="res-data"></p></div>
-      </div>
-      
-      <div class="timeline-item" id="step-status">
-        <div class="timeline-dot"></div>
-        <div class="timeline-content"><h4 id="res-status"></h4><p id="res-desc"></p></div>
-      </div>
+    <div style="text-align: center; margin-top: 32px;">
+      <a href="#" id="link-laudo" target="_blank" class="btn-pdf">📄 Visualizar Laudo / Orçamento</a>
     </div>
   </div>
 </main>
 
 <footer id="site-footer"></footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="supabase-config.js"></script>
 <script src="data.js"></script>
 <script src="script.js"></script>
@@ -75,38 +98,46 @@
     const res = document.getElementById('resultado');
     
     if (!protocolo) return;
+    
     msg.textContent = "Buscando...";
     msg.className = "msg on ok";
 
     const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
     
-    // Busca apenas os dados públicos do chamado
+    // Busca no banco de dados pelo protocolo exato
     const { data, error } = await db.from('chamados')
-      .select('protocolo, titulo, status, descricao, criado_em')
+      .select('*')
       .eq('protocolo', protocolo)
       .maybeSingle();
 
     if (error || !data) {
-      msg.textContent = "Protocolo não encontrado. Verifique o código.";
+      msg.textContent = "Protocolo não encontrado. Verifique se digitou corretamente.";
       msg.className = "msg on err";
       res.style.display = "none";
       return;
     }
 
-    msg.className = "msg"; // Esconde a mensagem
+    msg.className = "msg"; // Esconde a mensagem de sucesso
     res.style.display = "block";
 
-    document.getElementById('res-protocolo').textContent = data.protocolo;
+    // Preenche as informações na tela
+    document.getElementById('res-status').textContent = data.status;
+    document.getElementById('res-protocolo').textContent = `Protocolo: ${data.protocolo}`;
+    
+    document.getElementById('res-nome').textContent = data.cliente_nome || '—';
+    document.getElementById('res-email').textContent = data.cliente_email || '—';
+    document.getElementById('res-telefone').textContent = data.cliente_telefone || '—';
+    
+    document.getElementById('res-servico').textContent = data.categoria || '—';
+    document.getElementById('res-titulo').textContent = data.titulo || '—';
+    document.getElementById('res-descricao').textContent = data.descricao || '—';
     document.getElementById('res-data').textContent = new Date(data.criado_em).toLocaleString('pt-BR');
-    document.getElementById('res-status').textContent = "Status: " + data.status;
-    document.getElementById('res-desc').textContent = data.titulo + " - " + data.descricao;
 
-    // Lógica visual simples para a timeline
-    const step = document.getElementById('step-status');
-    if (data.status === 'Concluída') {
-      step.classList.add('done');
-      step.querySelector('.timeline-dot').textContent = "✓";
-    }
+    // Configura o botão do Laudo para abrir a página laudo.html com o ID do chamado
+    document.getElementById('link-laudo').href = `laudo.html?id=${data.id}`;
+    
+    // Rola a tela suavemente para o resultado
+    res.scrollIntoView({ behavior: 'smooth' });
   }
 </script>
 </body>
