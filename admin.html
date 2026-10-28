@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Painel Administrativo — TechEmpire</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* TEMA CLARO */
+  /* ================= TEMA CLARO ================= */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --bg: #F8F9FA; --s1: #FFFFFF; --s2: #F3F4F6;
@@ -20,7 +20,6 @@
   .sidebar { width: 240px; background: var(--s1); border-right: 1px solid var(--border); padding: 24px; display: flex; flex-direction: column; flex-shrink: 0; }
   .logo { display: flex; align-items: center; gap: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 40px; color: var(--text-main); }
   .logo i { background: var(--brand); color: #fff; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; font-style: normal; font-weight: 800; }
-  .logo b { color: var(--text-main); }
   .sidebar nav { display: flex; flex-direction: column; gap: 4px; }
   .sidebar a { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px; font-weight: 500; color: var(--text-muted); transition: 0.2s; font-size: 14px; cursor: pointer; }
   .sidebar a:hover, .sidebar a.active { background: rgba(143, 210, 31, 0.1); color: var(--brand-dark); }
@@ -35,10 +34,12 @@
 
   .content-area { flex: 1; display: grid; grid-template-columns: 1fr 340px; overflow: hidden; }
   .main-content { padding: 32px; overflow-y: auto; display: flex; flex-direction: column; }
+  
   .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
-  .page-header .texts span { color: var(--brand-dark); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; display: block; }
   .page-header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; }
   .page-header p { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
+  .btn-new { background: var(--brand); color: #fff; padding: 10px 20px; border-radius: 8px; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+  .btn-new:hover { background: var(--brand-dark); }
 
   .tela { display: none; flex-direction: column; flex: 1; }
   .tela.active { display: flex; }
@@ -51,50 +52,17 @@
   tr:hover td { background: var(--s2); }
   .pill { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; background: rgba(143, 210, 31, 0.15); color: var(--brand-dark); }
   .btn-acao { background: var(--brand); color: #fff; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; transition: 0.2s; }
-  .btn-acao:hover { background: var(--brand-dark); }
-  .btn-sec { background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; margin-left: 5px; transition: 0.2s; }
-  .btn-sec:hover { border-color: var(--brand); color: var(--brand-dark); }
-
-  /* KANBAN */
-  .summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
-  .summary-card { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 12px; }
-  .summary-card .icon { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-size: 18px; }
-  .summary-card .icon.green { background: rgba(143, 210, 31, 0.1); color: var(--brand-dark); }
-  .summary-card .icon.blue { background: rgba(59, 130, 246, 0.1); color: #3B82F6; }
-  .summary-card .icon.yellow { background: rgba(245, 158, 11, 0.1); color: #F59E0B; }
-  .summary-card .icon.gray { background: var(--s2); color: var(--text-muted); }
-  .summary-card .info h3 { font-size: 20px; font-family: 'Space Grotesk'; line-height: 1; }
-  .summary-card .info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-
-  .kanban-board { display: flex; gap: 16px; flex: 1; overflow-x: auto; }
-  .kanban-col { min-width: 260px; flex: 1; background: transparent; }
-  .kanban-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; font-size: 13px; font-weight: 600; color: var(--text-main); }
-  .kanban-header .dot { width: 8px; height: 8px; border-radius: 50%; }
-  .kanban-header .count { color: var(--text-muted); }
-  .kanban-cards { display: flex; flex-direction: column; gap: 12px; }
-  .kanban-card { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; cursor: pointer; transition: 0.2s; }
-  .kanban-card:hover { border-color: var(--brand); }
-  .k-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-  .k-icon { width: 32px; height: 32px; background: var(--s2); border-radius: 8px; display: grid; place-items: center; font-size: 16px; }
-  .k-tag { font-size: 10px; color: var(--text-muted); font-family: monospace; }
-  .k-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
-  .k-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
-  .empty-col { border: 1px dashed var(--border); border-radius: 12px; padding: 40px 20px; text-align: center; color: var(--text-muted); font-size: 12px; }
 
   /* ANOTAÇÕES */
   .sidebar-notes { background: var(--s1); border-left: 1px solid var(--border); padding: 24px; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; }
   .notes-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: 600; font-size: 15px; }
   .note-input-box { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 24px; }
   .note-input-box textarea { width: 100%; background: transparent; border: none; color: var(--text-main); outline: none; resize: none; font-size: 13px; font-family: 'Inter'; height: 60px; margin-bottom: 12px; }
-  .note-tools { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 12px; color: var(--text-muted); }
   .btn-save-note { background: var(--brand); color: #fff; padding: 6px 16px; border-radius: 6px; font-weight: 600; font-size: 12px; }
-  .note-item { background: var(--bg); border-radius: 8px; padding: 16px; margin-bottom: 12px; border-left: 3px solid var(--brand); display: flex; justify-content: space-between; }
-  .note-text { font-size: 12px; line-height: 1.5; color: var(--text-main); }
-  .btn-del-note { color: var(--err); cursor: pointer; font-size: 16px; padding: 0 4px; opacity: 0.5; transition: 0.2s; }
 
   /* MODAIS */
   .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-  .modal-box { background: var(--s1); border: 1px solid var(--border); border-radius: 16px; width: 95%; max-width: 500px; padding: 32px; display: flex; flex-direction: column; gap: 16px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+  .modal-box { background: var(--s1); border: 1px solid var(--border); border-radius: 16px; width: 95%; max-width: 600px; padding: 32px; display: flex; flex-direction: column; gap: 16px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
   .modal-box h2 { font-family: 'Space Grotesk'; color: var(--text-main); font-size: 20px; margin-bottom: 8px;}
   .form-group { margin-bottom: 8px; }
   .form-group label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block; font-weight: 600;}
@@ -105,10 +73,6 @@
   .btn-modal.primary { background: var(--brand); color: #fff; }
   .btn-modal.danger { background: var(--err); color: #fff; }
   .btn-modal.secondary { background: var(--s1); border: 1px solid var(--border); color: var(--text-main); }
-  .btn-modal.whatsapp { background: #25D366; color: #fff; }
-  .btn-modal.print { background: #333; color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px; }
-
-  @media (max-width: 1000px) { .content-area { grid-template-columns: 1fr; } .sidebar-notes { display: none; } }
 </style>
 </head>
 <body>
@@ -116,9 +80,8 @@
   <div class="sidebar">
     <a href="index.html" class="logo"><i>TE</i><span>Tech<b>Empire</b></span></a>
     <nav>
-      <a id="nav-inicio" class="active" onclick="mudarAba('inicio')">🏠 Início</a>
-      <a id="nav-chamados" onclick="mudarAba('chamados')">🎫 Chamados</a>
-      <a id="nav-laudos" onclick="mudarAba('laudos')">📄 Laudos / Briefings</a>
+      <a id="nav-inicio" onclick="mudarAba('inicio')">🏠 Início</a>
+      <a id="nav-chamados" class="active" onclick="mudarAba('chamados')">🎫 Chamados</a>
       <a id="nav-clientes" onclick="mudarAba('clientes')">👥 Clientes</a>
       <a href="login.html" class="sair">🚪 Sair da conta</a>
     </nav>
@@ -128,11 +91,8 @@
     <div class="topbar">
       <div class="search-box"><span>🔍</span><input type="text" placeholder="Buscar..."></div>
       <div class="user-info">
-        <div class="notif-icon">🔔</div>
-        <div class="user-block">
-          <div class="avatar">👤</div>
-          <div><div style="font-size: 13px; font-weight: 600;">Administrador</div><div style="font-size: 11px; color: var(--brand-dark);">Painel</div></div>
-        </div>
+        <div class="avatar">👤</div>
+        <div><div style="font-size: 13px; font-weight: 600;">Administrador</div></div>
       </div>
     </div>
 
@@ -140,40 +100,19 @@
       <div class="main-content">
         
         <div class="page-header">
-          <div class="texts">
-            <span id="page-subtitle">Painel Administrativo</span>
-            <h1 id="page-title">Organização de Projetos</h1>
-            <p id="page-desc">Acompanhe e gerencie todos os projetos e chamados.</p>
+          <div>
+            <h1 id="page-title">Chamados</h1>
+            <p id="page-desc">Gerencie todos os chamados.</p>
           </div>
-        </div>
-
-        <!-- TELA: INÍCIO (KANBAN) -->
-        <div id="tela-inicio" class="tela active">
-          <div class="summary-cards">
-            <div class="summary-card"><div class="icon green">📁</div><div class="info"><h3 id="sum-novos">0</h3><p>Novos pedidos</p></div></div>
-            <div class="summary-card"><div class="icon blue">⚙️</div><div class="info"><h3 id="sum-execucao">0</h3><p>Em execução</p></div></div>
-            <div class="summary-card"><div class="icon yellow">👤</div><div class="info"><h3 id="sum-aguardando">0</h3><p>Aguardando cliente</p></div></div>
-            <div class="summary-card"><div class="icon gray">✓</div><div class="info"><h3 id="sum-concluidos">0</h3><p>Concluídos</p></div></div>
-          </div>
-          <div class="kanban-board" id="kanban-board"></div>
+          <button class="btn-new" id="btn-novo-chamado" onclick="abrirNovoChamado()">+ Novo Chamado</button>
         </div>
 
         <!-- TELA: CHAMADOS -->
-        <div id="tela-chamados" class="tela">
+        <div id="tela-chamados" class="tela active">
           <div class="table-box">
             <table>
               <thead><tr><th>Protocolo</th><th>Cliente</th><th>Assunto</th><th>Status</th><th>Ações</th></tr></thead>
               <tbody id="tabela-chamados-body"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- TELA: LAUDOS -->
-        <div id="tela-laudos" class="tela">
-          <div class="table-box">
-            <table>
-              <thead><tr><th>Protocolo</th><th>Cliente</th><th>Tipo</th><th>Status do Doc</th><th>Ação</th></tr></thead>
-              <tbody id="tabela-laudos-body"></tbody>
             </table>
           </div>
         </div>
@@ -195,7 +134,7 @@
         <div class="notes-header"><span>📝 Anotações</span></div>
         <div class="note-input-box">
           <textarea id="note-text" placeholder="Digite sua anotação..."></textarea>
-          <div class="note-tools">
+          <div style="display: flex; justify-content: flex-end;">
             <button class="btn-save-note" onclick="salvarAnotacao()">Salvar</button>
           </div>
         </div>
@@ -204,19 +143,14 @@
     </div>
   </div>
 
-  <!-- MODAL DE GERENCIAMENTO DE CHAMADO (STATUS/EXCLUIR) -->
+  <!-- MODAL: GERENCIAR CHAMADO -->
   <div class="modal" id="modal-chamado">
     <div class="modal-box">
       <h2>Gerenciar Chamado</h2>
       <input type="hidden" id="edit-id">
-      
+      <div class="form-group"><label>Cliente</label><input type="text" id="edit-cliente" disabled style="opacity: 0.6;"></div>
       <div class="form-group">
-        <label>Cliente</label>
-        <input type="text" id="edit-cliente" disabled style="opacity: 0.6;">
-      </div>
-      
-      <div class="form-group">
-        <label>Status do Atendimento</label>
+        <label>Status</label>
         <select id="edit-status">
           <option value="Nova chamada">Nova chamada</option>
           <option value="Em andamento">Em andamento</option>
@@ -224,7 +158,6 @@
           <option value="Concluída">Concluída</option>
         </select>
       </div>
-      
       <div class="modal-actions">
         <button class="btn-modal danger" onclick="excluirChamado()">Excluir</button>
         <div style="display: flex; gap: 10px;">
@@ -235,67 +168,33 @@
     </div>
   </div>
 
-  <!-- MODAL DE DOCUMENTO (Laudo ou Briefing) -->
-  <div class="modal" id="modal-laudo">
+  <!-- MODAL: NOVO CHAMADO -->
+  <div class="modal" id="modal-novo">
     <div class="modal-box">
-      <h2 id="modal-laudo-titulo">Gerenciar Documento</h2>
-      <div style="background: rgba(255,255,255,0.02); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px;">
-        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Problema / Descrição:</div>
-        <div id="modal-laudo-desc" style="font-size: 13px; line-height: 1.5;"></div>
-      </div>
-
-      <!-- CAMPOS PARA MANUTENÇÃO -->
-      <div id="campos-manutencao">
+      <h2>Novo Chamado Presencial</h2>
+      <form id="form-novo">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group"><label>Nome do Cliente *</label><input name="nome" required></div>
+          <div class="form-group"><label>Telefone *</label><input name="telefone" required></div>
+        </div>
+        <div class="form-group"><label>E-mail</label><input name="email" type="email"></div>
         <div class="form-group">
-          <label>Diagnóstico Técnico</label>
-          <textarea id="laudo-diag" rows="3" placeholder="Ex: Placa-mãe com curto..."></textarea>
+          <label>Tipo de Serviço</label>
+          <select name="categoria">
+            <option value="Manutenção de Computador">Manutenção de Computador</option>
+            <option value="Assistência para Celular">Assistência para Celular</option>
+            <option value="Suporte Técnico">Suporte Técnico</option>
+            <option value="Criação de Site">Criação de Site</option>
+          </select>
         </div>
-        <div class="form-group">
-          <label>Solução Aplicada</label>
-          <textarea id="laudo-solucao" rows="3" placeholder="Ex: Substituição do capacitor..."></textarea>
+        <div class="form-group"><label>Assunto *</label><input name="titulo" required placeholder="Resuma o problema"></div>
+        <div class="form-group"><label>Descrição *</label><textarea name="descricao" required rows="3"></textarea></div>
+        
+        <div class="modal-actions">
+          <button type="button" class="btn-modal secondary" onclick="fecharModal('modal-novo')">Cancelar</button>
+          <button type="submit" class="btn-modal primary">Criar Chamado</button>
         </div>
-      </div>
-
-      <!-- CAMPOS PARA SITE -->
-      <div id="campos-site" style="display: none;">
-        <div class="form-group">
-          <label>Briefing e Escopo do Projeto</label>
-          <textarea id="proj-escopo" rows="4" placeholder="Descreva o que será feito no site..."></textarea>
-        </div>
-        <div class="form-group">
-          <label>Link do Protótipo / Preview</label>
-          <input type="url" id="proj-link" placeholder="https://preview.exemplo.com">
-        </div>
-      </div>
-      
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-        <div class="form-group">
-          <label>Prazo</label>
-          <input type="text" id="laudo-prazo" placeholder="Ex: 3 dias">
-        </div>
-        <div class="form-group">
-          <label>Valor (R$)</label>
-          <input type="number" id="laudo-valor" step="0.01" placeholder="0.00">
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>Status</label>
-        <select id="laudo-status">
-          <option value="Aguardando aprovação do orçamento">Aguardando aprovação do orçamento</option>
-          <option value="Em andamento">Em andamento</option>
-          <option value="Concluída">Concluída</option>
-        </select>
-      </div>
-
-      <div class="modal-actions" style="flex-direction: column; gap: 10px;">
-        <div style="display: flex; gap: 10px; width: 100%;">
-          <button class="btn-modal primary" style="flex: 1;" onclick="salvarLaudo()">Salvar Documento</button>
-          <a href="#" id="btn-laudo-print" target="_blank" class="btn-modal print" style="flex: 1; display: none;">🖨️ Imprimir / PDF</a>
-        </div>
-        <a href="#" id="btn-laudo-whatsapp" target="_blank" class="btn-modal whatsapp" style="width: 100%; text-align: center; display: none;">Enviar por WhatsApp</a>
-        <button class="btn-modal secondary" style="width: 100%;" onclick="fecharModal('modal-laudo')">Fechar</button>
-      </div>
+      </form>
     </div>
   </div>
 
@@ -303,15 +202,14 @@
   <script src="supabase-config.js"></script>
   <script>
     const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
-    let idAdmin = null, chamados = [], clientes = [], laudoAtual = null, isSiteAtual = false;
+    let idAdmin = null, chamados = [], clientes = [];
 
     async function init() {
       const { data: { session } } = await db.auth.getSession();
       if (!session) { window.location.href = "login.html"; return; }
       idAdmin = session.user.id;
       await carregarDados();
-      mudarAba('inicio');
-      carregarAnotacoes();
+      mudarAba('chamados');
     }
 
     async function carregarDados() {
@@ -319,69 +217,32 @@
       chamados = c || [];
       const { data: cl } = await db.from("usuarios").select("*").eq("is_admin", false);
       clientes = cl || [];
-      renderizarKanban();
       renderizarTabelaChamados();
-      renderizarTabelaLaudos();
       renderizarTabelaClientes();
     }
 
     function mudarAba(aba) {
       document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
       document.getElementById('nav-' + aba).classList.add('active');
-      const title = document.getElementById('page-title');
-      const desc = document.getElementById('page-desc');
       document.querySelectorAll('.tela').forEach(t => t.classList.remove('active'));
       document.getElementById('tela-' + aba).classList.add('active');
-
-      if (aba === 'inicio') { title.textContent = 'Organização'; desc.textContent = 'Gerencie os projetos.'; renderizarKanban(); }
-      if (aba === 'chamados') { title.textContent = 'Chamados'; desc.textContent = 'Todos os pedidos.'; renderizarTabelaChamados(); }
-      if (aba === 'laudos') { title.textContent = 'Laudos e Briefings'; desc.textContent = 'Manutenção e Sites.'; renderizarTabelaLaudos(); }
-      if (aba === 'clientes') { title.textContent = 'Clientes'; desc.textContent = 'Base de dados.'; renderizarTabelaClientes(); }
-    }
-
-    function renderizarKanban() {
-      const novos = chamados.filter(c => c.status === 'Nova chamada').length;
-      const exec = chamados.filter(c => c.status === 'Em andamento').length;
-      const aguard = chamados.filter(c => c.status === 'Aguardando aprovação do orçamento').length;
-      const concl = chamados.filter(c => c.status === 'Concluída').length;
-
-      document.getElementById('sum-novos').textContent = novos;
-      document.getElementById('sum-execucao').textContent = exec;
-      document.getElementById('sum-aguardando').textContent = aguard;
-      document.getElementById('sum-concluidos').textContent = concl;
-
-      const colunas = [
-        { id: 'Nova chamada', title: 'Novos pedidos', color: 'var(--brand)', count: novos },
-        { id: 'Em andamento', title: 'Em execução', color: '#3B82F6', count: exec },
-        { id: 'Aguardando', title: 'Aguardando', color: '#F59E0B', count: aguard },
-        { id: 'Concluída', title: 'Concluídos', color: 'var(--text-muted)', count: concl }
-      ];
-
-      let html = '';
-      colunas.forEach(col => {
-        let filtrados = col.id === 'Aguardando' ? chamados.filter(c => c.status === 'Aguardando aprovação do orçamento') : chamados.filter(c => c.status === col.id);
-        html += `<div class="kanban-col"><div class="kanban-header"><div class="dot" style="background: ${col.color}"></div>${col.title} (${col.count})</div><div class="kanban-cards">`;
-        if (filtrados.length === 0) html += `<div class="empty-col">Nenhum projeto.</div>`;
-        else {
-          filtrados.forEach(c => {
-            const isSite = c.categoria && c.categoria.toLowerCase().includes('site');
-            html += `<div class="kanban-card" onclick="abrirModalChamado('${c.id}')">
-              <div class="k-card-top"><div class="k-icon">${isSite ? '💻' : '🔧'}</div><div class="k-tag">${c.protocolo || 'S/N'}</div></div>
-              <div class="k-title">${c.cliente_nome || 'Visitante'}</div>
-              <div class="k-desc">${c.titulo || 'Sem descrição'}</div>
-            </div>`;
-          });
-        }
-        html += `</div></div>`;
-      });
-      document.getElementById('kanban-board').innerHTML = html;
+      
+      if (aba === 'chamados') {
+        document.getElementById('page-title').textContent = 'Chamados';
+        document.getElementById('page-desc').textContent = 'Gerencie todos os chamados.';
+        document.getElementById('btn-novo-chamado').style.display = 'block';
+      } else if (aba === 'clientes') {
+        document.getElementById('page-title').textContent = 'Clientes';
+        document.getElementById('page-desc').textContent = 'Base de clientes.';
+        document.getElementById('btn-novo-chamado').style.display = 'none';
+      }
     }
 
     function renderizarTabelaChamados() {
       let html = '';
       chamados.forEach(c => {
         html += `<tr>
-          <td>${c.protocolo || 'S/N'}</td>
+          <td>${c.protocolo || 'Gerando...'}</td>
           <td>${c.cliente_nome || 'Visitante'}</td>
           <td>${c.titulo}</td>
           <td><span class="pill">${c.status}</span></td>
@@ -389,24 +250,6 @@
         </tr>`;
       });
       document.getElementById('tabela-chamados-body').innerHTML = html;
-    }
-
-    function renderizarTabelaLaudos() {
-      let html = '';
-      chamados.forEach(c => {
-        const isSite = c.categoria && c.categoria.toLowerCase().includes('site');
-        const temDoc = isSite ? c.detalhes_projeto : c.laudo_tecnico;
-        const statusDoc = temDoc ? "✅ Emitido" : "⏳ Pendente";
-        
-        html += `<tr>
-          <td>${c.protocolo || 'S/N'}</td>
-          <td>${c.cliente_nome || 'Visitante'}</td>
-          <td>${isSite ? 'Site' : 'Manutenção'}</td>
-          <td>${statusDoc}</td>
-          <td><button class="btn-sec" onclick="abrirModalLaudo('${c.id}')">Gerenciar</button></td>
-        </tr>`;
-      });
-      document.getElementById('tabela-laudos-body').innerHTML = html || "<tr><td colspan='5' style='text-align:center;'>Nenhum documento pendente.</td></tr>";
     }
 
     function renderizarTabelaClientes() {
@@ -417,133 +260,81 @@
       document.getElementById('tabela-clientes-body').innerHTML = html;
     }
 
-    function abrirModalChamado(id) {
+    // AÇÕES
+    window.abrirNovoChamado = () => document.getElementById('modal-novo').style.display = 'flex';
+    window.fecharModal = (id) => document.getElementById(id).style.display = 'none';
+
+    window.abrirModalChamado = (id) => {
       const c = chamados.find(x => x.id === id);
       document.getElementById('edit-id').value = c.id;
-      document.getElementById('edit-cliente').value = c.cliente_nome || 'Visitante';
+      document.getElementById('edit-cliente').value = c.cliente_nome;
       document.getElementById('edit-status').value = c.status;
       document.getElementById('modal-chamado').style.display = 'flex';
-    }
+    };
 
-    async function salvarChamado() {
+    window.salvarChamado = async () => {
       const id = document.getElementById('edit-id').value;
       const status = document.getElementById('edit-status').value;
       await db.from("chamados").update({ status }).eq("id", id);
       fecharModal('modal-chamado');
       await carregarDados();
-    }
+    };
 
-    async function excluirChamado() {
+    window.excluirChamado = async () => {
       const id = document.getElementById('edit-id').value;
       if (!confirm("Excluir?")) return;
       await db.from("chamados").delete().eq("id", id);
       fecharModal('modal-chamado');
       await carregarDados();
-    }
+    };
 
-    // ================= MODAL LAUDO / BRIEFING =================
-    function abrirModalLaudo(id) {
-      laudoAtual = chamados.find(x => x.id === id);
-      if (!laudoAtual) return;
-      isSiteAtual = laudoAtual.categoria && laudoAtual.categoria.toLowerCase().includes('site');
+    // NOVO CHAMADO (CRIA CLIENTE E CHAMADO)
+    document.getElementById('form-novo').onsubmit = async (e) => {
+      e.preventDefault();
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.disabled = true; btn.textContent = "Criando...";
+      
+      const formData = new FormData(e.target);
+      const nome = formData.get('nome');
+      const email = formData.get('email');
+      const telefone = formData.get('telefone');
+      const categoria = formData.get('categoria');
+      const titulo = formData.get('titulo');
+      const descricao = formData.get('descricao');
 
-      document.getElementById('modal-laudo-titulo').textContent = isSiteAtual ? 'Briefing do Projeto' : 'Laudo Técnico';
-      document.getElementById('modal-laudo-desc').textContent = laudoAtual.descricao;
+      try {
+        // 1. Cria o Chamado
+        const { data: chamado, error } = await db.from('chamados').insert({
+          cliente_nome: nome,
+          cliente_email: email,
+          cliente_telefone: telefone,
+          categoria: categoria,
+          titulo: titulo,
+          descricao: descricao,
+          status: "Nova chamada"
+        }).select().single();
 
-      document.getElementById('campos-manutencao').style.display = isSiteAtual ? 'none' : 'block';
-      document.getElementById('campos-site').style.display = isSiteAtual ? 'block' : 'none';
+        if (error) throw error;
 
-      if (isSiteAtual) {
-        const p = laudoAtual.detalhes_projeto || {};
-        document.getElementById('proj-escopo').value = p.escopo || '';
-        document.getElementById('proj-link').value = p.link || '';
-        document.getElementById('laudo-prazo').value = p.prazo || '';
-        document.getElementById('laudo-valor').value = p.valor || '';
-      } else {
-        const l = laudoAtual.laudo_tecnico || {};
-        document.getElementById('laudo-diag').value = l.diagnostico || '';
-        document.getElementById('laudo-solucao').value = l.solucao || '';
-        document.getElementById('laudo-prazo').value = l.prazo || '';
-        document.getElementById('laudo-valor').value = l.valor || '';
-      }
-
-      document.getElementById('laudo-status').value = laudoAtual.status;
-      document.getElementById('btn-laudo-whatsapp').style.display = 'none';
-      document.getElementById('btn-laudo-print').style.display = 'none';
-
-      const temDoc = isSiteAtual ? laudoAtual.detalhes_projeto : laudoAtual.laudo_tecnico;
-      if (temDoc) configurarBotoesDocumento();
-
-      document.getElementById('modal-laudo').style.display = 'flex';
-    }
-
-    async function salvarLaudo() {
-      if (!laudoAtual) return;
-      const prazo = document.getElementById('laudo-prazo').value;
-      const valor = document.getElementById('laudo-valor').value;
-      const status = document.getElementById('laudo-status').value;
-      let updateData = { status: status };
-
-      if (isSiteAtual) {
-        updateData.detalhes_projeto = { escopo: document.getElementById('proj-escopo').value, link: document.getElementById('proj-link').value, prazo, valor };
-        laudoAtual.detalhes_projeto = updateData.detalhes_projeto;
-      } else {
-        updateData.laudo_tecnico = { diagnostico: document.getElementById('laudo-diag').value, solucao: document.getElementById('laudo-solucao').value, prazo, valor };
-        laudoAtual.laudo_tecnico = updateData.laudo_tecnico;
-      }
-
-      laudoAtual.status = status;
-      const { error } = await db.from("chamados").update(updateData).eq("id", laudoAtual.id);
-      if (error) return alert("Erro: " + error.message);
-
-      configurarBotoesDocumento();
-      alert("Documento salvo com sucesso!");
-      await carregarDados();
-    }
-
-    function configurarBotoesDocumento() {
-      const btnPrint = document.getElementById('btn-laudo-print');
-      btnPrint.href = `laudo.html?id=${laudoAtual.id}`; 
-      btnPrint.style.display = 'flex';
-
-      const fone = laudoAtual.whatsapp || laudoAtual.cliente_telefone;
-      if (fone) {
-        const numLimpo = fone.replace(/\D/g, '');
-        let msg = "";
-        if (isSiteAtual) {
-          const p = laudoAtual.detalhes_projeto || {};
-          msg = `Olá, ${laudoAtual.cliente_nome}! Segue a atualização do seu projeto ${laudoAtual.protocolo}:\n\n*Escopo:* ${p.escopo}\n*Preview:* ${p.link}\n*Prazo:* ${p.prazo}\n*Valor:* R$ ${p.valor}`;
-        } else {
-          const l = laudoAtual.laudo_tecnico || {};
-          msg = `Olá, ${laudoAtual.cliente_nome}! Segue o laudo do seu chamado ${laudoAtual.protocolo}:\n\n*Diagnóstico:* ${l.diagnostico}\n*Solução:* ${l.solucao}\n*Prazo:* ${l.prazo}\n*Valor:* R$ ${l.valor}`;
+        // 2. Tenta salvar o cliente na tabela de usuários (se não existir)
+        if (email) {
+          const { data: existe } = await db.from('usuarios').select('id').eq('email', email).maybeSingle();
+          if (!existe) {
+            await db.from('usuarios').insert({ nome, email, telefone, is_admin: false });
+          }
         }
-        const btnWpp = document.getElementById('btn-laudo-whatsapp');
-        btnWpp.href = `https://wa.me/55${numLimpo}?text=${encodeURIComponent(msg)}`;
-        btnWpp.style.display = 'block';
+
+        alert(`Chamado criado! Protocolo: ${chamado.protocolo}`);
+        fecharModal('modal-novo');
+        e.target.reset();
+        await carregarDados();
+
+      } catch (err) {
+        alert("Erro: " + err.message);
+      } finally {
+        btn.disabled = false; btn.textContent = "Criar Chamado";
       }
-    }
-
-    // ================= ANOTAÇÕES =================
-    async function salvarAnotacao() {
-      const texto = document.getElementById('note-text').value.trim();
-      if (!texto) return;
-      await db.from('anotacoes').insert({ admin_id: idAdmin, texto });
-      document.getElementById('note-text').value = '';
-      carregarAnotacoes();
-    }
-
-    async function carregarAnotacoes() {
-      const { data } = await db.from('anotacoes').select('*').order('criado_em', { ascending: false });
-      document.getElementById('notes-list').innerHTML = data.length ? data.map(n => `<div class="note-item"><div class="note-text">${n.texto}</div><button class="btn-del-note" onclick="excluirAnotacao('${n.id}')">🗑️</button></div>`).join('') : '<p style="font-size:12px; color:#6B7280;">Nenhuma anotação.</p>';
-    }
-
-    async function excluirAnotacao(id) {
-      if (!confirm("Apagar?")) return;
-      await db.from('anotacoes').delete().eq('id', id);
-      carregarAnotacoes();
-    }
-
-    function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
+    };
 
     init();
   </script>
