@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#F8F9FA">
 <title>Manutenção preventiva e detectiva — TechEmpire</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,15 +32,15 @@
     <p class="sub">Arraste o computador para girar. Clique nos pontos verdes ou escolha um componente na lista.</p>
   </div>
   
-  <div class="lab">
-    <!-- Div do visualizador 3D -->
-    <div class="stage" id="stage" role="img" aria-label="Computador em 3D que pode ser girado com o mouse ou o dedo">
-      <span class="hint">↔ Arraste para girar</span>
+  <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px;">
+    <!-- Div do visualizador 3D com altura e fundo forçados -->
+    <div id="stage" style="position: relative; height: 500px; background: #F3F4F6; border-radius: 24px; border: 1px solid #E5E7EB; overflow: hidden;">
+      <span style="position: absolute; left: 16px; bottom: 14px; font-size: 13px; color: #6B7280; background: rgba(255,255,255,0.8); padding: 6px 12px; border-radius: 99px; pointer-events: none;">↔ Arraste para girar</span>
     </div>
     
     <div>
       <div class="parts" id="parts"></div>
-      <div class="box info" id="info"></div>
+      <div class="box info" id="info" style="background: #fff; border-radius: 16px; padding: 20px;"></div>
     </div>
   </div>
 </section>
@@ -49,17 +48,8 @@
 <section class="sec reveal">
   <div class="sec-h"><span class="badge">Entenda a diferença</span><h2>Duas formas de cuidar do seu equipamento.</h2></div>
   <div class="cards">
-    <div class="card"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div><h3>Preventiva</h3><p>Ações programadas para evitar que o problema surja: limpeza de poeira, troca de pasta térmica, atualizações, backup e conferência de cabos e conexões.</p></div>
+    <div class="card"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div><h3>Preventiva</h3><p>Ações programadas para evitar que o problema surja: limpeza de poeira, troca de pasta térmica, atualizações, backup e conferência de cabos.</p></div>
     <div class="card"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v3l2 1"/></svg></div><h3>Detectiva</h3><p>Inspeções e testes que descobrem falhas escondidas ou em início: temperatura sob carga, saúde do disco, teste de memória e medição da fonte.</p></div>
-  </div>
-</section>
-
-<section class="sec reveal">
-  <div class="sec-h"><span class="badge">Quando fazer</span><h2>Uma rotina simples.</h2><p class="sub">Referências gerais. O intervalo ideal depende do ambiente e do uso do equipamento.</p></div>
-  <div class="when">
-    <div class="card"><b>Todo mês</b><p>Backup dos arquivos importantes e atualizações do sistema e dos drivers.</p></div>
-    <div class="card"><b>3 a 6 meses</b><p>Limpeza da poeira, conferência das ventoinhas e dos filtros de ar.</p></div>
-    <div class="card"><b>1 a 2 anos</b><p>Troca da pasta térmica e revisão geral com testes de memória, disco e fonte.</p></div>
   </div>
 </section>
 
@@ -71,16 +61,11 @@
 
 <footer id="site-footer"></footer>
 
-<!-- Bibliotecas Base -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="supabase-config.js"></script>
 <script src="data.js"></script>
 <script src="script.js"></script>
-
-<!-- Biblioteca Three.js (Para o 3D) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-<!-- Arquivo com a lógica do 3D -->
 <script src="manutencao.js"></script>
 </body>
 </html>
