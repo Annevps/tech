@@ -34,19 +34,19 @@ Pages.manutencao = () => {
   const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(35, 1, .1, 100); 
   cam.position.set(0, .5, 15);
 
-  // Iluminação para dar realismo
-  scene.add(new THREE.AmbientLight(0xffffff, .4)); 
-  const dl = new THREE.DirectionalLight(0xffffff, 1.5); dl.position.set(5, 10, 7); scene.add(dl);
-  const pl = new THREE.PointLight(0x00DDB5, 2, 20); pl.position.set(-3, 2, 5); scene.add(pl); // Luz Turquesa
+  // Iluminação para fundo claro
+  scene.add(new THREE.AmbientLight(0xffffff, .8)); 
+  const dl = new THREE.DirectionalLight(0xffffff, 1.2); dl.position.set(5, 10, 7); scene.add(dl);
+  const pl = new THREE.PointLight(0x8fd21f, 2, 20); pl.position.set(-3, 2, 5); scene.add(pl);
 
   const pc = new THREE.Group(); scene.add(pc); 
   const hit = [], porParte = {}, fans = [];
 
-  // Materiais Premium
+  // Materiais
   const matMetal = new THREE.MeshStandardMaterial({ color: 0x2a2d30, roughness: .4, metalness: .8 });
   const matDark = new THREE.MeshStandardMaterial({ color: 0x121518, roughness: .6, metalness: .5 });
   const matGlass = new THREE.MeshPhysicalMaterial({ color: 0xffffff, transparent: true, opacity: 0.05, roughness: 0.1, metalness: 0.1, clearcoat: 1, side: THREE.DoubleSide });
-  const matGreen = new THREE.MeshStandardMaterial({ color: 0x00DDB5, emissive: 0x00DDB5, emissiveIntensity: 0.6 });
+  const matGreen = new THREE.MeshStandardMaterial({ color: 0x8fd21f, emissive: 0x8fd21f, emissiveIntensity: 0.6 });
 
   const caixa = (w, h, d, mat, x, y, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); return m; };
   
@@ -72,20 +72,20 @@ Pages.manutencao = () => {
 
   const W = 2.8, H = 5.4, D = 5.2;
 
-  // Gabinete Translúcido (Vidro Temperado)
-  pc.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(W, H, D)), new THREE.LineBasicMaterial({ color: 0x00DDB5, transparent: true, opacity: .4 })));
+  // Gabinete
+  pc.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(W, H, D)), new THREE.LineBasicMaterial({ color: 0x8fd21f, transparent: true, opacity: .6 })));
   pc.add(new THREE.Mesh(new THREE.BoxGeometry(W, H, D), matGlass));
   
   // Placa-mãe
   pc.add(caixa(.1, 4.6, 4.4, matDark, -1.3, .2, .2));
 
-  // CPU e Watercooler
+  // CPU
   const cpuG = new THREE.Group(); 
   cpuG.add(caixa(.7, 1.1, 1.1, matMetal, -.9, 1.3, .3)); 
   const wf = fan(.5, true); wf.position.set(-.5, 1.3, .3); cpuG.add(wf);
   marcar("cpu", cpuG);
 
-  // RAM (com LEDs)
+  // RAM
   const ramG = new THREE.Group(); 
   [-1.1, -1.5, -1.9].forEach(z => { 
     ramG.add(caixa(.15, 1.1, .2, matDark, -1.1, 1.4, z)); 
@@ -93,18 +93,18 @@ Pages.manutencao = () => {
   }); 
   marcar("ram", ramG);
 
-  // Placa de Vídeo (GPU)
+  // GPU
   const gpuG = new THREE.Group(); 
   gpuG.add(caixa(.8, .7, 3.8, matMetal, -.9, -.7, .3)); 
   [-.7, 1.1].forEach(z => { const f = fan(.55, true); f.position.set(-.5, -.7, z); gpuG.add(f); }); 
   marcar("gpu", gpuG);
 
-  // Ventoinhas do gabinete (Frontal)
+  // Fans do Gabinete
   const fanG = new THREE.Group(); 
   [[1.3, 2.6], [-.7, 2.6], [1.3, 0.8]].forEach(([y, z]) => { const f = fan(1.0, false); f.position.set(.3, y, z); fanG.add(f); }); 
   marcar("fans", fanG);
 
-  // Fonte (PSU)
+  // Fonte
   marcar("psu", caixa(2.4, 1.1, 2.8, matDark, 0, -2.4, -.9));
 
   // SSD
