@@ -3,163 +3,88 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TechEmpire — Tecnologia que funciona.</title>
+<title>Tecnologia que funciona — TechEmpire</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #F8F9FA; --s1: #FFFFFF; --s2: #F3F4F6;
-    --line: #E5E7EB; --line2: #D1D5DB;
-    --ink: #1F2937; --muted: #6B7280;
-    --lime: #8fd21f; --lime2: #7ab81a;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); line-height: 1.6; overflow-x: hidden; }
-  a { text-decoration: none; color: inherit; }
-  
-  header { background: rgba(248,249,250,0.85); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50; }
-  .bar-in { max-width: 1160px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
-  .logo img { height: 60px; width: auto; object-fit: contain; }
-  nav { display: flex; align-items: center; gap: 8px; }
-  nav a { padding: 8px 14px; border-radius: 99px; font-weight: 500; font-size: 15px; color: var(--muted); transition: 0.3s; }
-  nav a:hover { color: var(--ink); background: var(--line); }
-  .btn-nav { border: 1px solid var(--line2); padding: 8px 16px; border-radius: 99px; font-weight: 600; font-size: 14px; }
-  .btn-nav.primary { background: var(--lime); border-color: var(--lime); color: #fff; }
-
-  .hero { max-width: 1160px; margin: 0 auto; padding: 80px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
-  .badge { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(143, 210, 31, 0.4); background: rgba(143, 210, 31, 0.15); color: #5c8a10; border-radius: 99px; padding: 6px 14px; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 20px; }
-  .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--lime); }
-  h1 { font-family: 'Space Grotesk', sans-serif; font-size: 64px; line-height: 1.05; font-weight: 700; margin-bottom: 24px; letter-spacing: -2px; }
-  h1 em { font-style: normal; color: var(--lime); }
-  .lead { color: var(--muted); font-size: 18px; max-width: 500px; margin-bottom: 32px; }
-  .btn-group { display: flex; gap: 12px; }
-  .btn { padding: 14px 28px; border-radius: 99px; font-weight: 600; font-size: 16px; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; }
-  .btn.primary { background: var(--lime); color: #fff; box-shadow: 0 4px 15px rgba(143, 210, 31, 0.4); }
-  .btn.primary:hover { background: var(--lime2); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(143, 210, 31, 0.5); }
-  .btn.secondary { background: var(--s1); border: 1px solid var(--line2); color: var(--ink); }
-  .btn.secondary:hover { background: var(--s2); transform: translateY(-3px); }
-  
-  .mock { background: var(--s1); border: 1px solid var(--line2); border-radius: 24px; padding: 24px; box-shadow: 0 20px 40px -20px rgba(0,0,0,0.1); transition: transform 0.4s; }
-  .mock:hover { transform: translateY(-5px); }
-  .mock .top { display: flex; gap: 6px; margin-bottom: 20px; }
-  .mock .top i { width: 10px; height: 10px; border-radius: 50%; background: var(--line2); }
-  .mock .ex { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 16px; letter-spacing: 1px; }
-  .mock .st { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 12px; background: var(--s2); margin-bottom: 8px; font-size: 14px; transition: 0.3s; }
-  .mock .st:hover { transform: translateX(5px); }
-  .mock .st b { margin-left: auto; color: var(--lime); font-size: 12px; }
-  .mock .st.on { border: 1px solid var(--lime); background: #fff; }
-  .mock .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line2); }
-  .mock .on .dot { background: var(--lime); animation: pulse 1.5s infinite; }
-  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(143, 210, 31, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(143, 210, 31, 0); } 100% { box-shadow: 0 0 0 0 rgba(143, 210, 31, 0); } }
-
-  .sec { max-width: 1160px; margin: 80px auto; padding: 0 24px; }
-  .sec-h { margin-bottom: 40px; }
-  h2 { font-family: 'Space Grotesk', sans-serif; font-size: 36px; font-weight: 700; margin-bottom: 12px; }
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
-  .card { background: var(--s1); border: 1px solid var(--line); border-radius: 20px; padding: 32px; transition: 0.3s; }
-  .card:hover { border-color: var(--lime); transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.08); }
-  
-  /* ÍCONES SVG NO LUGAR DOS EMOJIS */
-  .ic { width: 48px; height: 48px; border-radius: 12px; background: rgba(143, 210, 31, 0.1); color: var(--lime2); display: grid; place-items: center; margin-bottom: 20px; transition: 0.3s; }
-  .ic svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-  .card:hover .ic { background: var(--lime); color: #fff; transform: scale(1.1); }
-  
-  .card h3 { font-family: 'Space Grotesk'; font-size: 20px; margin-bottom: 8px; }
-  .card p { color: var(--muted); font-size: 15px; }
-
-  footer { border-top: 1px solid var(--line); background: var(--s1); padding: 60px 24px 30px; text-align: center; }
-  footer img { height: 60px; margin-bottom: 20px; transition: 0.3s; }
-  footer img:hover { transform: scale(1.1); }
-  footer p { color: var(--muted); font-size: 14px; }
-
-  @media (max-width: 860px) { .hero { grid-template-columns: 1fr; text-align: center; } h1 { font-size: 48px; } .lead { margin: 0 auto 32px; } .btn-group { justify-content: center; } nav { display: none; } }
-</style>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-page="home" data-auth="public">
 
-  <header>
-    <div class="bar-in">
-      <a href="index.html" class="logo"><img src="tech.png" alt="TechEmpire"></a>
-      <nav>
-        <a href="index.html" style="color: var(--ink); font-weight: 600;">Início</a>
-        <a href="servicos.html">Serviços</a>
-        <a href="manutencao.html">Manutenção</a>
-        <a href="sobre.html">Sobre</a>
-        <a href="contato.html">Contato</a>
-        <a href="consulta.html" style="color: var(--lime2); font-weight: 600;">Acompanhar</a>
-        <a href="login.html" class="btn-nav">Entrar</a>
-        <a href="criar-conta.html" class="btn-nav primary">Criar conta</a>
-      </nav>
+<!-- O menu será injetado pelo script.js -->
+<header id="site-header"></header>
+
+<main class="wrap-main">
+  <!-- HERO -->
+  <section class="hero">
+    <div>
+      <span class="badge">Empresa júnior de TI</span>
+      <h1>Tecnologia que <em>funciona.</em></h1>
+      <p class="lead">Manutenção de computadores, suporte técnico e criação de sites com preço justo. Abra um chamado, converse com a gente pelo site e acompanhe cada etapa.</p>
+      <div class="row" style="margin-top:30px">
+        <a class="btn primary" href="criar-conta.html">Criar minha conta →</a>
+        <a class="btn" href="servicos.html">Ver serviços</a>
+      </div>
     </div>
-  </header>
+    <div class="mock" aria-hidden="true">
+      <div class="top"><i></i><i></i><i></i></div>
+      <div class="ex">Exemplo ilustrativo de acompanhamento</div>
+      <div class="st"><span class="dot"></span>Chamado recebido<b>✓</b></div>
+      <div class="st"><span class="dot"></span>Diagnóstico e orçamento<b>✓</b></div>
+      <div class="st on"><span class="dot"></span>Em andamento<b>agora</b></div>
+      <div class="st"><span class="dot"></span>Concluído</div>
+    </div>
+  </section>
 
-  <main>
-    <section class="hero">
-      <div>
-        <span class="badge">Empresa júnior de TI</span>
-        <h1>Tecnologia que <br><em>funciona.</em></h1>
-        <p class="lead">Manutenção de computadores, suporte técnico e criação de sites com preço justo. Abra um chamado, converse com a gente pelo site e acompanhe cada etapa.</p>
-        <div class="btn-group">
-          <a href="criar-conta.html" class="btn primary">Criar minha conta →</a>
-          <a href="servicos.html" class="btn secondary">Ver serviços</a>
-        </div>
+  <!-- FAIXA ROLANDO -->
+  <div class="mark" aria-hidden="true">
+    <div>
+      <span>Manutenção de PC</span><span>Celulares</span><span>Suporte técnico</span><span>Criação de sites</span><span>Manutenção preventiva</span>
+      <span>Manutenção de PC</span><span>Celulares</span><span>Suporte técnico</span><span>Criação de sites</span><span>Manutenção preventiva</span>
+    </div>
+  </div>
+
+  <!-- SERVIÇOS -->
+  <section class="sec reveal">
+    <div class="sec-h"><span class="badge">Serviços</span><h2>Tudo o que sua tecnologia precisa.</h2></div>
+    <div class="bento" id="cards-servicos"></div>
+  </section>
+
+  <!-- COMO FUNCIONA -->
+  <section class="sec reveal">
+    <div class="sec-h"><span class="badge">Como funciona</span><h2>Do problema à solução, sem complicação.</h2></div>
+    <div class="steps">
+      <div class="card"><h3>Crie sua conta</h3><p>Cadastro rápido e seguro, com seus dados protegidos.</p></div>
+      <div class="card"><h3>Abra um chamado</h3><p>Descreva o problema ou o site que quer, com fotos se precisar.</p></div>
+      <div class="card"><h3>Converse com a gente</h3><p>Tire dúvidas pelo chat do site e aprove o orçamento.</p></div>
+      <div class="card"><h3>Acompanhe</h3><p>Veja o status, a solução e os vídeos do serviço no seu painel.</p></div>
+    </div>
+  </section>
+
+  <!-- BANNER PC 3D -->
+  <section class="sec reveal">
+    <div class="card" style="display:flex;gap:24px;align-items:center;justify-content:space-between;flex-wrap:wrap">
+      <div style="max-width:620px">
+        <span class="badge">Novo</span>
+        <h2>Evite o defeito antes que ele aconteça.</h2>
+        <p>Explore um computador em 3D e veja o que a manutenção preventiva e a detectiva fazem em cada componente.</p>
       </div>
-      <div>
-        <div class="mock">
-          <div class="top"><i></i><i></i><i></i></div>
-          <div class="ex">Exemplo ilustrativo de acompanhamento</div>
-          <div class="st"><span class="dot"></span>Chamado recebido<b>✓</b></div>
-          <div class="st"><span class="dot"></span>Diagnóstico e orçamento<b>✓</b></div>
-          <div class="st on"><span class="dot"></span>Em andamento<b>agora</b></div>
-          <div class="st"><span class="dot"></span>Concluído</div>
-        </div>
-      </div>
-    </section>
+      <a class="btn primary" href="manutencao.html">Explorar o PC em 3D →</a>
+    </div>
+  </section>
 
-    <section class="sec">
-      <div class="sec-h"><span class="badge">Serviços</span><h2>Tudo o que sua tecnologia precisa.</h2></div>
-      <div class="cards" id="cards-servicos"></div>
-    </section>
-  </main>
+  <!-- CTA FINAL -->
+  <div class="cta reveal">
+    <div><h2>Pronto para resolver?</h2><p>Crie sua conta e abra seu primeiro chamado em poucos minutos.</p></div>
+    <a class="btn" href="criar-conta.html">Começar agora →</a>
+  </div>
+</main>
 
-  <footer>
-    <img src="tech.png" alt="TechEmpire">
-    <p>© 2026 TechEmpire. Todos os direitos reservados.</p>
-    <p style="margin-top: 8px; font-size: 12px; opacity: 0.7;">Seus dados são tratados conforme a LGPD.</p>
-  </footer>
+<footer id="site-footer"></footer>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Cards de Serviço com Ícones SVG (Sem Emojis)
-      const servicos = [
-        { 
-          svg: '<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>', 
-          titulo: 'Manutenção de Computadores', 
-          texto: 'Formatação, limpeza, troca de peças, remoção de vírus e upgrades de desempenho.' 
-        },
-        { 
-          svg: '<svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>', 
-          titulo: 'Suporte Técnico', 
-          texto: 'Ajuda com redes, impressoras, e-mail, backup e configuração de equipamentos.' 
-        },
-        { 
-          svg: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg>', 
-          titulo: 'Criação de Sites', 
-          texto: 'Institucional, portfólio, loja virtual e landing page, com orçamento sob medida.' 
-        }
-      ];
-      
-      const container = document.getElementById('cards-servicos');
-      if (container) {
-        container.innerHTML = servicos.map(s => `
-          <div class="card">
-            <div class="ic">${s.svg}</div>
-            <h3>${s.titulo}</h3>
-            <p>${s.texto}</p>
-          </div>
-        `).join('');
-      }
-    });
-  </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="supabase-config.js"></script>
+<script src="data.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
