@@ -6,7 +6,7 @@
 <title>Painel Administrativo — TechEmpire</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* ================= TEMA CLARO ================= */
+  /* TEMA CLARO */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --bg: #F8F9FA; --s1: #FFFFFF; --s2: #F3F4F6;
@@ -17,31 +17,22 @@
   a { text-decoration: none; color: inherit; }
   button { cursor: pointer; font-family: inherit; border: none; background: none; }
   
-  /* SIDEBAR */
   .sidebar { width: 240px; background: var(--s1); border-right: 1px solid var(--border); padding: 24px; display: flex; flex-direction: column; flex-shrink: 0; }
   .logo { display: flex; align-items: center; gap: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 40px; color: var(--text-main); }
   .logo i { background: var(--brand); color: #fff; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; font-style: normal; font-weight: 800; }
   .logo b { color: var(--text-main); }
-  
   .sidebar nav { display: flex; flex-direction: column; gap: 4px; }
   .sidebar a { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px; font-weight: 500; color: var(--text-muted); transition: 0.2s; font-size: 14px; cursor: pointer; }
   .sidebar a:hover, .sidebar a.active { background: rgba(143, 210, 31, 0.1); color: var(--brand-dark); }
   .sidebar .sair { margin-top: auto; color: var(--err); }
 
-  .card-footer-logo { margin-top: 20px; background: var(--s2); padding: 16px; border-radius: 12px; border: 1px solid var(--border); font-size: 12px; color: var(--text-muted); }
-  .card-footer-logo b { color: var(--text-main); display: block; font-size: 14px; margin-bottom: 4px; }
-
-  /* MAIN */
   .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
   .topbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 32px; border-bottom: 1px solid var(--border); background: var(--s1); }
   .search-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; width: 350px; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
   .search-box input { background: none; border: none; outline: none; color: var(--text-main); width: 100%; font-size: 13px; }
   .user-info { display: flex; align-items: center; gap: 20px; }
-  .notif-icon { position: relative; font-size: 20px; color: var(--text-muted); cursor: pointer; }
-  .user-block { display: flex; align-items: center; gap: 12px; }
   .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--s2); display: grid; place-items: center; border: 1px solid var(--border); }
 
-  /* CONTEÚDO */
   .content-area { flex: 1; display: grid; grid-template-columns: 1fr 340px; overflow: hidden; }
   .main-content { padding: 32px; overflow-y: auto; display: flex; flex-direction: column; }
   .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
@@ -80,7 +71,6 @@
   .kanban-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; font-size: 13px; font-weight: 600; color: var(--text-main); }
   .kanban-header .dot { width: 8px; height: 8px; border-radius: 50%; }
   .kanban-header .count { color: var(--text-muted); }
-  
   .kanban-cards { display: flex; flex-direction: column; gap: 12px; }
   .kanban-card { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; cursor: pointer; transition: 0.2s; }
   .kanban-card:hover { border-color: var(--brand); }
@@ -89,9 +79,6 @@
   .k-tag { font-size: 10px; color: var(--text-muted); font-family: monospace; }
   .k-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
   .k-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
-  .k-card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 12px; }
-  .k-date { font-size: 11px; color: var(--text-muted); }
-  .k-pill { font-size: 10px; font-weight: 600; padding: 4px 8px; border-radius: 4px; background: rgba(143, 210, 31, 0.15); color: var(--brand-dark); }
   .empty-col { border: 1px dashed var(--border); border-radius: 12px; padding: 40px 20px; text-align: center; color: var(--text-muted); font-size: 12px; }
 
   /* ANOTAÇÕES */
@@ -118,6 +105,8 @@
   .btn-modal.primary { background: var(--brand); color: #fff; }
   .btn-modal.danger { background: var(--err); color: #fff; }
   .btn-modal.secondary { background: var(--s1); border: 1px solid var(--border); color: var(--text-main); }
+  .btn-modal.whatsapp { background: #25D366; color: #fff; }
+  .btn-modal.print { background: #333; color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
   @media (max-width: 1000px) { .content-area { grid-template-columns: 1fr; } .sidebar-notes { display: none; } }
 </style>
@@ -183,7 +172,7 @@
         <div id="tela-laudos" class="tela">
           <div class="table-box">
             <table>
-              <thead><tr><th>Protocolo</th><th>Cliente</th><th>Tipo</th><th>Ação</th></tr></thead>
+              <thead><tr><th>Protocolo</th><th>Cliente</th><th>Tipo</th><th>Status do Doc</th><th>Ação</th></tr></thead>
               <tbody id="tabela-laudos-body"></tbody>
             </table>
           </div>
@@ -193,7 +182,7 @@
         <div id="tela-clientes" class="tela">
           <div class="table-box">
             <table>
-              <thead><tr><th>Nome</th><th>E-mail</th><th>Telefone</th></tr></thead>
+              <thead><tr><th>Nome</th><th>E-mail</th><th>Telefone</th><th>Data de Cadastro</th></tr></thead>
               <tbody id="tabela-clientes-body"></tbody>
             </table>
           </div>
@@ -215,13 +204,17 @@
     </div>
   </div>
 
-  <!-- MODAL DE GERENCIAMENTO -->
+  <!-- MODAL DE GERENCIAMENTO DE CHAMADO (STATUS/EXCLUIR) -->
   <div class="modal" id="modal-chamado">
     <div class="modal-box">
       <h2>Gerenciar Chamado</h2>
       <input type="hidden" id="edit-id">
-      <div class="form-group"><label>Cliente</label><input type="text" id="edit-cliente" disabled style="opacity: 0.6;"></div>
-      <div class="form-group"><label>E-mail</label><input type="email" id="edit-email" disabled style="opacity: 0.6;"></div>
+      
+      <div class="form-group">
+        <label>Cliente</label>
+        <input type="text" id="edit-cliente" disabled style="opacity: 0.6;">
+      </div>
+      
       <div class="form-group">
         <label>Status do Atendimento</label>
         <select id="edit-status">
@@ -231,6 +224,7 @@
           <option value="Concluída">Concluída</option>
         </select>
       </div>
+      
       <div class="modal-actions">
         <button class="btn-modal danger" onclick="excluirChamado()">Excluir</button>
         <div style="display: flex; gap: 10px;">
@@ -241,11 +235,75 @@
     </div>
   </div>
 
+  <!-- MODAL DE DOCUMENTO (Laudo ou Briefing) -->
+  <div class="modal" id="modal-laudo">
+    <div class="modal-box">
+      <h2 id="modal-laudo-titulo">Gerenciar Documento</h2>
+      <div style="background: rgba(255,255,255,0.02); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px;">
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Problema / Descrição:</div>
+        <div id="modal-laudo-desc" style="font-size: 13px; line-height: 1.5;"></div>
+      </div>
+
+      <!-- CAMPOS PARA MANUTENÇÃO -->
+      <div id="campos-manutencao">
+        <div class="form-group">
+          <label>Diagnóstico Técnico</label>
+          <textarea id="laudo-diag" rows="3" placeholder="Ex: Placa-mãe com curto..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Solução Aplicada</label>
+          <textarea id="laudo-solucao" rows="3" placeholder="Ex: Substituição do capacitor..."></textarea>
+        </div>
+      </div>
+
+      <!-- CAMPOS PARA SITE -->
+      <div id="campos-site" style="display: none;">
+        <div class="form-group">
+          <label>Briefing e Escopo do Projeto</label>
+          <textarea id="proj-escopo" rows="4" placeholder="Descreva o que será feito no site..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Link do Protótipo / Preview</label>
+          <input type="url" id="proj-link" placeholder="https://preview.exemplo.com">
+        </div>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="form-group">
+          <label>Prazo</label>
+          <input type="text" id="laudo-prazo" placeholder="Ex: 3 dias">
+        </div>
+        <div class="form-group">
+          <label>Valor (R$)</label>
+          <input type="number" id="laudo-valor" step="0.01" placeholder="0.00">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Status</label>
+        <select id="laudo-status">
+          <option value="Aguardando aprovação do orçamento">Aguardando aprovação do orçamento</option>
+          <option value="Em andamento">Em andamento</option>
+          <option value="Concluída">Concluída</option>
+        </select>
+      </div>
+
+      <div class="modal-actions" style="flex-direction: column; gap: 10px;">
+        <div style="display: flex; gap: 10px; width: 100%;">
+          <button class="btn-modal primary" style="flex: 1;" onclick="salvarLaudo()">Salvar Documento</button>
+          <a href="#" id="btn-laudo-print" target="_blank" class="btn-modal print" style="flex: 1; display: none;">🖨️ Imprimir / PDF</a>
+        </div>
+        <a href="#" id="btn-laudo-whatsapp" target="_blank" class="btn-modal whatsapp" style="width: 100%; text-align: center; display: none;">Enviar por WhatsApp</a>
+        <button class="btn-modal secondary" style="width: 100%;" onclick="fecharModal('modal-laudo')">Fechar</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script>
     const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
-    let idAdmin = null, chamados = [], clientes = [];
+    let idAdmin = null, chamados = [], clientes = [], laudoAtual = null, isSiteAtual = false;
 
     async function init() {
       const { data: { session } } = await db.auth.getSession();
@@ -253,6 +311,7 @@
       idAdmin = session.user.id;
       await carregarDados();
       mudarAba('inicio');
+      carregarAnotacoes();
     }
 
     async function carregarDados() {
@@ -276,7 +335,7 @@
 
       if (aba === 'inicio') { title.textContent = 'Organização'; desc.textContent = 'Gerencie os projetos.'; renderizarKanban(); }
       if (aba === 'chamados') { title.textContent = 'Chamados'; desc.textContent = 'Todos os pedidos.'; renderizarTabelaChamados(); }
-      if (aba === 'laudos') { title.textContent = 'Laudos'; desc.textContent = 'Manutenção e Sites.'; renderizarTabelaLaudos(); }
+      if (aba === 'laudos') { title.textContent = 'Laudos e Briefings'; desc.textContent = 'Manutenção e Sites.'; renderizarTabelaLaudos(); }
       if (aba === 'clientes') { title.textContent = 'Clientes'; desc.textContent = 'Base de dados.'; renderizarTabelaClientes(); }
     }
 
@@ -337,20 +396,23 @@
       chamados.forEach(c => {
         const isSite = c.categoria && c.categoria.toLowerCase().includes('site');
         const temDoc = isSite ? c.detalhes_projeto : c.laudo_tecnico;
+        const statusDoc = temDoc ? "✅ Emitido" : "⏳ Pendente";
+        
         html += `<tr>
           <td>${c.protocolo || 'S/N'}</td>
           <td>${c.cliente_nome || 'Visitante'}</td>
           <td>${isSite ? 'Site' : 'Manutenção'}</td>
-          <td>${temDoc ? "✅ Emitido" : "⏳ Pendente"} <a href="laudo.html?id=${c.id}" target="_blank" class="btn-sec" style="float:right">Abrir PDF</a></td>
+          <td>${statusDoc}</td>
+          <td><button class="btn-sec" onclick="abrirModalLaudo('${c.id}')">Gerenciar</button></td>
         </tr>`;
       });
-      document.getElementById('tabela-laudos-body').innerHTML = html;
+      document.getElementById('tabela-laudos-body').innerHTML = html || "<tr><td colspan='5' style='text-align:center;'>Nenhum documento pendente.</td></tr>";
     }
 
     function renderizarTabelaClientes() {
       let html = '';
       clientes.forEach(c => {
-        html += `<tr><td>${c.nome}</td><td>${c.email}</td><td>${c.telefone || '—'}</td></tr>`;
+        html += `<tr><td>${c.nome}</td><td>${c.email}</td><td>${c.telefone || '—'}</td><td>${new Date(c.criado_em || Date.now()).toLocaleDateString('pt-BR')}</td></tr>`;
       });
       document.getElementById('tabela-clientes-body').innerHTML = html;
     }
@@ -359,15 +421,14 @@
       const c = chamados.find(x => x.id === id);
       document.getElementById('edit-id').value = c.id;
       document.getElementById('edit-cliente').value = c.cliente_nome || 'Visitante';
-      document.getElementById('edit-email').value = c.cliente_email || '—';
       document.getElementById('edit-status').value = c.status;
       document.getElementById('modal-chamado').style.display = 'flex';
     }
 
     async function salvarChamado() {
       const id = document.getElementById('edit-id').value;
-      const novoStatus = document.getElementById('edit-status').value;
-      await db.from("chamados").update({ status: novoStatus }).eq("id", id);
+      const status = document.getElementById('edit-status').value;
+      await db.from("chamados").update({ status }).eq("id", id);
       fecharModal('modal-chamado');
       await carregarDados();
     }
@@ -380,6 +441,89 @@
       await carregarDados();
     }
 
+    // ================= MODAL LAUDO / BRIEFING =================
+    function abrirModalLaudo(id) {
+      laudoAtual = chamados.find(x => x.id === id);
+      if (!laudoAtual) return;
+      isSiteAtual = laudoAtual.categoria && laudoAtual.categoria.toLowerCase().includes('site');
+
+      document.getElementById('modal-laudo-titulo').textContent = isSiteAtual ? 'Briefing do Projeto' : 'Laudo Técnico';
+      document.getElementById('modal-laudo-desc').textContent = laudoAtual.descricao;
+
+      document.getElementById('campos-manutencao').style.display = isSiteAtual ? 'none' : 'block';
+      document.getElementById('campos-site').style.display = isSiteAtual ? 'block' : 'none';
+
+      if (isSiteAtual) {
+        const p = laudoAtual.detalhes_projeto || {};
+        document.getElementById('proj-escopo').value = p.escopo || '';
+        document.getElementById('proj-link').value = p.link || '';
+        document.getElementById('laudo-prazo').value = p.prazo || '';
+        document.getElementById('laudo-valor').value = p.valor || '';
+      } else {
+        const l = laudoAtual.laudo_tecnico || {};
+        document.getElementById('laudo-diag').value = l.diagnostico || '';
+        document.getElementById('laudo-solucao').value = l.solucao || '';
+        document.getElementById('laudo-prazo').value = l.prazo || '';
+        document.getElementById('laudo-valor').value = l.valor || '';
+      }
+
+      document.getElementById('laudo-status').value = laudoAtual.status;
+      document.getElementById('btn-laudo-whatsapp').style.display = 'none';
+      document.getElementById('btn-laudo-print').style.display = 'none';
+
+      const temDoc = isSiteAtual ? laudoAtual.detalhes_projeto : laudoAtual.laudo_tecnico;
+      if (temDoc) configurarBotoesDocumento();
+
+      document.getElementById('modal-laudo').style.display = 'flex';
+    }
+
+    async function salvarLaudo() {
+      if (!laudoAtual) return;
+      const prazo = document.getElementById('laudo-prazo').value;
+      const valor = document.getElementById('laudo-valor').value;
+      const status = document.getElementById('laudo-status').value;
+      let updateData = { status: status };
+
+      if (isSiteAtual) {
+        updateData.detalhes_projeto = { escopo: document.getElementById('proj-escopo').value, link: document.getElementById('proj-link').value, prazo, valor };
+        laudoAtual.detalhes_projeto = updateData.detalhes_projeto;
+      } else {
+        updateData.laudo_tecnico = { diagnostico: document.getElementById('laudo-diag').value, solucao: document.getElementById('laudo-solucao').value, prazo, valor };
+        laudoAtual.laudo_tecnico = updateData.laudo_tecnico;
+      }
+
+      laudoAtual.status = status;
+      const { error } = await db.from("chamados").update(updateData).eq("id", laudoAtual.id);
+      if (error) return alert("Erro: " + error.message);
+
+      configurarBotoesDocumento();
+      alert("Documento salvo com sucesso!");
+      await carregarDados();
+    }
+
+    function configurarBotoesDocumento() {
+      const btnPrint = document.getElementById('btn-laudo-print');
+      btnPrint.href = `laudo.html?id=${laudoAtual.id}`; 
+      btnPrint.style.display = 'flex';
+
+      const fone = laudoAtual.whatsapp || laudoAtual.cliente_telefone;
+      if (fone) {
+        const numLimpo = fone.replace(/\D/g, '');
+        let msg = "";
+        if (isSiteAtual) {
+          const p = laudoAtual.detalhes_projeto || {};
+          msg = `Olá, ${laudoAtual.cliente_nome}! Segue a atualização do seu projeto ${laudoAtual.protocolo}:\n\n*Escopo:* ${p.escopo}\n*Preview:* ${p.link}\n*Prazo:* ${p.prazo}\n*Valor:* R$ ${p.valor}`;
+        } else {
+          const l = laudoAtual.laudo_tecnico || {};
+          msg = `Olá, ${laudoAtual.cliente_nome}! Segue o laudo do seu chamado ${laudoAtual.protocolo}:\n\n*Diagnóstico:* ${l.diagnostico}\n*Solução:* ${l.solucao}\n*Prazo:* ${l.prazo}\n*Valor:* R$ ${l.valor}`;
+        }
+        const btnWpp = document.getElementById('btn-laudo-whatsapp');
+        btnWpp.href = `https://wa.me/55${numLimpo}?text=${encodeURIComponent(msg)}`;
+        btnWpp.style.display = 'block';
+      }
+    }
+
+    // ================= ANOTAÇÕES =================
     async function salvarAnotacao() {
       const texto = document.getElementById('note-text').value.trim();
       if (!texto) return;
