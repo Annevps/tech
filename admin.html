@@ -4,87 +4,108 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Painel Administrativo — TechEmpire</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* ================= TEMA ESCURO PREMIUM (IGUAL À REFERÊNCIA) ================= */
+  /* ================= TEMA ESCURO PREMIUM ================= */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #0B0D0F; --s1: #121518; --s2: #1A1D21; --line: #2A2D31;
-    --text-main: #FFFFFF; --text-muted: #8C939D;
-    --brand: #00DDB5; --brand-dark: #00A884; --err: #FF6464;
+    --bg: #0B0D0F;
+    --s1: #121518;
+    --s2: #1A1D21;
+    --s3: #22262b;
+    --line: #2A2D31;
+    --text-main: #FFFFFF;
+    --text-muted: #8C939D;
+    --brand: #00DDB5; /* Turquesa da imagem */
+    --brand-dark: #00A884;
+    --err: #FF6464;
+    --warning: #FFC832;
   }
   body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
   a { text-decoration: none; color: inherit; }
   button { cursor: pointer; font-family: inherit; border: none; background: none; }
 
-  /* SIDEBAR */
+  /* ================= SIDEBAR ================= */
   .sidebar { width: 240px; background: var(--s1); border-right: 1px solid var(--line); padding: 24px; display: flex; flex-direction: column; }
-  .logo { display: flex; align-items: center; gap: 10px; font-family: 'Space Grotesk'; font-size: 18px; font-weight: 700; margin-bottom: 40px; }
+  .logo { display: flex; align-items: center; gap: 12px; font-family: 'Space Grotesk'; font-size: 18px; font-weight: 700; margin-bottom: 40px; }
   .logo i { background: var(--brand); color: #000; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; font-style: normal; font-weight: 800; }
   .sidebar nav { display: flex; flex-direction: column; gap: 4px; }
-  .sidebar a { padding: 10px 14px; border-radius: 8px; font-weight: 500; color: var(--text-muted); font-size: 14px; cursor: pointer; }
+  .sidebar a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; font-weight: 500; color: var(--text-muted); font-size: 14px; cursor: pointer; transition: 0.2s; }
   .sidebar a:hover, .sidebar a.active { background: rgba(0, 221, 181, 0.1); color: var(--brand); }
   .sidebar .sair { margin-top: auto; color: var(--err); }
 
-  /* MAIN */
+  /* ================= MAIN ================= */
   .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
   .topbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 32px; border-bottom: 1px solid var(--line); background: var(--s1); }
+  .user-info { display: flex; align-items: center; gap: 20px; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--s2); display: grid; place-items: center; border: 1px solid var(--line); }
+
   .content { padding: 32px; overflow-y: auto; flex: 1; }
   
-  .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+  /* HEADER DA PÁGINA */
+  .page-header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+  .page-header .icon-title { width: 48px; height: 48px; background: rgba(0, 221, 181, 0.15); color: var(--brand); border-radius: 12px; display: grid; place-items: center; font-size: 24px; }
   .page-header h1 { font-family: 'Space Grotesk'; font-size: 28px; }
   .page-header p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
-  .btn-new { background: var(--brand); color: #000; padding: 10px 20px; border-radius: 8px; font-weight: 700; }
 
-  .tela { display: none; }
-  .tela.active { display: block; }
+  /* CARDS DE RESUMO SUPERIORES */
+  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 32px; }
+  .summary-card { background: var(--s1); border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: flex; align-items: flex-start; gap: 16px; transition: 0.2s; cursor: pointer; }
+  .summary-card:hover { border-color: var(--brand); transform: translateY(-2px); }
+  .summary-card .icon { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; font-size: 20px; }
+  .summary-card h3 { font-size: 16px; font-family: 'Space Grotesk'; margin-bottom: 4px; }
+  .summary-card p { font-size: 12px; color: var(--text-muted); }
 
-  /* KPIs */
-  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
-  .summary-card { background: var(--s1); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
-  .summary-card h3 { font-size: 32px; color: var(--brand); font-family: 'Space Grotesk'; }
-  .summary-card p { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
-
-  /* TABELAS */
-  .table-box { background: var(--s1); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
-  table { width: 100%; border-collapse: collapse; }
-  th { text-align: left; padding: 16px; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--line); }
-  td { padding: 16px; border-bottom: 1px solid var(--line); font-size: 14px; }
-  .pill { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 12px; background: rgba(0, 221, 181, 0.15); color: var(--brand); }
-  .btn-acao { background: var(--brand); color: #000; padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 12px; }
-
-  /* ORGANIZAÇÃO (GRID 3 COLUNAS) */
+  /* ÁREA DE ORGANIZAÇÃO (3 COLUNAS) */
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-bottom: 32px; }
   .box { background: var(--s1); border: 1px solid var(--line); border-radius: 16px; padding: 24px; }
   .box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
-  .box-header h3 { font-family: 'Space Grotesk'; font-size: 16px; color: var(--brand); }
+  .box-header h3 { font-family: 'Space Grotesk'; font-size: 16px; color: var(--brand); display: flex; align-items: center; gap: 8px; }
+
+  /* LISTA DE PROJETOS */
+  .proj-item { background: var(--s2); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+  .proj-item h4 { font-size: 14px; margin-bottom: 4px; display: flex; justify-content: space-between; }
+  .proj-item .status { font-size: 11px; padding: 2px 8px; border-radius: 99px; background: rgba(0, 221, 181, 0.1); color: var(--brand); }
+  .proj-item .links { display: flex; gap: 12px; font-size: 12px; color: var(--text-muted); margin-top: 8px; }
+  .proj-item .links a:hover { color: var(--brand); }
 
   /* CALENDÁRIO */
   .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
   .calendar-header button { background: var(--s2); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; color: var(--text-main); }
-  .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; font-size: 12px; }
+  .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; font-size: 12px; margin-bottom: 16px; }
   .calendar-day-name { color: var(--text-muted); padding: 4px; font-weight: 600; }
-  .calendar-date { background: var(--s2); border-radius: 6px; padding: 8px 0; cursor: pointer; }
+  .calendar-date { background: var(--s2); border-radius: 6px; padding: 8px 0; font-size: 13px; color: var(--text-main); cursor: pointer; transition: 0.2s; position: relative; }
+  .calendar-date:hover { background: var(--line); }
   .calendar-date.today { border: 2px solid var(--brand); color: var(--brand); font-weight: 700; }
-  .calendar-date.empty { background: transparent; }
+  .calendar-date.empty { background: transparent; cursor: default; }
   .calendar-date.has-task { background: rgba(0, 221, 181, 0.15); color: var(--brand); font-weight: 600; }
   .calendar-date.alert { background: rgba(255, 100, 100, 0.2); color: var(--err); font-weight: 700; animation: piscar 1.5s infinite; }
   @keyframes piscar { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
 
-  /* TAREFAS */
-  .task-item { background: var(--s2); padding: 12px; border-radius: 8px; margin-bottom: 8px; }
-  .task-item h4 { font-size: 14px; margin-bottom: 4px; }
+  /* LISTA DE TAREFAS */
+  .task-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-bottom: 1px solid var(--line); }
+  .task-item input[type="checkbox"] { width: 16px; height: 16px; margin-top: 2px; cursor: pointer; }
+  .task-item .task-info { flex: 1; }
+  .task-item h4 { font-size: 14px; margin-bottom: 2px; }
   .task-item p { font-size: 12px; color: var(--text-muted); }
+  .task-item .status { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: rgba(0, 221, 181, 0.1); color: var(--brand); }
+
+  /* ONDE PAREI (TABELA) */
+  .diario-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+  .diario-table th { text-align: left; padding: 12px; color: var(--text-muted); font-size: 12px; border-bottom: 1px solid var(--line); }
+  .diario-table td { padding: 12px; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .diario-table td a { color: var(--brand); }
 
   /* MODAIS */
-  .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
   .modal-box { background: var(--s1); border: 1px solid var(--line); border-radius: 16px; width: 95%; max-width: 500px; padding: 32px; display: flex; flex-direction: column; gap: 16px; }
   .modal-box h2 { font-family: 'Space Grotesk'; font-size: 20px; color: var(--brand); }
-  .form-group { margin-bottom: 8px; }
+  .form-group { margin-bottom: 12px; }
   .form-group label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block; }
-  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; color: var(--text-main); }
-  .modal-actions { display: flex; justify-content: space-between; margin-top: 16px; }
-  .btn-modal { padding: 12px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; color: var(--text-main); outline: none; }
+  .form-group input:focus, .form-group textarea:focus { border-color: var(--brand); }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+  .btn-modal { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; }
   .btn-modal.primary { background: var(--brand); color: #000; }
   .btn-modal.secondary { background: transparent; border: 1px solid var(--line); color: var(--text-main); }
 </style>
@@ -94,7 +115,6 @@
   <div class="sidebar">
     <a href="index.html" class="logo"><i>TE</i><span>Tech<b>Empire</b></span></a>
     <nav>
-      <a id="nav-inicio" onclick="mudarAba('inicio')">Início</a>
       <a id="nav-chamados" onclick="mudarAba('chamados')">Chamados</a>
       <a id="nav-clientes" onclick="mudarAba('clientes')">Clientes</a>
       <a id="nav-organizacao" class="active" onclick="mudarAba('organizacao')">Organização</a>
@@ -109,56 +129,44 @@
 
     <div class="content">
       
-      <!-- TELA INÍCIO -->
-      <div id="tela-inicio" class="tela">
-        <div class="page-header"><h1>Dashboard</h1></div>
-        <div class="summary-grid">
-          <div class="summary-card"><h3 id="kpi-total">0</h3><p>Total de Chamados</p></div>
-          <div class="summary-card"><h3 id="kpi-pendentes">0</h3><p>Pendentes</p></div>
-          <div class="summary-card"><h3 id="kpi-concluidos">0</h3><p>Concluídos</p></div>
-          <div class="summary-card"><h3 id="kpi-clientes">0</h3><p>Clientes</p></div>
-        </div>
-      </div>
-
-      <!-- TELA CHAMADOS -->
-      <div id="tela-chamados" class="tela">
-        <div class="page-header">
-          <h1>Chamados</h1>
-          <button class="btn-new" onclick="abrirModal('modal-novo')">+ Novo Chamado</button>
-        </div>
-        <div class="table-box">
-          <table>
-            <thead><tr><th>Protocolo</th><th>Cliente</th><th>Status</th><th>Ações</th></tr></thead>
-            <tbody id="tabela-chamados-body"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- TELA CLIENTES -->
-      <div id="tela-clientes" class="tela">
-        <div class="page-header"><h1>Clientes</h1></div>
-        <div class="table-box">
-          <table>
-            <thead><tr><th>Nome</th><th>E-mail</th><th>Telefone</th></tr></thead>
-            <tbody id="tabela-clientes-body"></tbody>
-          </table>
-        </div>
-      </div>
-
       <!-- TELA ORGANIZAÇÃO -->
       <div id="tela-organizacao" class="tela active">
         <div class="page-header">
+          <div class="icon-title">📁</div>
           <div>
             <h1>Organização</h1>
-            <p>Aqui você organiza seus projetos, links, tarefas e prazos.</p>
+            <p>Aqui você organiza seus projetos, links, tarefas, prazos e acompanha o progresso dos seus sites.</p>
+          </div>
+        </div>
+
+        <div class="summary-grid">
+          <div class="summary-card" onclick="abrirModal('projeto')">
+            <div class="icon" style="background: rgba(100, 150, 255, 0.1); color: #6496FF;">🔗</div>
+            <div><h3>Links dos Projetos</h3><p>Seus projetos, repositórios e ferramentas.</p></div>
+          </div>
+          <div class="summary-card">
+            <div class="icon" style="background: rgba(0, 221, 181, 0.1); color: var(--brand);">📅</div>
+            <div><h3>Calendário de Entregas</h3><p>Acompanhe seus prazos e compromissos.</p></div>
+          </div>
+          <div class="summary-card" onclick="abrirModal('tarefa')">
+            <div class="icon" style="background: rgba(255, 200, 50, 0.1); color: var(--warning);">📋</div>
+            <div><h3>Lista de Tarefas</h3><p>Controle o que já foi feito e o que falta.</p></div>
+          </div>
+          <div class="summary-card">
+            <div class="icon" style="background: rgba(255, 100, 100, 0.1); color: var(--err);">📝</div>
+            <div><h3>Onde Parei?</h3><p>Registre o progresso dos seus projetos.</p></div>
           </div>
         </div>
 
         <div class="grid-3">
           <div class="box">
             <div class="box-header"><h3>Links e Projetos</h3></div>
-            <div id="lista-projetos"><p style="color: var(--text-muted); font-size: 13px;">Nenhum projeto.</p></div>
+            <div id="lista-projetos">
+              <p style="color: var(--text-muted); font-size: 13px;">Nenhum projeto cadastrado.</p>
+            </div>
+            <button class="btn-modal primary" style="width: 100%; margin-top: 12px;" onclick="abrirModal('projeto')">+ Adicionar novo projeto</button>
           </div>
+
           <div class="box">
             <div class="box-header"><h3>Calendário</h3></div>
             <div class="calendar-header">
@@ -167,64 +175,67 @@
               <button onclick="mudarMes(1)">></button>
             </div>
             <div class="calendar-grid" id="calendar-grid"></div>
+            <div class="next-deliveries">
+              <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Próximas entregas</p>
+              <div id="lista-entregas"></div>
+            </div>
           </div>
+
           <div class="box">
             <div class="box-header"><h3>Tarefas</h3></div>
-            <div id="lista-tarefas"><p style="color: var(--text-muted); font-size: 13px;">Nenhuma tarefa.</p></div>
+            <div style="display: flex; gap: 8px; margin-bottom: 16px; font-size: 12px; color: var(--text-muted);">
+              <span>Pendentes</span> <span>Em andamento</span> <span>Concluídas</span>
+            </div>
+            <div id="lista-tarefas">
+              <p style="color: var(--text-muted); font-size: 13px;">Nenhuma tarefa.</p>
+            </div>
+            <button class="btn-modal primary" style="width: 100%; margin-top: 12px;" onclick="abrirModal('tarefa')">+ Nova tarefa</button>
           </div>
         </div>
-      </div>
 
+        <div class="box">
+          <div class="box-header"><h3>Onde Parei? (Últimos projetos)</h3></div>
+          <table class="diario-table">
+            <thead><tr><th>Projeto</th><th>Último trabalho feito</th><th>Onde parei</th><th>Próximo passo</th><th>Última atualização</th></tr></thead>
+            <tbody id="tabela-diario">
+              <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Nenhum registro.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
     </div>
   </div>
 
-  <!-- MODAIS -->
-  <div class="modal" id="modal-novo">
+  <!-- MODAL PROJETO -->
+  <div class="modal" id="modal-projeto">
     <div class="modal-box">
-      <h2>Novo Chamado</h2>
-      <form id="form-novo">
-        <div class="form-group"><label>Nome do Cliente *</label><input name="nome" required></div>
-        <div class="form-group"><label>Telefone *</label><input name="telefone" required></div>
-        <div class="form-group"><label>E-mail</label><input name="email" type="email"></div>
-        <div class="form-group">
-          <label>Tipo de Serviço</label>
-          <select name="categoria">
-            <option value="Manutenção">Manutenção de Computador</option>
-            <option value="Site">Criação de Site</option>
-          </select>
-        </div>
-        <div class="form-group"><label>Assunto *</label><input name="titulo" required></div>
-        <div class="form-group"><label>Descrição *</label><textarea name="descricao" required rows="3"></textarea></div>
+      <h2>Novo Projeto</h2>
+      <form id="form-projeto">
+        <div class="form-group"><label>Nome do Projeto</label><input name="nome" required></div>
+        <div class="form-group"><label>Link do GitHub</label><input name="github" type="url"></div>
+        <div class="form-group"><label>Link do Site</label><input name="site" type="url"></div>
+        <div class="form-group"><label>Status</label><select name="status"><option>Em desenvolvimento</option><option>Aguardando</option><option>Concluído</option><option>Pausado</option></select></div>
         <div class="modal-actions">
-          <button type="button" class="btn-modal secondary" onclick="fecharModal('modal-novo')">Cancelar</button>
-          <button type="submit" class="btn-modal primary">Criar Chamado</button>
+          <button type="button" class="btn-modal secondary" onclick="fecharModal('modal-projeto')">Cancelar</button>
+          <button type="submit" class="btn-modal primary">Salvar</button>
         </div>
       </form>
     </div>
   </div>
 
-  <div class="modal" id="modal-chamado">
+  <!-- MODAL TAREFA -->
+  <div class="modal" id="modal-tarefa">
     <div class="modal-box">
-      <h2>Gerenciar Chamado</h2>
-      <input type="hidden" id="edit-id">
-      <div class="form-group"><label>Cliente</label><input type="text" id="edit-cliente" disabled></div>
-      <div class="form-group">
-        <label>Status</label>
-        <select id="edit-status">
-          <option value="Nova chamada">Nova chamada</option>
-          <option value="Em andamento">Em andamento</option>
-          <option value="Aguardando aprovação do orçamento">Aguardando cliente</option>
-          <option value="Concluída">Concluída</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Parecer Técnico / Orçamento</label>
-        <textarea id="edit-parecer" rows="3"></textarea>
-      </div>
-      <div class="modal-actions">
-        <button class="btn-modal secondary" onclick="fecharModal('modal-chamado')">Cancelar</button>
-        <button class="btn-modal primary" onclick="salvarChamado()">Salvar</button>
-      </div>
+      <h2>Nova Tarefa</h2>
+      <form id="form-tarefa">
+        <div class="form-group"><label>Título</label><input name="titulo" required></div>
+        <div class="form-group"><label>Data de Entrega</label><input name="data" type="date" required></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-modal secondary" onclick="fecharModal('modal-tarefa')">Cancelar</button>
+          <button type="submit" class="btn-modal primary">Salvar</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -243,7 +254,10 @@
       if (aba === 'organizacao') carregarOrganizacao();
     }
 
-    window.abrirModal = (id) => document.getElementById(id).style.display = 'flex';
+    window.abrirModal = (tipo) => {
+      if (tipo === 'projeto') document.getElementById('modal-projeto').style.display = 'flex';
+      if (tipo === 'tarefa') document.getElementById('modal-tarefa').style.display = 'flex';
+    };
     window.fecharModal = (id) => document.getElementById(id).style.display = 'none';
 
     // CALENDÁRIO
@@ -281,86 +295,76 @@
       }
     }
 
-    // CARREGAR DADOS GERAIS
+    // CARREGAR DADOS
     async function carregarDados() {
-      const { data: chamados } = await db.from('chamados').select('*').order('criado_em', { ascending: false });
-      const tbody = document.getElementById('tabela-chamados-body');
-      if (chamados) {
-        tbody.innerHTML = chamados.map(c => `
-          <tr>
-            <td>${c.protocolo}</td>
-            <td>${c.cliente_nome}</td>
-            <td><span class="pill">${c.status}</span></td>
-            <td><button class="btn-acao" onclick="abrirChamado('${c.id}')">Gerenciar</button></td>
-          </tr>
+      // Projetos
+      const { data: projetos } = await db.from('projetos').select('*').order('criado_em', { ascending: false });
+      const divProjetos = document.getElementById('lista-projetos');
+      if (projetos && projetos.length > 0) {
+        divProjetos.innerHTML = projetos.map(p => `
+          <div class="proj-item">
+            <h4>${p.nome} <span class="status">${p.status}</span></h4>
+            <div class="links">
+              ${p.url_github ? `<a href="${p.url_github}" target="_blank">GitHub</a>` : ''}
+              ${p.url_site ? `<a href="${p.url_site}" target="_blank">Site</a>` : ''}
+            </div>
+          </div>
         `).join('');
-        document.getElementById('kpi-total').textContent = chamados.length;
-        document.getElementById('kpi-pendentes').textContent = chamados.filter(c => c.status === 'Nova chamada').length;
-        document.getElementById('kpi-concluidos').textContent = chamados.filter(c => c.status === 'Concluída').length;
       }
 
-      const { data: clientes } = await db.from('usuarios').select('*').eq('is_admin', false);
-      const tbodyCli = document.getElementById('tabela-clientes-body');
-      if (clientes) {
-        tbodyCli.innerHTML = clientes.map(c => `<tr><td>${c.nome}</td><td>${c.email}</td><td>${c.telefone || '—'}</td></tr>`).join('');
-        document.getElementById('kpi-clientes').textContent = clientes.length;
-      }
-    }
-
-    // CARREGAR ORGANIZAÇÃO
-    async function carregarOrganizacao() {
+      // Tarefas
       const { data: tarefas } = await db.from('tarefas').select('*').order('data_entrega');
       tarefasGlobal = tarefas || [];
       const divTarefas = document.getElementById('lista-tarefas');
       if (tarefasGlobal.length > 0) {
-        divTarefas.innerHTML = tarefasGlobal.map(t => `<div class="task-item"><h4>${t.titulo}</h4><p>${t.data_entrega ? new Date(t.data_entrega + 'T12:00:00').toLocaleDateString('pt-BR') : 'Sem data'}</p></div>`).join('');
+        divTarefas.innerHTML = tarefasGlobal.map(t => `
+          <div class="task-item">
+            <input type="checkbox" ${t.status === 'Concluída' ? 'checked' : ''}>
+            <div class="task-info">
+              <h4>${t.titulo}</h4>
+              <p>${t.data_entrega ? new Date(t.data_entrega + 'T12:00:00').toLocaleDateString('pt-BR') : 'Sem data'}</p>
+            </div>
+            <span class="status">${t.status || 'Pendente'}</span>
+          </div>
+        `).join('');
       }
+
       renderizarCalendario();
     }
 
-    // AÇÕES
-    window.abrirChamado = async (id) => {
-      const { data: c } = await db.from('chamados').select('*').eq('id', id).single();
-      document.getElementById('edit-id').value = c.id;
-      document.getElementById('edit-cliente').value = c.cliente_nome;
-      document.getElementById('edit-status').value = c.status;
-      document.getElementById('edit-parecer').value = c.parecer_tecnico || '';
-      abrirModal('modal-chamado');
-    };
+    async function carregarOrganizacao() {
+      carregarDados();
+    }
 
-    window.salvarChamado = async () => {
-      const id = document.getElementById('edit-id').value;
-      await db.from('chamados').update({
-        status: document.getElementById('edit-status').value,
-        parecer_tecnico: document.getElementById('edit-parecer').value
-      }).eq('id', id);
-      fecharModal('modal-chamado');
+    // SALVAR
+    document.getElementById('form-projeto').onsubmit = async (e) => {
+      e.preventDefault();
+      const form = new FormData(e.target);
+      await db.from('projetos').insert({
+        nome: form.get('nome'),
+        url_github: form.get('github'),
+        url_site: form.get('site'),
+        status: form.get('status')
+      });
+      fecharModal('modal-projeto');
+      e.target.reset();
       carregarDados();
     };
 
-    document.getElementById('form-novo').onsubmit = async (e) => {
+    document.getElementById('form-tarefa').onsubmit = async (e) => {
       e.preventDefault();
       const form = new FormData(e.target);
-      const { data: ch, error } = await db.from('chamados').insert({
-        cliente_nome: form.get('nome'), cliente_telefone: form.get('telefone'),
-        cliente_email: form.get('email'), categoria: form.get('categoria'),
-        titulo: form.get('titulo'), descricao: form.get('descricao'), status: "Nova chamada"
-      }).select().single();
-      
-      if (error) return alert("Erro: " + error.message);
-      if (form.get('email')) {
-        const { data: user } = await db.from('usuarios').select('id').eq('email', form.get('email')).maybeSingle();
-        if (!user) await db.from('usuarios').insert({ nome: form.get('nome'), email: form.get('email'), telefone: form.get('telefone') });
-      }
-      alert(`Chamado criado! Protocolo: ${ch.protocolo}`);
-      fecharModal('modal-novo');
+      await db.from('tarefas').insert({
+        titulo: form.get('titulo'),
+        data_entrega: form.get('data')
+      });
+      fecharModal('modal-tarefa');
       e.target.reset();
       carregarDados();
     };
 
     // INICIALIZA
     carregarDados();
-    carregarOrganizacao();
   </script>
 </body>
 </html>
