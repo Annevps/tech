@@ -72,14 +72,15 @@
 
   /* MODAIS */
   .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
-  .modal-box { background: var(--s1); border-radius: 16px; width: 95%; max-width: 500px; padding: 32px; }
-  .form-group { margin-bottom: 12px; }
+  .modal-box { background: var(--s1); border-radius: 16px; width: 95%; max-width: 500px; padding: 32px; display: flex; flex-direction: column; gap: 16px; }
+  .modal-box h2 { font-family: 'Space Grotesk'; font-size: 20px; color: var(--brand-dark); }
+  .form-group { margin-bottom: 8px; }
   .form-group label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block; }
   .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; }
-  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
-  .btn-modal { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; }
+  .modal-actions { display: flex; justify-content: space-between; margin-top: 16px; }
+  .btn-modal { padding: 12px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; }
   .btn-modal.primary { background: var(--brand); color: #fff; }
-  .btn-modal.secondary { background: transparent; border: 1px solid var(--border); }
+  .btn-modal.secondary { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
 </style>
 </head>
 <body>
