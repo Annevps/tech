@@ -8,6 +8,119 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<style>
+  /* ================= ESTILOS DO PC 3D (TEMA CLARO) ================= */
+  .lab { display: grid; grid-template-columns: 1.2fr 1fr; gap: 30px; align-items: start; margin-top: 40px; }
+  
+  .stage-container {
+    position: relative; height: 500px; background: #F3F4F6; 
+    border-radius: 24px; border: 1px solid #E5E7EB; 
+    overflow: hidden; box-shadow: inset 0 0 40px rgba(0,0,0,0.05);
+  }
+  
+  .hint {
+    position: absolute; left: 16px; bottom: 14px; font-size: 13px; 
+    color: #6B7280; background: rgba(255,255,255,0.9); 
+    padding: 8px 16px; border-radius: 99px; pointer-events: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-weight: 500;
+  }
+
+  /* ================= MENU DE PEÇAS (BOTÕES PREMIUM) ================= */
+  .parts { 
+    display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; 
+  }
+  
+  .parts button {
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    padding: 12px 18px;
+    border-radius: 99px; /* Deixa arredondado */
+    font-size: 14px;
+    font-weight: 500;
+    color: #6B7280;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+  }
+
+  .parts button:hover {
+    background: #F3F4F6;
+    border-color: #D1D5DB;
+    color: #1F2937;
+    transform: translateY(-2px);
+  }
+
+  .parts button[aria-pressed="true"] {
+    background: rgba(143, 210, 31, 0.15); /* Fundo verde claro */
+    border-color: #8fd21f; /* Borda verde */
+    color: #5c8a10; /* Texto verde escuro */
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(143, 210, 31, 0.2);
+  }
+
+  /* ================= CAIXA DE INFORMAÇÕES (LAUDO LATERAL) ================= */
+  .info-box {
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    min-height: 300px;
+  }
+  
+  .info-box h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    color: #1F2937;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #F3F4F6;
+    padding-bottom: 16px;
+  }
+
+  .info-box .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+  .info-box .tag.t1 { background: rgba(143, 210, 31, 0.1); color: #7ab81a; }
+  .info-box .tag.t2 { background: rgba(59, 130, 246, 0.1); color: #3B82F6; }
+
+  .info-box ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px 0;
+  }
+  
+  .info-box li {
+    position: relative;
+    padding-left: 24px;
+    margin-bottom: 10px;
+    font-size: 15px;
+    color: #4B5563;
+    line-height: 1.5;
+  }
+
+  .info-box li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: #8fd21f;
+    font-weight: bold;
+    font-size: 16px;
+  }
+
+  @media (max-width: 860px) {
+    .lab { grid-template-columns: 1fr; }
+    .stage-container { height: 400px; }
+  }
+</style>
 </head>
 <body data-page="manutencao" data-auth="public">
 <header id="site-header"></header>
@@ -32,24 +145,35 @@
     <p class="sub">Arraste o computador para girar. Clique nos pontos verdes ou escolha um componente na lista.</p>
   </div>
   
-  <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px;">
-    <!-- Div do visualizador 3D com altura e fundo forçados -->
-    <div id="stage" style="position: relative; height: 500px; background: #F3F4F6; border-radius: 24px; border: 1px solid #E5E7EB; overflow: hidden;">
-      <span style="position: absolute; left: 16px; bottom: 14px; font-size: 13px; color: #6B7280; background: rgba(255,255,255,0.8); padding: 6px 12px; border-radius: 99px; pointer-events: none;">↔ Arraste para girar</span>
+  <div class="lab">
+    <!-- O Stage do 3D -->
+    <div id="stage" class="stage-container" role="img" aria-label="Computador em 3D">
+      <span class="hint">↔ Arraste para girar</span>
     </div>
     
+    <!-- A Lista de Peças e o Texto -->
     <div>
       <div class="parts" id="parts"></div>
-      <div class="box info" id="info" style="background: #fff; border-radius: 16px; padding: 20px;"></div>
+      <div class="info-box" id="info"></div>
     </div>
   </div>
 </section>
 
+<!-- O resto da página continua igual -->
 <section class="sec reveal">
   <div class="sec-h"><span class="badge">Entenda a diferença</span><h2>Duas formas de cuidar do seu equipamento.</h2></div>
   <div class="cards">
     <div class="card"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div><h3>Preventiva</h3><p>Ações programadas para evitar que o problema surja: limpeza de poeira, troca de pasta térmica, atualizações, backup e conferência de cabos.</p></div>
     <div class="card"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v3l2 1"/></svg></div><h3>Detectiva</h3><p>Inspeções e testes que descobrem falhas escondidas ou em início: temperatura sob carga, saúde do disco, teste de memória e medição da fonte.</p></div>
+  </div>
+</section>
+
+<section class="sec reveal">
+  <div class="sec-h"><span class="badge">Quando fazer</span><h2>Uma rotina simples.</h2><p class="sub">Referências gerais. O intervalo ideal depende do ambiente e do uso do equipamento.</p></div>
+  <div class="when">
+    <div class="card"><b>Todo mês</b><p>Backup dos arquivos importantes e atualizações do sistema e dos drivers.</p></div>
+    <div class="card"><b>3 a 6 meses</b><p>Limpeza da poeira, conferência das ventoinhas e dos filtros de ar.</p></div>
+    <div class="card"><b>1 a 2 anos</b><p>Troca da pasta térmica e revisão geral com testes de memória, disco e fonte.</p></div>
   </div>
 </section>
 
