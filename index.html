@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* ================= TEMA CLARO E ANIMAÇÕES ================= */
   :root {
     --bg: #F8F9FA; --s1: #FFFFFF; --s2: #F3F4F6;
     --line: #E5E7EB; --line2: #D1D5DB;
@@ -15,26 +14,19 @@
     --lime: #8fd21f; --lime2: #7ab81a;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); line-height: 1.6; overflow-x: hidden; }
   a { text-decoration: none; color: inherit; }
   
-  /* Header */
-  header { background: rgba(248,249,250,0.85); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50; animation: fadeDown 0.8s ease forwards; }
-  @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+  header { background: rgba(248,249,250,0.85); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50; }
   .bar-in { max-width: 1160px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
-  .logo img { height: 60px; width: auto; object-fit: contain; transition: transform 0.3s; }
-  .logo:hover img { transform: scale(1.05); }
+  .logo img { height: 60px; width: auto; object-fit: contain; }
   nav { display: flex; align-items: center; gap: 8px; }
   nav a { padding: 8px 14px; border-radius: 99px; font-weight: 500; font-size: 15px; color: var(--muted); transition: 0.3s; }
-  nav a:hover { color: var(--ink); background: var(--line); transform: translateY(-2px); }
-  .btn-nav { border: 1px solid var(--line2); padding: 8px 16px; border-radius: 99px; font-weight: 600; font-size: 14px; transition: 0.3s; }
-  .btn-nav.primary { background: var(--lime); border-color: var(--lime); color: #fff; box-shadow: 0 4px 15px rgba(143, 210, 31, 0.3); }
-  .btn-nav.primary:hover { background: var(--lime2); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(143, 210, 31, 0.5); }
+  nav a:hover { color: var(--ink); background: var(--line); }
+  .btn-nav { border: 1px solid var(--line2); padding: 8px 16px; border-radius: 99px; font-weight: 600; font-size: 14px; }
+  .btn-nav.primary { background: var(--lime); border-color: var(--lime); color: #fff; }
 
-  /* Hero */
   .hero { max-width: 1160px; margin: 0 auto; padding: 80px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
-  .hero-text { animation: fadeRight 1s ease forwards; opacity: 0; }
-  @keyframes fadeRight { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: translateX(0); } }
   .badge { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(143, 210, 31, 0.4); background: rgba(143, 210, 31, 0.15); color: #5c8a10; border-radius: 99px; padding: 6px 14px; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 20px; }
   .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--lime); }
   h1 { font-family: 'Space Grotesk', sans-serif; font-size: 64px; line-height: 1.05; font-weight: 700; margin-bottom: 24px; letter-spacing: -2px; }
@@ -47,36 +39,34 @@
   .btn.secondary { background: var(--s1); border: 1px solid var(--line2); color: var(--ink); }
   .btn.secondary:hover { background: var(--s2); transform: translateY(-3px); }
   
-  /* Mockup */
-  .hero-visual { animation: fadeLeft 1s ease forwards; opacity: 0; animation-delay: 0.2s; }
-  @keyframes fadeLeft { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
   .mock { background: var(--s1); border: 1px solid var(--line2); border-radius: 24px; padding: 24px; box-shadow: 0 20px 40px -20px rgba(0,0,0,0.1); transition: transform 0.4s; }
-  .mock:hover { transform: translateY(-5px); box-shadow: 0 30px 60px -20px rgba(0,0,0,0.15); }
+  .mock:hover { transform: translateY(-5px); }
   .mock .top { display: flex; gap: 6px; margin-bottom: 20px; }
   .mock .top i { width: 10px; height: 10px; border-radius: 50%; background: var(--line2); }
   .mock .ex { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 16px; letter-spacing: 1px; }
   .mock .st { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 12px; background: var(--s2); margin-bottom: 8px; font-size: 14px; transition: 0.3s; }
-  .mock .st:hover { transform: translateX(5px); background: var(--line); }
+  .mock .st:hover { transform: translateX(5px); }
   .mock .st b { margin-left: auto; color: var(--lime); font-size: 12px; }
   .mock .st.on { border: 1px solid var(--lime); background: #fff; }
   .mock .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line2); }
   .mock .on .dot { background: var(--lime); animation: pulse 1.5s infinite; }
   @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(143, 210, 31, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(143, 210, 31, 0); } 100% { box-shadow: 0 0 0 0 rgba(143, 210, 31, 0); } }
 
-  /* Seções */
-  .sec { max-width: 1160px; margin: 80px auto; padding: 0 24px; opacity: 0; transform: translateY(40px); transition: 1s; }
-  .sec.visible { opacity: 1; transform: translateY(0); }
+  .sec { max-width: 1160px; margin: 80px auto; padding: 0 24px; }
   .sec-h { margin-bottom: 40px; }
   h2 { font-family: 'Space Grotesk', sans-serif; font-size: 36px; font-weight: 700; margin-bottom: 12px; }
   .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
   .card { background: var(--s1); border: 1px solid var(--line); border-radius: 20px; padding: 32px; transition: 0.3s; }
   .card:hover { border-color: var(--lime); transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.08); }
-  .ic { width: 48px; height: 48px; border-radius: 12px; background: rgba(143, 210, 31, 0.1); color: var(--lime2); display: grid; place-items: center; margin-bottom: 20px; font-size: 24px; transition: 0.3s; }
+  
+  /* ÍCONES SVG NO LUGAR DOS EMOJIS */
+  .ic { width: 48px; height: 48px; border-radius: 12px; background: rgba(143, 210, 31, 0.1); color: var(--lime2); display: grid; place-items: center; margin-bottom: 20px; transition: 0.3s; }
+  .ic svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
   .card:hover .ic { background: var(--lime); color: #fff; transform: scale(1.1); }
+  
   .card h3 { font-family: 'Space Grotesk'; font-size: 20px; margin-bottom: 8px; }
   .card p { color: var(--muted); font-size: 15px; }
 
-  /* Rodapé */
   footer { border-top: 1px solid var(--line); background: var(--s1); padding: 60px 24px 30px; text-align: center; }
   footer img { height: 60px; margin-bottom: 20px; transition: 0.3s; }
   footer img:hover { transform: scale(1.1); }
@@ -87,19 +77,15 @@
 </head>
 <body>
 
-  <!-- HEADER -->
   <header>
     <div class="bar-in">
-      <a href="index.html" class="logo">
-        <img src="tech.png" alt="TechEmpire">
-      </a>
+      <a href="index.html" class="logo"><img src="tech.png" alt="TechEmpire"></a>
       <nav>
         <a href="index.html" style="color: var(--ink); font-weight: 600;">Início</a>
         <a href="servicos.html">Serviços</a>
         <a href="manutencao.html">Manutenção</a>
         <a href="sobre.html">Sobre</a>
         <a href="contato.html">Contato</a>
-        <!-- LINK CORRIGIDO PARA A PÁGINA DE CONSULTA -->
         <a href="consulta.html" style="color: var(--lime2); font-weight: 600;">Acompanhar</a>
         <a href="login.html" class="btn-nav">Entrar</a>
         <a href="criar-conta.html" class="btn-nav primary">Criar conta</a>
@@ -107,10 +93,9 @@
     </div>
   </header>
 
-  <!-- CONTEÚDO PRINCIPAL -->
   <main>
     <section class="hero">
-      <div class="hero-text">
+      <div>
         <span class="badge">Empresa júnior de TI</span>
         <h1>Tecnologia que <br><em>funciona.</em></h1>
         <p class="lead">Manutenção de computadores, suporte técnico e criação de sites com preço justo. Abra um chamado, converse com a gente pelo site e acompanhe cada etapa.</p>
@@ -119,8 +104,7 @@
           <a href="servicos.html" class="btn secondary">Ver serviços</a>
         </div>
       </div>
-
-      <div class="hero-visual">
+      <div>
         <div class="mock">
           <div class="top"><i></i><i></i><i></i></div>
           <div class="ex">Exemplo ilustrativo de acompanhamento</div>
@@ -132,57 +116,49 @@
       </div>
     </section>
 
-    <section class="sec" id="sec-servicos">
-      <div class="sec-h">
-        <span class="badge">Serviços</span>
-        <h2>Tudo o que sua tecnologia precisa.</h2>
-      </div>
-      <div class="cards" id="cards-servicos">
-        <!-- Os cards vão aparecer aqui via JavaScript -->
-      </div>
+    <section class="sec">
+      <div class="sec-h"><span class="badge">Serviços</span><h2>Tudo o que sua tecnologia precisa.</h2></div>
+      <div class="cards" id="cards-servicos"></div>
     </section>
   </main>
 
-  <!-- RODAPÉ -->
   <footer>
     <img src="tech.png" alt="TechEmpire">
     <p>© 2026 TechEmpire. Todos os direitos reservados.</p>
     <p style="margin-top: 8px; font-size: 12px; opacity: 0.7;">Seus dados são tratados conforme a LGPD.</p>
   </footer>
 
-  <!-- SCRIPT PARA RENDERIZAR OS CARDS E ANIMAÇÃO DE SCROLL -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // 1. Renderiza os cards de serviço (sem depender do script.js)
+      // Cards de Serviço com Ícones SVG (Sem Emojis)
       const servicos = [
-        { icone: '💻', titulo: 'Manutenção de Computadores', texto: 'Formatação, limpeza, troca de peças, remoção de vírus e upgrades.' },
-        { icone: '📱', titulo: 'Assistência para Celulares', texto: 'Diagnóstico de defeitos, software, bateria e problemas de configuração.' },
-        { icone: '🌐', titulo: 'Criação de Sites', texto: 'Institucional, portfólio, loja virtual e landing page, com orçamento sob medida.' }
+        { 
+          svg: '<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>', 
+          titulo: 'Manutenção de Computadores', 
+          texto: 'Formatação, limpeza, troca de peças, remoção de vírus e upgrades de desempenho.' 
+        },
+        { 
+          svg: '<svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>', 
+          titulo: 'Suporte Técnico', 
+          texto: 'Ajuda com redes, impressoras, e-mail, backup e configuração de equipamentos.' 
+        },
+        { 
+          svg: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg>', 
+          titulo: 'Criação de Sites', 
+          texto: 'Institucional, portfólio, loja virtual e landing page, com orçamento sob medida.' 
+        }
       ];
       
       const container = document.getElementById('cards-servicos');
       if (container) {
         container.innerHTML = servicos.map(s => `
           <div class="card">
-            <div class="ic">${s.icone}</div>
+            <div class="ic">${s.svg}</div>
             <h3>${s.titulo}</h3>
             <p>${s.texto}</p>
           </div>
         `).join('');
       }
-
-      // 2. Animação de Scroll (as seções aparecem ao descer)
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-          }
-        });
-      }, { threshold: 0.1 });
-
-      document.querySelectorAll('.sec').forEach(sec => {
-        observer.observe(sec);
-      });
     });
   </script>
 </body>
