@@ -44,10 +44,11 @@ function desenharChrome() {
   if (headerEl && document.body.dataset.page !== 'admin') {
     headerEl.innerHTML = `<div class="bar-in">
       <a class="logo" href="index.html" aria-label="TechEmpire — início" style="display:flex; align-items:center; text-decoration:none;">
-        <img src="tech.png?v=99" alt="TechEmpire" style="height: 75px; width: auto; object-fit: contain; filter: drop-shadow(0 0 15px rgba(180, 240, 60, 0.6)); transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        <img src="tech.png?v=99" alt="TechEmpire" style="height: 60px; width: auto; object-fit: contain;">
       </a>
      <button class="menu" aria-expanded="false" aria-label="Abrir menu">☰</button>
      <nav id="nav">${l("index.html", "Início")}${l("servicos.html", "Serviços")}${l("manutencao.html", "Manutenção")}${l("sobre.html", "Sobre")}${l("contato.html", "Contato")}
+     <a href="consulta.html" style="color: var(--lime); font-weight: bold;">Acompanhar</a>
      ${logado ? `${adm ? l("admin.html", "Admin") : ""}${l("painel.html", "Meu painel")}${l("perfil.html", "Perfil")}<a href="#" class="btn sm" onclick="fazerLogout(event)">Sair</a>`
        : `<a class="btn sm" href="login.html">Entrar</a><a class="btn sm primary" href="criar-conta.html">Criar conta</a>`}</nav></div>`;
     $(".menu").onclick = e => { const n = $("#nav").classList.toggle("open"); e.currentTarget.setAttribute("aria-expanded", n); };
@@ -57,7 +58,7 @@ function desenharChrome() {
   if (footerEl && document.body.dataset.page !== 'admin') {
     footerEl.innerHTML = `<div class="foot">
       <div>
-        <a href="index.html" style="display:inline-block; margin-bottom:24px;"><img src="tech.png?v=99" alt="TechEmpire" style="height: 90px; width: auto; object-fit: contain;"></a>
+        <a href="index.html" style="display:inline-block; margin-bottom:24px;"><img src="tech.png?v=99" alt="TechEmpire" style="height: 80px; width: auto; object-fit: contain;"></a>
         <p>Manutenção de dispositivos, suporte técnico e criação de sites. Tecnologia que funciona.</p>
       </div>
       <div><h4>Site</h4><a href="servicos.html">Serviços</a><a href="manutencao.html">Manutenção preventiva</a><a href="sobre.html">Sobre</a><a href="contato.html">Contato</a></div>
