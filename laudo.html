@@ -65,6 +65,10 @@
         <div><div class="data-row"><span>Diagnóstico Técnico</span><strong id="laudo-diag">—</strong></div></div>
         <div><div class="data-row"><span>Solução Aplicada</span><strong id="laudo-solucao">—</strong></div></div>
       </div>
+      
+      <!-- NOVO: PARECER TÉCNICO -->
+      <div class="section-title" style="margin-top: 30px;">Parecer Técnico / Orçamento</div>
+      <div class="box-texto" id="laudo-parecer">—</div>
     </div>
 
     <!-- Bloco Site -->
@@ -106,23 +110,18 @@
     async function carregarLaudo() {
       const urlParams = new URLSearchParams(window.location.search);
       const id = urlParams.get('id');
-      const protocolo = urlParams.get('protocolo');
       
-      if (!id && !protocolo) {
+      if (!id) {
         alert("Documento não encontrado.");
         window.location.href = "index.html";
         return;
       }
 
-      let query = db.from("chamados").select("*");
-      if (id) query = query.eq("id", id);
-      else query = query.eq("protocolo", protocolo);
-
-      const { data: c, error } = await query.single();
+      const { data: c, error } = await db.from("chamados").select("*").eq("id", id).single();
       
       if (error || !c) {
-        alert("Não encontramos nenhum documento com esse protocolo.");
-        window.location.href = "consulta.html";
+        alert("Não encontramos nenhum documento.");
+        window.location.href = "acompanhar.html";
         return;
       }
 
@@ -158,6 +157,7 @@
         const l = c.laudo_tecnico || {};
         document.getElementById('laudo-diag').textContent = l.diagnostico || 'Aguardando diagnóstico';
         document.getElementById('laudo-solucao').textContent = l.solucao || 'Aguardando solução';
+        document.getElementById('laudo-parecer').textContent = l.parecer || 'Aguardando preenchimento';
         prazo = l.prazo || 'A definir';
         valor = l.valor;
       }
