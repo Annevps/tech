@@ -4,11 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Painel Administrativo — TechEmpire</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   /* ================= TEMA CLARO ================= */
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  :root { --bg: #F8F9FA; --s1: #FFFFFF; --s2: #F3F4F6; --border: #E5E7EB; --text-main: #1F2937; --text-muted: #6B7280; --brand: #8fd21f; --brand-dark: #7ab81a; --err: #EF4444; }
+  :root {
+    --bg: #F8F9FA; --s1: #FFFFFF; --s2: #F3F4F6;
+    --border: #E5E7EB; --text-main: #1F2937; --text-muted: #6B7280;
+    --brand: #8fd21f; --brand-dark: #7ab81a; --err: #EF4444;
+  }
   body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
   a { text-decoration: none; color: inherit; }
   button { cursor: pointer; font-family: inherit; border: none; background: none; }
@@ -17,10 +21,15 @@
   .sidebar { width: 240px; background: var(--s1); border-right: 1px solid var(--border); padding: 24px; display: flex; flex-direction: column; flex-shrink: 0; }
   .logo { display: flex; align-items: center; gap: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 40px; color: var(--text-main); }
   .logo i { background: var(--brand); color: #fff; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; font-style: normal; font-weight: 800; }
+  .logo b { color: var(--text-main); }
+  
   .sidebar nav { display: flex; flex-direction: column; gap: 4px; }
   .sidebar a { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px; font-weight: 500; color: var(--text-muted); transition: 0.2s; font-size: 14px; cursor: pointer; }
   .sidebar a:hover, .sidebar a.active { background: rgba(143, 210, 31, 0.1); color: var(--brand-dark); }
   .sidebar .sair { margin-top: auto; color: var(--err); }
+
+  .card-footer-logo { margin-top: 20px; background: var(--s2); padding: 16px; border-radius: 12px; border: 1px solid var(--border); font-size: 12px; color: var(--text-muted); }
+  .card-footer-logo b { color: var(--text-main); display: block; font-size: 14px; margin-bottom: 4px; }
 
   /* MAIN */
   .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
@@ -28,36 +37,20 @@
   .search-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; width: 350px; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
   .search-box input { background: none; border: none; outline: none; color: var(--text-main); width: 100%; font-size: 13px; }
   .user-info { display: flex; align-items: center; gap: 20px; }
+  .notif-icon { position: relative; font-size: 20px; color: var(--text-muted); cursor: pointer; }
+  .user-block { display: flex; align-items: center; gap: 12px; }
   .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--s2); display: grid; place-items: center; border: 1px solid var(--border); }
 
   /* CONTEÚDO */
   .content-area { flex: 1; display: grid; grid-template-columns: 1fr 340px; overflow: hidden; }
   .main-content { padding: 32px; overflow-y: auto; display: flex; flex-direction: column; }
-  
-  .page-header { margin-bottom: 24px; }
+  .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+  .page-header .texts span { color: var(--brand-dark); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; display: block; }
   .page-header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; }
   .page-header p { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
 
   .tela { display: none; flex-direction: column; flex: 1; }
   .tela.active { display: flex; }
-
-  /* KANBAN E CARDS */
-  .summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
-  .summary-card { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 4px; }
-  .summary-card h3 { font-size: 24px; font-family: 'Space Grotesk'; color: var(--brand-dark); line-height: 1; }
-  .summary-card p { font-size: 13px; color: var(--text-muted); margin: 0; }
-
-  .kanban-board { display: flex; gap: 16px; flex: 1; overflow-x: auto; }
-  .kanban-col { min-width: 260px; flex: 1; background: transparent; }
-  .kanban-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; font-size: 13px; font-weight: 600; color: var(--text-main); }
-  .kanban-cards { display: flex; flex-direction: column; gap: 12px; }
-  .kanban-card { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; cursor: pointer; transition: 0.2s; }
-  .kanban-card:hover { border-color: var(--brand); }
-  .kanban-card .k-tag { font-size: 11px; color: var(--text-muted); font-family: monospace; margin-bottom: 8px; display: block; }
-  .kanban-card .k-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
-  .kanban-card .k-desc { font-size: 12px; color: var(--text-muted); }
-  
-  .empty-col { border: 1px dashed var(--border); border-radius: 12px; padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px; }
 
   /* TABELAS */
   .table-box { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-top: 16px; width: 100%; }
@@ -68,6 +61,38 @@
   .pill { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; background: rgba(143, 210, 31, 0.15); color: var(--brand-dark); }
   .btn-acao { background: var(--brand); color: #fff; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; transition: 0.2s; }
   .btn-acao:hover { background: var(--brand-dark); }
+  .btn-sec { background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; margin-left: 5px; transition: 0.2s; }
+  .btn-sec:hover { border-color: var(--brand); color: var(--brand-dark); }
+
+  /* KANBAN */
+  .summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+  .summary-card { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 12px; }
+  .summary-card .icon { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-size: 18px; }
+  .summary-card .icon.green { background: rgba(143, 210, 31, 0.1); color: var(--brand-dark); }
+  .summary-card .icon.blue { background: rgba(59, 130, 246, 0.1); color: #3B82F6; }
+  .summary-card .icon.yellow { background: rgba(245, 158, 11, 0.1); color: #F59E0B; }
+  .summary-card .icon.gray { background: var(--s2); color: var(--text-muted); }
+  .summary-card .info h3 { font-size: 20px; font-family: 'Space Grotesk'; line-height: 1; }
+  .summary-card .info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  .kanban-board { display: flex; gap: 16px; flex: 1; overflow-x: auto; }
+  .kanban-col { min-width: 260px; flex: 1; background: transparent; }
+  .kanban-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; font-size: 13px; font-weight: 600; color: var(--text-main); }
+  .kanban-header .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .kanban-header .count { color: var(--text-muted); }
+  
+  .kanban-cards { display: flex; flex-direction: column; gap: 12px; }
+  .kanban-card { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; cursor: pointer; transition: 0.2s; }
+  .kanban-card:hover { border-color: var(--brand); }
+  .k-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .k-icon { width: 32px; height: 32px; background: var(--s2); border-radius: 8px; display: grid; place-items: center; font-size: 16px; }
+  .k-tag { font-size: 10px; color: var(--text-muted); font-family: monospace; }
+  .k-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  .k-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+  .k-card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 12px; }
+  .k-date { font-size: 11px; color: var(--text-muted); }
+  .k-pill { font-size: 10px; font-weight: 600; padding: 4px 8px; border-radius: 4px; background: rgba(143, 210, 31, 0.15); color: var(--brand-dark); }
+  .empty-col { border: 1px dashed var(--border); border-radius: 12px; padding: 40px 20px; text-align: center; color: var(--text-muted); font-size: 12px; }
 
   /* ANOTAÇÕES */
   .sidebar-notes { background: var(--s1); border-left: 1px solid var(--border); padding: 24px; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; }
@@ -76,20 +101,24 @@
   .note-input-box textarea { width: 100%; background: transparent; border: none; color: var(--text-main); outline: none; resize: none; font-size: 13px; font-family: 'Inter'; height: 60px; margin-bottom: 12px; }
   .note-tools { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 12px; color: var(--text-muted); }
   .btn-save-note { background: var(--brand); color: #fff; padding: 6px 16px; border-radius: 6px; font-weight: 600; font-size: 12px; }
+  .note-item { background: var(--bg); border-radius: 8px; padding: 16px; margin-bottom: 12px; border-left: 3px solid var(--brand); display: flex; justify-content: space-between; }
+  .note-text { font-size: 12px; line-height: 1.5; color: var(--text-main); }
+  .btn-del-note { color: var(--err); cursor: pointer; font-size: 16px; padding: 0 4px; opacity: 0.5; transition: 0.2s; }
 
-  /* MODAL */
+  /* MODAIS */
   .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-  .modal-box { background: var(--s1); border: 1px solid var(--border); border-radius: 16px; width: 95%; max-width: 500px; padding: 32px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+  .modal-box { background: var(--s1); border: 1px solid var(--border); border-radius: 16px; width: 95%; max-width: 500px; padding: 32px; display: flex; flex-direction: column; gap: 16px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
   .modal-box h2 { font-family: 'Space Grotesk'; color: var(--text-main); font-size: 20px; margin-bottom: 8px;}
+  .form-group { margin-bottom: 8px; }
   .form-group label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block; font-weight: 600;}
-  .form-group input, .form-group select { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-main); outline: none; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-main); outline: none; font-family: 'Inter';}
+  .form-group input:focus, .form-group textarea:focus { border-color: var(--brand); background: #fff; }
   .modal-actions { display: flex; justify-content: space-between; margin-top: 16px; gap: 10px;}
   .btn-modal { padding: 12px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; }
   .btn-modal.primary { background: var(--brand); color: #fff; }
   .btn-modal.danger { background: var(--err); color: #fff; }
   .btn-modal.secondary { background: var(--s1); border: 1px solid var(--border); color: var(--text-main); }
 
-  /* RESPONSIVO */
   @media (max-width: 1000px) { .content-area { grid-template-columns: 1fr; } .sidebar-notes { display: none; } }
 </style>
 </head>
@@ -100,8 +129,9 @@
     <nav>
       <a id="nav-inicio" class="active" onclick="mudarAba('inicio')">🏠 Início</a>
       <a id="nav-chamados" onclick="mudarAba('chamados')">🎫 Chamados</a>
+      <a id="nav-laudos" onclick="mudarAba('laudos')">📄 Laudos / Briefings</a>
       <a id="nav-clientes" onclick="mudarAba('clientes')">👥 Clientes</a>
-      <a href="login.html" class="sair">🚪 Sair</a>
+      <a href="login.html" class="sair">🚪 Sair da conta</a>
     </nav>
   </div>
 
@@ -109,42 +139,66 @@
     <div class="topbar">
       <div class="search-box"><span>🔍</span><input type="text" placeholder="Buscar..."></div>
       <div class="user-info">
-        <div class="avatar">👤</div>
-        <div><div style="font-size: 13px; font-weight: 600;">Administrador</div></div>
+        <div class="notif-icon">🔔</div>
+        <div class="user-block">
+          <div class="avatar">👤</div>
+          <div><div style="font-size: 13px; font-weight: 600;">Administrador</div><div style="font-size: 11px; color: var(--brand-dark);">Painel</div></div>
+        </div>
       </div>
     </div>
 
     <div class="content-area">
       <div class="main-content">
+        
         <div class="page-header">
-          <h1 id="page-title">Organização</h1>
-          <p id="page-desc">Gerencie os projetos.</p>
+          <div class="texts">
+            <span id="page-subtitle">Painel Administrativo</span>
+            <h1 id="page-title">Organização de Projetos</h1>
+            <p id="page-desc">Acompanhe e gerencie todos os projetos e chamados.</p>
+          </div>
         </div>
 
-        <!-- TELA INÍCIO (KANBAN) -->
+        <!-- TELA: INÍCIO (KANBAN) -->
         <div id="tela-inicio" class="tela active">
           <div class="summary-cards">
-            <div class="summary-card"><h3 id="sum-novos">0</h3><p>Novos pedidos</p></div>
-            <div class="summary-card"><h3 id="sum-execucao">0</h3><p>Em execução</p></div>
-            <div class="summary-card"><h3 id="sum-aguardando">0</h3><p>Aguardando cliente</p></div>
-            <div class="summary-card"><h3 id="sum-concluidos">0</h3><p>Concluídos</p></div>
+            <div class="summary-card"><div class="icon green">📁</div><div class="info"><h3 id="sum-novos">0</h3><p>Novos pedidos</p></div></div>
+            <div class="summary-card"><div class="icon blue">⚙️</div><div class="info"><h3 id="sum-execucao">0</h3><p>Em execução</p></div></div>
+            <div class="summary-card"><div class="icon yellow">👤</div><div class="info"><h3 id="sum-aguardando">0</h3><p>Aguardando cliente</p></div></div>
+            <div class="summary-card"><div class="icon gray">✓</div><div class="info"><h3 id="sum-concluidos">0</h3><p>Concluídos</p></div></div>
           </div>
           <div class="kanban-board" id="kanban-board"></div>
         </div>
 
-        <!-- TELA CHAMADOS -->
+        <!-- TELA: CHAMADOS -->
         <div id="tela-chamados" class="tela">
           <div class="table-box">
-            <table><thead><tr><th>Protocolo</th><th>Cliente</th><th>Status</th></tr></thead><tbody id="tabela-chamados-body"></tbody></table>
+            <table>
+              <thead><tr><th>Protocolo</th><th>Cliente</th><th>Assunto</th><th>Status</th><th>Ações</th></tr></thead>
+              <tbody id="tabela-chamados-body"></tbody>
+            </table>
           </div>
         </div>
 
-        <!-- TELA CLIENTES -->
-        <div id="tela-clientes" class="tela">
+        <!-- TELA: LAUDOS -->
+        <div id="tela-laudos" class="tela">
           <div class="table-box">
-            <table><thead><tr><th>Nome</th><th>E-mail</th><th>Telefone</th></tr></thead><tbody id="tabela-clientes-body"></tbody></table>
+            <table>
+              <thead><tr><th>Protocolo</th><th>Cliente</th><th>Tipo</th><th>Ação</th></tr></thead>
+              <tbody id="tabela-laudos-body"></tbody>
+            </table>
           </div>
         </div>
+
+        <!-- TELA: CLIENTES -->
+        <div id="tela-clientes" class="tela">
+          <div class="table-box">
+            <table>
+              <thead><tr><th>Nome</th><th>E-mail</th><th>Telefone</th></tr></thead>
+              <tbody id="tabela-clientes-body"></tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
 
       <!-- ANOTAÇÕES -->
@@ -161,14 +215,15 @@
     </div>
   </div>
 
-  <!-- MODAL -->
+  <!-- MODAL DE GERENCIAMENTO -->
   <div class="modal" id="modal-chamado">
     <div class="modal-box">
       <h2>Gerenciar Chamado</h2>
       <input type="hidden" id="edit-id">
       <div class="form-group"><label>Cliente</label><input type="text" id="edit-cliente" disabled style="opacity: 0.6;"></div>
+      <div class="form-group"><label>E-mail</label><input type="email" id="edit-email" disabled style="opacity: 0.6;"></div>
       <div class="form-group">
-        <label>Status</label>
+        <label>Status do Atendimento</label>
         <select id="edit-status">
           <option value="Nova chamada">Nova chamada</option>
           <option value="Em andamento">Em andamento</option>
@@ -179,7 +234,7 @@
       <div class="modal-actions">
         <button class="btn-modal danger" onclick="excluirChamado()">Excluir</button>
         <div style="display: flex; gap: 10px;">
-          <button class="btn-modal secondary" onclick="fecharModal()">Cancelar</button>
+          <button class="btn-modal secondary" onclick="fecharModal('modal-chamado')">Cancelar</button>
           <button class="btn-modal primary" onclick="salvarChamado()">Salvar</button>
         </div>
       </div>
@@ -190,7 +245,7 @@
   <script src="supabase-config.js"></script>
   <script>
     const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
-    let chamados = [], clientes = [], idAdmin = null;
+    let idAdmin = null, chamados = [], clientes = [];
 
     async function init() {
       const { data: { session } } = await db.auth.getSession();
@@ -206,18 +261,23 @@
       const { data: cl } = await db.from("usuarios").select("*").eq("is_admin", false);
       clientes = cl || [];
       renderizarKanban();
-      renderizarTabelas();
+      renderizarTabelaChamados();
+      renderizarTabelaLaudos();
+      renderizarTabelaClientes();
     }
 
     function mudarAba(aba) {
       document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
       document.getElementById('nav-' + aba).classList.add('active');
+      const title = document.getElementById('page-title');
+      const desc = document.getElementById('page-desc');
       document.querySelectorAll('.tela').forEach(t => t.classList.remove('active'));
       document.getElementById('tela-' + aba).classList.add('active');
 
-      if (aba === 'inicio') { document.getElementById('page-title').textContent = 'Organização'; renderizarKanban(); }
-      if (aba === 'chamados') { document.getElementById('page-title').textContent = 'Chamados'; renderizarTabelas(); }
-      if (aba === 'clientes') { document.getElementById('page-title').textContent = 'Clientes'; renderizarTabelas(); }
+      if (aba === 'inicio') { title.textContent = 'Organização'; desc.textContent = 'Gerencie os projetos.'; renderizarKanban(); }
+      if (aba === 'chamados') { title.textContent = 'Chamados'; desc.textContent = 'Todos os pedidos.'; renderizarTabelaChamados(); }
+      if (aba === 'laudos') { title.textContent = 'Laudos'; desc.textContent = 'Manutenção e Sites.'; renderizarTabelaLaudos(); }
+      if (aba === 'clientes') { title.textContent = 'Clientes'; desc.textContent = 'Base de dados.'; renderizarTabelaClientes(); }
     }
 
     function renderizarKanban() {
@@ -231,22 +291,23 @@
       document.getElementById('sum-aguardando').textContent = aguard;
       document.getElementById('sum-concluidos').textContent = concl;
 
-      const cols = [
-        { id: 'Nova chamada', title: 'Novos pedidos' },
-        { id: 'Em andamento', title: 'Em execução' },
-        { id: 'Aguardando', title: 'Aguardando cliente' },
-        { id: 'Concluída', title: 'Concluídos' }
+      const colunas = [
+        { id: 'Nova chamada', title: 'Novos pedidos', color: 'var(--brand)', count: novos },
+        { id: 'Em andamento', title: 'Em execução', color: '#3B82F6', count: exec },
+        { id: 'Aguardando', title: 'Aguardando', color: '#F59E0B', count: aguard },
+        { id: 'Concluída', title: 'Concluídos', color: 'var(--text-muted)', count: concl }
       ];
 
       let html = '';
-      cols.forEach(col => {
+      colunas.forEach(col => {
         let filtrados = col.id === 'Aguardando' ? chamados.filter(c => c.status === 'Aguardando aprovação do orçamento') : chamados.filter(c => c.status === col.id);
-        html += `<div class="kanban-col"><div class="kanban-header">${col.title} (${filtrados.length})</div><div class="kanban-cards">`;
+        html += `<div class="kanban-col"><div class="kanban-header"><div class="dot" style="background: ${col.color}"></div>${col.title} (${col.count})</div><div class="kanban-cards">`;
         if (filtrados.length === 0) html += `<div class="empty-col">Nenhum projeto.</div>`;
         else {
           filtrados.forEach(c => {
-            html += `<div class="kanban-card" onclick="abrirModal('${c.id}')">
-              <span class="k-tag">${c.protocolo || 'S/N'}</span>
+            const isSite = c.categoria && c.categoria.toLowerCase().includes('site');
+            html += `<div class="kanban-card" onclick="abrirModalChamado('${c.id}')">
+              <div class="k-card-top"><div class="k-icon">${isSite ? '💻' : '🔧'}</div><div class="k-tag">${c.protocolo || 'S/N'}</div></div>
               <div class="k-title">${c.cliente_nome || 'Visitante'}</div>
               <div class="k-desc">${c.titulo || 'Sem descrição'}</div>
             </div>`;
@@ -257,33 +318,57 @@
       document.getElementById('kanban-board').innerHTML = html;
     }
 
-    function renderizarTabelas() {
-      let htmlC = '';
+    function renderizarTabelaChamados() {
+      let html = '';
       chamados.forEach(c => {
-        htmlC += `<tr><td>${c.protocolo || 'S/N'}</td><td>${c.cliente_nome || 'Visitante'}</td><td><span class="pill">${c.status}</span></td></tr>`;
+        html += `<tr>
+          <td>${c.protocolo || 'S/N'}</td>
+          <td>${c.cliente_nome || 'Visitante'}</td>
+          <td>${c.titulo}</td>
+          <td><span class="pill">${c.status}</span></td>
+          <td><button class="btn-acao" onclick="abrirModalChamado('${c.id}')">Gerenciar</button></td>
+        </tr>`;
       });
-      document.getElementById('tabela-chamados-body').innerHTML = htmlC;
-
-      let htmlU = '';
-      clientes.forEach(c => {
-        htmlU += `<tr><td>${c.nome}</td><td>${c.email}</td><td>${c.telefone || '—'}</td></tr>`;
-      });
-      document.getElementById('tabela-clientes-body').innerHTML = htmlU;
+      document.getElementById('tabela-chamados-body').innerHTML = html;
     }
 
-    function abrirModal(id) {
+    function renderizarTabelaLaudos() {
+      let html = '';
+      chamados.forEach(c => {
+        const isSite = c.categoria && c.categoria.toLowerCase().includes('site');
+        const temDoc = isSite ? c.detalhes_projeto : c.laudo_tecnico;
+        html += `<tr>
+          <td>${c.protocolo || 'S/N'}</td>
+          <td>${c.cliente_nome || 'Visitante'}</td>
+          <td>${isSite ? 'Site' : 'Manutenção'}</td>
+          <td>${temDoc ? "✅ Emitido" : "⏳ Pendente"} <a href="laudo.html?id=${c.id}" target="_blank" class="btn-sec" style="float:right">Abrir PDF</a></td>
+        </tr>`;
+      });
+      document.getElementById('tabela-laudos-body').innerHTML = html;
+    }
+
+    function renderizarTabelaClientes() {
+      let html = '';
+      clientes.forEach(c => {
+        html += `<tr><td>${c.nome}</td><td>${c.email}</td><td>${c.telefone || '—'}</td></tr>`;
+      });
+      document.getElementById('tabela-clientes-body').innerHTML = html;
+    }
+
+    function abrirModalChamado(id) {
       const c = chamados.find(x => x.id === id);
       document.getElementById('edit-id').value = c.id;
       document.getElementById('edit-cliente').value = c.cliente_nome || 'Visitante';
+      document.getElementById('edit-email').value = c.cliente_email || '—';
       document.getElementById('edit-status').value = c.status;
       document.getElementById('modal-chamado').style.display = 'flex';
     }
 
     async function salvarChamado() {
       const id = document.getElementById('edit-id').value;
-      const status = document.getElementById('edit-status').value;
-      await db.from("chamados").update({ status }).eq("id", id);
-      fecharModal();
+      const novoStatus = document.getElementById('edit-status').value;
+      await db.from("chamados").update({ status: novoStatus }).eq("id", id);
+      fecharModal('modal-chamado');
       await carregarDados();
     }
 
@@ -291,7 +376,7 @@
       const id = document.getElementById('edit-id').value;
       if (!confirm("Excluir?")) return;
       await db.from("chamados").delete().eq("id", id);
-      fecharModal();
+      fecharModal('modal-chamado');
       await carregarDados();
     }
 
@@ -305,10 +390,16 @@
 
     async function carregarAnotacoes() {
       const { data } = await db.from('anotacoes').select('*').order('criado_em', { ascending: false });
-      document.getElementById('notes-list').innerHTML = data.length ? data.map(n => `<div style="background:#F8F9FA; border-left:3px solid #8fd21f; padding:12px; margin-bottom:8px; border-radius:6px; font-size:13px;">${n.texto}</div>`).join('') : '<p style="font-size:12px; color:#6B7280;">Nenhuma anotação.</p>';
+      document.getElementById('notes-list').innerHTML = data.length ? data.map(n => `<div class="note-item"><div class="note-text">${n.texto}</div><button class="btn-del-note" onclick="excluirAnotacao('${n.id}')">🗑️</button></div>`).join('') : '<p style="font-size:12px; color:#6B7280;">Nenhuma anotação.</p>';
     }
 
-    function fecharModal() { document.getElementById('modal-chamado').style.display = 'none'; }
+    async function excluirAnotacao(id) {
+      if (!confirm("Apagar?")) return;
+      await db.from('anotacoes').delete().eq('id', id);
+      carregarAnotacoes();
+    }
+
+    function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
 
     init();
   </script>
