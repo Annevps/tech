@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acompanhar Atendimento — TechEmpire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  .consulta-container { max-width: 600px; margin: 80px auto; background: var(--s1); padding: 40px; border-radius: 24px; border: 1px solid var(--line2); box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; }
+  .consulta-container h1 { font-family: 'Space Grotesk'; font-size: 32px; margin-bottom: 8px; color: var(--ink); }
+  .consulta-container h1 em { color: var(--lime); font-style: normal; }
+  .consulta-container p { color: var(--muted); margin-bottom: 32px; }
+  .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
+  .input-group input { flex: 1; padding: 16px; border-radius: 12px; border: 1px solid var(--line2); background: var(--bg); color: var(--ink); font-size: 16px; text-align: center; text-transform: uppercase; }
+  .input-group button { padding: 0 24px; border-radius: 12px; background: var(--lime); color: #fff; font-weight: bold; cursor: pointer; border: none; }
+  
+  /* Timeline */
+  .timeline { margin-top: 40px; text-align: left; display: none; }
+  .timeline-item { display: flex; gap: 16px; margin-bottom: 24px; position: relative; }
+  .timeline-item::before { content: ""; position: absolute; left: 11px; top: 24px; bottom: -24px; width: 2px; background: var(--line2); }
+  .timeline-item:last-child::before { display: none; }
+  .timeline-dot { width: 24px; height: 24px; border-radius: 50%; background: var(--bg); border: 2px solid var(--line2); display: grid; place-items: center; z-index: 1; flex-shrink: 0; }
+  .timeline-item.done .timeline-dot { background: var(--lime); border-color: var(--lime); color: #fff; }
+  .timeline-content h4 { font-size: 16px; margin-bottom: 4px; color: var(--ink); }
+  .timeline-content p { font-size: 14px; color: var(--muted); margin: 0; }
+  .timeline-item.done .timeline-content h4 { color: var(--lime2); }
+</style>
+</head>
+<body data-page="public" data-auth="public">
+<header id="site-header"></header>
+
+<main class="wrap-main">
+  <div class="consulta-container">
+    <h1>Acompanhe seu <em>Atendimento</em></h1>
+    <p>Digite o número do protocolo que você recebeu.</p>
+    
+    <div id="form-busca">
+      <div class="input-group">
+        <input type="text" id="protocolo" placeholder="TE-20231025-0001">
+        <button onclick="buscar()">Buscar</button>
+      </div>
+    </div>
+    
+    <div id="msg-consulta" class="msg" style="margin-top: 20px;"></div>
+
+    <div id="resultado" class="timeline">
+      <h3 id="res-protocolo" style="font-family: 'Space Grotesk'; margin-bottom: 24px;"></h3>
+      
+      <div class="timeline-item done">
+        <div class="timeline-dot">✓</div>
+        <div class="timeline-content"><h4>Chamado Recebido</h4><p id="res-data"></p></div>
+      </div>
+      
+      <div class="timeline-item" id="step-status">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content"><h4 id="res-status"></h4><p id="res-desc"></p></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer id="site-footer"></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="data.js"></script>
+<script src="script.js"></script>
+
+<script>
+  async function buscar() {
+    const protocolo = document.getElementById('protocolo').value.trim().toUpperCase();
+    const msg = document.getElementById('msg-consulta');
+    const res = document.getElementById('resultado');
+    
+    if (!protocolo) return;
+    msg.textContent = "Buscando...";
+    msg.className = "msg on ok";
+
+    const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
+    
+    // Busca apenas os dados públicos do chamado
+    const { data, error } = await db.from('chamados')
+      .select('protocolo, titulo, status, descricao, criado_em')
+      .eq('protocolo', protocolo)
+      .maybeSingle();
+
+    if (error || !data) {
+      msg.textContent = "Protocolo não encontrado. Verifique o código.";
+      msg.className = "msg on err";
+      res.style.display = "none";
+      return;
+    }
+
+    msg.className = "msg"; // Esconde a mensagem
+    res.style.display = "block";
+
+    document.getElementById('res-protocolo').textContent = data.protocolo;
+    document.getElementById('res-data').textContent = new Date(data.criado_em).toLocaleString('pt-BR');
+    document.getElementById('res-status').textContent = "Status: " + data.status;
+    document.getElementById('res-desc').textContent = data.titulo + " - " + data.descricao;
+
+    // Lógica visual simples para a timeline
+    const step = document.getElementById('step-status');
+    if (data.status === 'Concluída') {
+      step.classList.add('done');
+      step.querySelector('.timeline-dot').textContent = "✓";
+    }
+  }
+</script>
+</body>
+</html>
