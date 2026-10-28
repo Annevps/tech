@@ -6,228 +6,241 @@
 <title>Contato — TechEmpire</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  .form-section { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin-bottom: 24px; }
-  .form-section h3 { border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 24px; font-family: var(--font-head); }
+  /* ================= CSS FORÇADO NO ARQUIVO ================= */
+  :root {
+    --bg: #F8F9FA; --s1: #FFFFFF; --s2: #F3F4F6;
+    --line: #E5E7EB; --line2: #D1D5DB;
+    --ink: #1F2937; --muted: #6B7280;
+    --lime: #8fd21f; --lime2: #7ab81a;
+    --err: #EF4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); line-height: 1.6; }
+  a { text-decoration: none; color: inherit; }
+  
+  /* Header (simplificado para esta página) */
+  header { background: rgba(248,249,250,0.85); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50; }
+  .bar-in { max-width: 1160px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .logo img { height: 50px; width: auto; }
+  nav { display: flex; align-items: center; gap: 8px; }
+  nav a { padding: 8px 14px; border-radius: 99px; font-weight: 500; font-size: 15px; color: var(--muted); transition: 0.2s; }
+  nav a:hover { color: var(--ink); background: var(--line); }
+  .btn-nav { border: 1px solid var(--line2); padding: 8px 16px; border-radius: 99px; font-weight: 600; font-size: 14px; }
+  .btn-nav.primary { background: var(--lime); border-color: var(--lime); color: #fff; }
+
+  /* Formulário */
+  .page-header { text-align: center; margin-bottom: 40px; padding-top: 40px; }
+  .page-header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 48px; font-weight: 700; margin-bottom: 16px; }
+  .page-header h1 em { font-style: normal; color: var(--lime); }
+  .page-header p { color: var(--muted); font-size: 18px; max-width: 600px; margin: 0 auto 24px; }
+  
+  .btn-whats { display: inline-flex; align-items: center; gap: 8px; background: #25D366; color: #fff; padding: 14px 28px; border-radius: 99px; font-weight: 600; font-size: 16px; transition: 0.3s; }
+  .btn-whats:hover { background: #1EBE5D; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3); }
+
+  .form-container { max-width: 800px; margin: 0 auto; background: var(--s1); border: 1px solid var(--line); border-radius: 24px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+  
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  @media (max-width: 760px) { .form-grid { grid-template-columns: 1fr; } }
   .full-width { grid-column: 1 / -1; }
+  
+  .input-group { display: flex; flex-direction: column; gap: 8px; }
+  .input-group label { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line2); background: var(--bg); color: var(--ink); font-size: 15px; transition: 0.2s; }
+  .input-group input:focus, .input-group select:focus, .input-group textarea:focus { outline: none; border-color: var(--lime); background: #fff; box-shadow: 0 0 0 3px rgba(143, 210, 31, 0.15); }
+  .input-group textarea { min-height: 120px; resize: vertical; }
+  
+  .btn-submit { width: 100%; background: var(--lime); color: #fff; border: none; padding: 18px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+  .btn-submit:hover { background: var(--lime2); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(143, 210, 31, 0.3); }
+  
+  .msg { padding: 16px; border-radius: 12px; margin-bottom: 20px; font-weight: 500; display: none; }
+  .msg.on { display: block; }
+  .msg.ok { background: rgba(143, 210, 31, 0.1); color: #5c8a10; border: 1px solid rgba(143, 210, 31, 0.3); }
+  .msg.err { background: rgba(239, 68, 68, 0.1); color: var(--err); border: 1px solid rgba(239, 68, 68, 0.3); }
+
+  @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } .form-container { padding: 24px; } }
 </style>
 </head>
-<body data-page="contato" data-auth="public">
-<header id="site-header"></header>
+<body>
 
-<main class="wrap-main">
-  <div style="max-width: 800px; margin: 0 auto;">
-    <div style="text-align: center; margin-bottom: 48px;">
-      <span class="badge">Fale Conosco</span>
-      <h1 style="font-size: clamp(32px, 5vw, 48px);">Como podemos <em>ajudar?</em></h1>
-      <p class="lead" style="margin: 0 auto;">Preencha o formulário abaixo e nossa equipe entrará em contato. Se preferir, você pode falar direto no WhatsApp.</p>
-      <div style="margin-top: 24px;">
-        <a href="https://wa.me/5533998414684?text=Ol%C3%A1%2C%20gostaria%20de%20falar%20com%20a%20TechEmpire." target="_blank" class="btn primary" style="background: #25D366; border-color: #25D366; color: #fff;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-          Chamar no WhatsApp
-        </a>
-      </div>
+  <header>
+    <div class="bar-in">
+      <a href="index.html" class="logo"><img src="tech.png" alt="TechEmpire"></a>
+      <nav>
+        <a href="index.html">Início</a>
+        <a href="servicos.html">Serviços</a>
+        <a href="contato.html" style="color: var(--ink); font-weight: 600;">Contato</a>
+        <a href="consulta.html" style="color: var(--lime2); font-weight: 600;">Acompanhar</a>
+        <a href="login.html" class="btn-nav">Entrar</a>
+        <a href="criar-conta.html" class="btn-nav primary">Criar conta</a>
+      </nav>
+    </div>
+  </header>
+
+  <main style="padding: 40px 24px 80px;">
+    <div class="page-header">
+      <h1>Como podemos <em>ajudar?</em></h1>
+      <p>Preencha o formulário abaixo e nossa equipe entrará em contato. Se preferir, você pode falar direto no WhatsApp.</p>
+      <a href="https://wa.me/5533998414684" target="_blank" class="btn-whats">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+        Chamar no WhatsApp
+      </a>
     </div>
 
-    <form id="form-contato" class="form-section">
+    <div class="form-container">
       <div class="msg" id="msg-contato"></div>
       
-      <div class="form-grid">
-        <div class="full-width">
-          <label>Nome Completo *</label>
-          <input type="text" id="nome" required placeholder="Seu nome">
+      <form id="form-contato">
+        <div class="form-grid">
+          <div class="input-group full-width">
+            <label>Nome Completo *</label>
+            <input type="text" id="nome" required placeholder="Seu nome">
+          </div>
+          <div class="input-group">
+            <label>E-mail *</label>
+            <input type="email" id="email" required placeholder="seu@email.com">
+          </div>
+          <div class="input-group">
+            <label>Telefone (com DDD) *</label>
+            <input type="tel" id="telefone" required placeholder="(33) 99999-9999">
+          </div>
+          <div class="input-group">
+            <label>WhatsApp (opcional)</label>
+            <input type="tel" id="whatsapp" placeholder="(33) 99999-9999">
+          </div>
+          <div class="input-group">
+            <label>Cidade *</label>
+            <input type="text" id="cidade" required placeholder="Sua cidade">
+          </div>
+
+          <div class="input-group full-width" style="margin-top: 20px; border-top: 1px solid var(--line); padding-top: 24px;">
+            <label>Tipo de Solicitação *</label>
+            <select id="tipo" required>
+              <option value="">Selecione o serviço...</option>
+              <option value="Manutenção de Computador">Manutenção de Computador</option>
+              <option value="Assistência para Celular">Assistência para Celular</option>
+              <option value="Suporte Técnico">Suporte Técnico</option>
+              <option value="Criação de Site">Criação de Site</option>
+              <option value="Outro">Outro Serviço</option>
+            </select>
+          </div>
+
+          <div class="input-group full-width">
+            <label>Assunto da Solicitação *</label>
+            <input type="text" id="assunto" required placeholder="Resuma o problema em uma frase">
+          </div>
+
+          <div class="input-group full-width">
+            <label>Descrição Detalhada *</label>
+            <textarea id="descricao" required placeholder="Descreva o problema ou o que você precisa."></textarea>
+          </div>
+
+          <div class="input-group full-width">
+            <label>Preferência de Atendimento</label>
+            <select id="preferencia">
+              <option value="site">Pelo próprio site (chat)</option>
+              <option value="whatsapp">Pelo WhatsApp</option>
+              <option value="email">Por e-mail</option>
+            </select>
+          </div>
+
+          <div class="input-group full-width">
+            <label>Fotos ou Arquivos (opcional)</label>
+            <input type="file" id="arquivos" multiple accept="image/*,.pdf">
+          </div>
         </div>
-        <div>
-          <label>E-mail *</label>
-          <input type="email" id="email" required placeholder="seu@email.com">
-        </div>
-        <div>
-          <label>Telefone (com DDD) *</label>
-          <input type="tel" id="telefone" required placeholder="(33) 99999-9999">
-        </div>
-        <div>
-          <label>WhatsApp (opcional)</label>
-          <input type="tel" id="whatsapp" placeholder="(33) 99999-9999">
-        </div>
-        <div>
-          <label>Cidade *</label>
-          <input type="text" id="cidade" required placeholder="Sua cidade">
-        </div>
 
-        <div class="full-width" style="margin-top: 16px; border-top: 1px solid var(--border); padding-top: 24px;">
-          <label>Tipo de Solicitação *</label>
-          <select id="tipo" required>
-            <option value="">Selecione o serviço...</option>
-            <option value="Manutenção de Computador">Manutenção de Computador</option>
-            <option value="Assistência para Celular">Assistência para Celular</option>
-            <option value="Suporte Técnico">Suporte Técnico</option>
-            <option value="Criação de Site">Criação de Site</option>
-            <option value="Outro">Outro Serviço</option>
-          </select>
-        </div>
+        <button type="submit" class="btn-submit" id="btn-enviar">Enviar Solicitação</button>
+      </form>
+    </div>
+  </main>
 
-        <div class="full-width">
-          <label>Assunto da Solicitação *</label>
-          <input type="text" id="assunto" required placeholder="Resuma o problema em uma frase">
-        </div>
+  <footer style="border-top: 1px solid var(--line); background: var(--s1); padding: 40px 24px; text-align: center;">
+    <img src="tech.png" alt="TechEmpire" style="height: 50px; margin-bottom: 16px;">
+    <p style="color: var(--muted); font-size: 14px;">© 2026 TechEmpire. Todos os direitos reservados.</p>
+  </footer>
 
-        <div class="full-width">
-          <label>Descrição Detalhada *</label>
-          <textarea id="descricao" rows="5" required placeholder="Descreva o problema ou o que você precisa."></textarea>
-        </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="supabase-config.js"></script>
+  
+  <script>
+    document.getElementById('form-contato').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-enviar');
+      const msg = document.getElementById('msg-contato');
+      
+      btn.disabled = true;
+      btn.textContent = "Enviando...";
+      msg.className = "msg";
 
-        <div class="full-width">
-          <label>Preferência de Atendimento</label>
-          <select id="preferencia">
-            <option value="site">Pelo próprio site (chat)</option>
-            <option value="whatsapp">Pelo WhatsApp</option>
-            <option value="email">Por e-mail</option>
-          </select>
-        </div>
+      const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
+      
+      const { data: { session } } = await db.auth.getSession();
+      const idCliente = session ? session.user.id : null;
 
-        <div class="full-width">
-          <label>Fotos ou Arquivos (opcional)</label>
-          <input type="file" id="arquivos" multiple accept="image/*,.pdf">
-        </div>
-      </div>
+      const telLimpo = document.getElementById('telefone').value.replace(/\D/g, '');
+      const whatsLimpo = document.getElementById('whatsapp').value.replace(/\D/g, '') || telLimpo;
 
-      <div style="margin-top: 32px;">
-        <button type="submit" class="btn primary" style="width: 100%; padding: 16px; font-size: 16px;" id="btn-enviar">Enviar Solicitação</button>
-      </div>
-    </form>
-  </div>
-</main>
+      if (telLimpo.length < 10) {
+        msg.textContent = "Por favor, informe um telefone válido com DDD.";
+        msg.className = "msg on err";
+        btn.disabled = false;
+        btn.textContent = "Enviar Solicitação";
+        return;
+      }
 
-<footer id="site-footer"></footer>
+      const formData = {
+        cliente_id: idCliente, 
+        cliente_nome: document.getElementById('nome').value.trim(),
+        cliente_email: document.getElementById('email').value.trim(),
+        cliente_telefone: telLimpo,
+        whatsapp: whatsLimpo,
+        cidade: document.getElementById('cidade').value.trim(),
+        categoria: document.getElementById('tipo').value,
+        titulo: document.getElementById('assunto').value.trim(),
+        descricao: document.getElementById('descricao').value.trim(),
+        preferencia_contato: document.getElementById('preferencia').value,
+        status: "Nova chamada"
+      };
 
-<!-- Bibliotecas Base -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="supabase-config.js"></script>
-<script src="data.js"></script>
-<script src="script.js"></script>
+      try {
+        const { data, error } = await db.from('chamados').insert([formData]).select('protocolo, id').single();
+        if (error) throw error;
 
-<!-- Script de Envio do Formulário -->
-<script>
-  document.getElementById('form-contato').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('btn-enviar');
-    const msg = document.getElementById('msg-contato');
-    
-    btn.disabled = true;
-    btn.textContent = "Enviando...";
-    msg.className = "msg";
-
-    const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
-    
-    // Verifica se o usuário está logado (para não dar erro no banco)
-    const { data: { session } } = await db.auth.getSession();
-    const idCliente = session ? session.user.id : null;
-    const emailForm = document.getElementById('email').value.trim();
-
-    // Limpa os números
-    const telLimpo = document.getElementById('telefone').value.replace(/\D/g, '');
-    const whatsLimpo = document.getElementById('whatsapp').value.replace(/\D/g, '') || telLimpo;
-
-    // Valida o telefone
-    if (telLimpo.length < 10) {
-      msg.textContent = "Por favor, informe um telefone válido com DDD.";
-      msg.className = "msg on err";
-      btn.disabled = false;
-      btn.textContent = "Enviar Solicitação";
-      return;
-    }
-
-    // Monta os dados
-    const formData = {
-      cliente_id: idCliente, 
-      cliente_nome: document.getElementById('nome').value.trim(),
-      cliente_email: emailForm,
-      cliente_telefone: telLimpo,
-      whatsapp: whatsLimpo,
-      cidade: document.getElementById('cidade').value.trim(),
-      categoria: document.getElementById('tipo').value,
-      titulo: document.getElementById('assunto').value.trim(),
-      descricao: document.getElementById('descricao').value.trim(),
-      preferencia_contato: document.getElementById('preferencia').value,
-      status: "Nova chamada"
-    };
-
-    try {
-      // Insere no banco
-      const { data, error } = await db.from('chamados').insert([formData]).select('protocolo, id').single();
-
-      if (error) throw error;
-
-      // Upload de arquivos
-      const files = document.getElementById('arquivos').files;
-      if (files.length > 0) {
-        for (const file of files) {
-          const path = `${data.id}/${Date.now()}-${file.name.replace(/[^\w.\-]+/g, "_")}`;
-          const { error: upError } = await db.storage.from('anexos').upload(path, file);
-          if (!upError) {
-            await db.from('arquivos_chamados').insert({
-              chamado_id: data.id,
-              nome_original: file.name,
-              caminho_storage: path,
-              tipo_arquivo: file.type
-            });
+        // Upload de arquivos
+        const files = document.getElementById('arquivos').files;
+        if (files.length > 0) {
+          for (const file of files) {
+            const path = `${data.id}/${Date.now()}-${file.name.replace(/[^\w.\-]+/g, "_")}`;
+            const { error: upError } = await db.storage.from('anexos').upload(path, file);
+            if (!upError) {
+              await db.from('arquivos_chamados').insert({
+                chamado_id: data.id, nome_original: file.name,
+                caminho_storage: path, tipo_arquivo: file.type
+              });
+            }
           }
         }
-      }
 
-      // ==========================================
-      // MENSAGEM DE SUCESSO INTELIGENTE
-      // ==========================================
-      let htmlSucesso = `
-        <div style="text-align: center; padding: 20px;">
-          <h3 style="color: var(--brand); margin-bottom: 16px;">Solicitação Enviada!</h3>
-          <p>Seu protocolo de atendimento é: <br><b style="font-size: 22px; color: white;">${data.protocolo}</b></p>
-      `;
-
-      // Se for visitante (não logado), incentiva a criar conta
-      if (!session) {
-        htmlSucesso += `
-          <div style="background: rgba(255,255,255,0.03); padding: 24px; border-radius: 12px; border: 1px solid var(--border); margin-top: 24px; text-align: left;">
-            <h4 style="font-size: 16px; margin-bottom: 8px; color: var(--text-main);">Acompanhe seu conserto em tempo real!</h4>
-            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">
-              Crie uma conta com o e-mail <b>${emailForm}</b> para ver o diagnóstico do técnico, aprovar o orçamento e conversar pelo chat.
-            </p>
-            <a href="criar-conta.html" class="btn primary" style="width: 100%; text-align: center;">Criar minha conta agora</a>
+        msg.innerHTML = `
+          <div style="text-align: center;">
+            <h3 style="color: var(--lime); margin-bottom: 8px;">Solicitação Enviada!</h3>
+            <p>Seu protocolo é: <b>${data.protocolo}</b></p>
+            <p style="margin-top: 8px; font-size: 14px;">Nossa equipe já foi notificada.</p>
           </div>
         `;
-      } else {
-        // Se já for cliente logado
-        htmlSucesso += `
-          <p style="margin-top: 16px;">Acompanhe o andamento pelo seu painel.</p>
-          <a href="painel.html" class="btn primary" style="margin-top: 16px; text-align: center; width: 100%;">Ir para o Meu Painel</a>
-        `;
+        msg.className = "msg on ok";
+        document.getElementById('form-contato').reset();
+
+      } catch (err) {
+        console.error("Erro detalhado:", err);
+        msg.innerHTML = `<strong>Erro ao salvar:</strong> ${err.message || err.details}`;
+        msg.className = "msg on err";
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Enviar Solicitação";
       }
-
-      // Botão do WhatsApp (comum para os dois)
-      htmlSucesso += `
-          <p style="margin-top: 24px; font-size: 14px; color: var(--text-muted);">Se preferir, fale com a gente agora:</p>
-          <a href="https://wa.me/5533998414684?text=Ol%C3%A1!%20Abri%20o%20protocolo%20${data.protocolo}%20no%20site." target="_blank" class="btn secondary" style="margin-top: 12px; width: 100%; background: transparent; border: 1px solid #25D366; color: #25D366;">
-            Chamar no WhatsApp
-          </a>
-        </div>
-      `;
-
-      msg.innerHTML = htmlSucesso;
-      msg.className = "msg on ok";
-      document.getElementById('form-contato').reset();
-
-    } catch (err) {
-      console.error("Erro detalhado:", err);
-      msg.innerHTML = `<strong>Erro ao salvar:</strong> ${err.message || err.details}`;
-      msg.className = "msg on err";
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "Enviar Solicitação";
-    }
-  });
-</script>
+    });
+  </script>
 </body>
 </html>
