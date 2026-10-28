@@ -32,21 +32,23 @@ Pages.manutencao = () => {
   renderer.domElement.style.touchAction = "pan-y";
 
   const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(35, 1, .1, 100); 
-  cam.position.set(0, .5, 15);
+  cam.position.set(0, 1, 16);
 
-  // Iluminação para fundo claro
-  scene.add(new THREE.AmbientLight(0xffffff, 0.9)); 
-  const dl = new THREE.DirectionalLight(0xffffff, 1.2); dl.position.set(5, 10, 7); scene.add(dl);
-  const pl = new THREE.PointLight(0x8fd21f, 2, 20); pl.position.set(-3, 2, 5); scene.add(pl);
+  // ================= ILUMINAÇÃO MELHORADA =================
+  scene.add(new THREE.AmbientLight(0xffffff, 0.6)); // Luz base mais suave
+  const dl1 = new THREE.DirectionalLight(0xffffff, 1.2); dl1.position.set(5, 10, 7); scene.add(dl1);
+  const dl2 = new THREE.DirectionalLight(0xffffff, 0.5); dl2.position.set(-5, 5, -5); scene.add(dl2); // Luz de preenchimento
+  const pl = new THREE.PointLight(0x8fd21f, 1.5, 20); pl.position.set(-3, 2, 5); scene.add(pl);
 
   const pc = new THREE.Group(); scene.add(pc); 
   const hit = [], porParte = {}, fans = [];
 
-  // Materiais
-  const matMetal = new THREE.MeshStandardMaterial({ color: 0x2a2d30, roughness: .4, metalness: .8 });
-  const matDark = new THREE.MeshStandardMaterial({ color: 0x121518, roughness: .6, metalness: .5 });
-  const matGlass = new THREE.MeshPhysicalMaterial({ color: 0xffffff, transparent: true, opacity: 0.05, roughness: 0.1, metalness: 0.1, clearcoat: 1, side: THREE.DoubleSide });
-  const matGreen = new THREE.MeshStandardMaterial({ color: 0x8fd21f, emissive: 0x8fd21f, emissiveIntensity: 0.6 });
+  // ================= MATERIAIS PREMIUM (Metais e Plásticos) =================
+  const matMetal = new THREE.MeshStandardMaterial({ color: 0x4a5056, roughness: 0.3, metalness: 0.9 }); // Metal claro
+  const matDark = new THREE.MeshStandardMaterial({ color: 0x2a2d30, roughness: 0.5, metalness: 0.7 }); // Plástico escuro
+  const matGlass = new THREE.MeshPhysicalMaterial({ color: 0xffffff, transparent: true, opacity: 0.1, roughness: 0.05, metalness: 0, clearcoat: 1, side: THREE.DoubleSide }); // Vidro
+  const matGreen = new THREE.MeshStandardMaterial({ color: 0x8fd21f, emissive: 0x8fd21f, emissiveIntensity: 0.8 }); // LED Verde
+  const matLED = new THREE.MeshBasicMaterial({ color: 0xffffff }); // LED Branco
 
   const caixa = (w, h, d, mat, x, y, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); return m; };
   
@@ -55,56 +57,74 @@ Pages.manutencao = () => {
     pc.add(obj); 
   }
 
+  // Função para criar ventoinhas detalhadas
   function fan(r, axisX) { 
     const g = new THREE.Group(), blades = new THREE.Group();
-    g.add(new THREE.Mesh(new THREE.TorusGeometry(r, r * .06, 12, 32), matDark));
-    for (let i = 0; i < 7; i++) { 
-      const b = new THREE.Mesh(new THREE.BoxGeometry(r * .85, r * .35, .02), new THREE.MeshStandardMaterial({ color: 0x3a3f44, roughness: .2, metalness: .9 })); 
-      const a = i / 7 * Math.PI * 2; 
+    g.add(new THREE.Mesh(new THREE.TorusGeometry(r, r * .08, 16, 48), matMetal)); // Aro externo
+    for (let i = 0; i < 9; i++) { 
+      const b = new THREE.Mesh(new THREE.BoxGeometry(r * .9, r * .25, .02), new THREE.MeshStandardMaterial({ color: 0x1a1c1f, roughness: 0.4, metalness: 0.5 })); 
+      const a = i / 9 * Math.PI * 2; 
       b.position.set(Math.cos(a) * r * .5, Math.sin(a) * r * .5, 0); 
       b.rotation.z = a + .35; blades.add(b); 
     }
-    const hub = new THREE.Mesh(new THREE.CylinderGeometry(r * .25, r * .25, .05, 16), matGreen); 
-    hub.rotation.x = Math.PI / 2; blades.add(hub); g.add(blades); fans.push(blades); 
+    const hub = new THREE.Mesh(new THREE.CylinderGeometry(r * .3, r * .3, .06, 24), matDark); 
+    const led = new THREE.Mesh(new THREE.CylinderGeometry(r * .15, r * .15, .07, 16), matLED); 
+    hub.rotation.x = Math.PI / 2; led.rotation.x = Math.PI / 2;
+    blades.add(hub, led); g.add(blades); fans.push(blades); 
     if (axisX) g.rotation.y = Math.PI / 2; 
     return g; 
   }
 
-  const W = 2.8, H = 5.4, D = 5.2;
+  const W = 3.2, H = 6.0, D = 5.8;
 
-  pc.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(W, H, D)), new THREE.LineBasicMaterial({ color: 0x8fd21f, transparent: true, opacity: .6 })));
+  // Gabinete de Vidro e Estrutura
+  pc.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(W, H, D)), new THREE.LineBasicMaterial({ color: 0x8fd21f, transparent: true, opacity: .5 })));
   pc.add(new THREE.Mesh(new THREE.BoxGeometry(W, H, D), matGlass));
-  pc.add(caixa(.1, 4.6, 4.4, matDark, -1.3, .2, .2));
+  
+  // Base e topo do gabinete
+  pc.add(caixa(W, .2, D, matDark, 0, H/2, 0));
+  pc.add(caixa(W, .2, D, matDark, 0, -H/2, 0));
 
+  // Placa-mãe
+  pc.add(caixa(.15, 5.0, 5.0, matDark, -1.5, .2, .2));
+
+  // Processador (CPU)
   const cpuG = new THREE.Group(); 
-  cpuG.add(caixa(.7, 1.1, 1.1, matMetal, -.9, 1.3, .3)); 
-  const wf = fan(.5, true); wf.position.set(-.5, 1.3, .3); cpuG.add(wf);
+  cpuG.add(caixa(.8, 1.2, 1.2, matMetal, -1.0, 1.5, .3)); 
+  const wf = fan(.6, true); wf.position.set(-.5, 1.5, .3); cpuG.add(wf);
   marcar("cpu", cpuG);
 
+  // Memória RAM
   const ramG = new THREE.Group(); 
-  [-1.1, -1.5, -1.9].forEach(z => { 
-    ramG.add(caixa(.15, 1.1, .2, matDark, -1.1, 1.4, z)); 
-    ramG.add(caixa(.16, .1, .22, matGreen, -1.1, 1.9, z)); 
+  [-1.2, -1.6, -2.0].forEach(z => { 
+    ramG.add(caixa(.15, 1.3, .2, matMetal, -1.2, 1.6, z)); 
+    ramG.add(caixa(.16, .1, .22, matGreen, -1.2, 2.15, z)); // LED verde na RAM
   }); 
   marcar("ram", ramG);
 
+  // Placa de Vídeo (GPU)
   const gpuG = new THREE.Group(); 
-  gpuG.add(caixa(.8, .7, 3.8, matMetal, -.9, -.7, .3)); 
-  [-.7, 1.1].forEach(z => { const f = fan(.55, true); f.position.set(-.5, -.7, z); gpuG.add(f); }); 
+  gpuG.add(caixa(1.2, .8, 4.2, matDark, -1.0, -.8, .3)); 
+  gpuG.add(caixa(1.2, .2, 4.2, matMetal, -1.0, -.3, .3)); // Detalhe superior
+  [-.8, 1.2].forEach(z => { const f = fan(.6, true); f.position.set(-.4, -.8, z); gpuG.add(f); }); 
   marcar("gpu", gpuG);
 
+  // Ventoinhas do Gabinete
   const fanG = new THREE.Group(); 
-  [[1.3, 2.6], [-.7, 2.6], [1.3, 0.8]].forEach(([y, z]) => { const f = fan(1.0, false); f.position.set(.3, y, z); fanG.add(f); }); 
+  [[1.5, 2.8], [-1.0, 2.8], [1.5, 1.0]].forEach(([y, z]) => { const f = fan(1.1, false); f.position.set(.4, y, z); fanG.add(f); }); 
   marcar("fans", fanG);
 
-  marcar("psu", caixa(2.4, 1.1, 2.8, matDark, 0, -2.4, -.9));
+  // Fonte (PSU)
+  marcar("psu", caixa(2.8, 1.3, 3.0, matDark, 0, -2.6, -1.0));
 
+  // SSD
   const ssdG = new THREE.Group(); 
-  ssdG.add(caixa(.6, 1.1, .2, matMetal, .9, .6, -2.0)); 
-  ssdG.add(caixa(.61, .1, .21, matGreen, .9, 1.0, -2.0)); 
+  ssdG.add(caixa(.7, 1.2, .25, matMetal, 1.1, .8, -2.2)); 
+  ssdG.add(caixa(.71, .1, .26, matGreen, 1.1, 1.3, -2.2)); 
   marcar("disco", ssdG);
 
-  let rotY = -1.2, rotX = .15, vel = 0, arrasta = false, lx = 0, ly = 0, moveu = 0, parado = 0, visivel = true; 
+  // ================= INTERATIVIDADE =================
+  let rotY = -1.0, rotX = .1, vel = 0, arrasta = false, lx = 0, ly = 0, moveu = 0, parado = 0, visivel = true; 
   const el = renderer.domElement, ray = new THREE.Raycaster(), v2 = new THREE.Vector2();
   const reduz = matchMedia("(prefers-reduced-motion:reduce)").matches;
 
@@ -113,17 +133,26 @@ Pages.manutencao = () => {
   el.addEventListener("pointerup", e => { arrasta = false; if (moveu < 6) { const r = el.getBoundingClientRect(); v2.set((e.clientX - r.left) / r.width * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(v2, cam); const h = ray.intersectObjects(hit, false)[0]; if (h) mostrar(h.object.userData.k); } });
   el.addEventListener("pointercancel", () => arrasta = false);
 
+  // Ajusta o tamanho do renderizador quando a janela muda
   const ro = new ResizeObserver(() => { const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }); ro.observe(stage);
+  
+  // Pausa a animação se não estiver visível na tela
   new IntersectionObserver(es => visivel = es[0].isIntersecting).observe(stage);
   
   const rel = new THREE.Clock();
   (function loop() { 
     requestAnimationFrame(loop); if (!visivel) return; const t = rel.getElapsedTime();
-    if (!arrasta) { rotY += vel; vel *= .93; parado += 1 / 60; if (!reduz && parado > 2) rotY += .004; }
+    
+    // Movimento suave
+    if (!arrasta) { rotY += vel; vel *= .93; parado += 1 / 60; if (!reduz && parado > 2) rotY += .005; }
     pc.rotation.set(rotX, rotY, 0); 
-    if (!reduz) fans.forEach((f, i) => f.rotation.z -= .08 + i * .002);
+    
+    // Rotação das ventoinhas
+    if (!reduz) fans.forEach((f, i) => f.rotation.z -= .1 + i * .005);
+    
     renderer.render(scene, cam); 
   })();
 
+  // Inicializa mostrando o processador
   mostrar("cpu");
 };
