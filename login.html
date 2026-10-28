@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* TEMA CLARO PREMIUM */
   :root { --bg: #F8F9FA; --s1: #FFFFFF; --line: #E5E7EB; --line2: #D1D5DB; --ink: #1F2937; --muted: #6B7280; --lime: #8fd21f; --lime2: #7ab81a; --err: #EF4444; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); line-height: 1.6; }
@@ -19,8 +18,6 @@
   nav { display: flex; align-items: center; gap: 8px; }
   nav a { padding: 8px 14px; border-radius: 99px; font-weight: 500; font-size: 15px; color: var(--muted); }
   nav a:hover { color: var(--ink); background: var(--line); }
-  .btn-nav { border: 1px solid var(--line2); padding: 8px 16px; border-radius: 99px; font-weight: 600; font-size: 14px; }
-  .btn-nav.primary { background: var(--lime); border-color: var(--lime); color: #fff; }
 
   .auth-container { max-width: 440px; margin: 80px auto; background: var(--s1); padding: 48px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid var(--line); }
   .auth-container h2 { font-family: 'Space Grotesk'; font-size: 32px; margin-bottom: 8px; }
@@ -72,7 +69,7 @@
           <label>Senha</label>
           <input name="senha" type="password" required placeholder="••••••••">
         </div>
-        <button type="submit" class="btn-submit">Entrar</button>
+        <button type="submit" class="btn-submit" id="btn-entrar">Entrar</button>
       </form>
 
       <div class="links">
@@ -83,30 +80,46 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="supabase-config.js"></script>
+  
   <script>
     document.getElementById('f-login').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const btn = e.target.querySelector('button');
-      const msg = document.getElementById('m-login');
-      btn.disabled = true; btn.textContent = "Entrando...";
       
+      const btn = document.getElementById('btn-entrar');
+      const msg = document.getElementById('m-login');
+      const email = e.target.email.value.trim().toLowerCase();
+      const senha = e.target.senha.value;
+      
+      btn.disabled = true; 
+      btn.textContent = "Entrando...";
+      msg.className = "msg";
+
       const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
-      const { data, error } = await db.auth.signInWithPassword({ 
-        email: e.target.email.value.trim(), 
-        password: e.target.senha.value 
-      });
+      
+      // Tenta logar no Supabase
+      const { data, error } = await db.auth.signInWithPassword({ email, password: senha });
 
       if (error) {
-        btn.disabled = false; btn.textContent = "Entrar";
+        btn.disabled = false; 
+        btn.textContent = "Entrar";
         msg.textContent = "E-mail ou senha incorretos.";
         msg.className = "msg on err";
         return;
       }
 
-      sessionStorage.setItem('te_user_id', data.user.id);
+      // ==========================================
+      // REDIRECIONAMENTO INTELIGENTE
+      // ==========================================
       
+      // Verifica na tabela 'usuarios' se é admin
       const { data: p } = await db.from("usuarios").select("is_admin").eq("id", data.user.id).maybeSingle();
-      window.location.href = p?.is_admin ? "admin.html" : "painel.html";
+
+      // Se o email for o admin@tech.com OU se a coluna is_admin for true
+      if (email === 'admin@tech.com' || p?.is_admin === true) {
+        window.location.href = "admin.html";
+      } else {
+        window.location.href = "painel.html";
+      }
     });
   </script>
 </body>
