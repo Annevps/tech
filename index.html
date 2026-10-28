@@ -1,44 +1,142 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechEmpire - Tecnologia que funciona</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TechEmpire — Tecnologia que funciona.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ================= TEMA CLARO FORÇADO DIRETO NO HTML ================= */
+  :root {
+    --bg: #F8F9FA; --s1: #FFFFFF; --s2: #F3F4F6;
+    --line: #E5E7EB; --line2: #D1D5DB;
+    --ink: #1F2937; --muted: #6B7280;
+    --lime: #8fd21f; --lime2: #7ab81a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  a { text-decoration: none; color: inherit; }
+  
+  /* Header */
+  header { background: rgba(248,249,250,0.85); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50; }
+  .bar-in { max-width: 1160px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .logo img { height: 60px; width: auto; object-fit: contain; }
+  nav { display: flex; align-items: center; gap: 8px; }
+  nav a { padding: 8px 14px; border-radius: 99px; font-weight: 500; font-size: 15px; color: var(--muted); transition: 0.2s; }
+  nav a:hover { color: var(--ink); background: var(--line); }
+  .btn-nav { border: 1px solid var(--line2); padding: 8px 16px; border-radius: 99px; font-weight: 600; font-size: 14px; }
+  .btn-nav.primary { background: var(--lime); border-color: var(--lime); color: #fff; }
+
+  /* Hero */
+  .hero { max-width: 1160px; margin: 0 auto; padding: 60px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  .badge { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(143, 210, 31, 0.4); background: rgba(143, 210, 31, 0.15); color: #5c8a10; border-radius: 99px; padding: 6px 14px; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 20px; }
+  .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--lime); }
+  h1 { font-family: 'Space Grotesk', sans-serif; font-size: 64px; line-height: 1.05; font-weight: 700; margin-bottom: 24px; letter-spacing: -2px; }
+  h1 em { font-style: normal; color: var(--lime); }
+  .lead { color: var(--muted); font-size: 18px; max-width: 500px; margin-bottom: 32px; }
+  .btn-group { display: flex; gap: 12px; }
+  .btn { padding: 14px 28px; border-radius: 99px; font-weight: 600; font-size: 16px; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+  .btn.primary { background: var(--lime); color: #fff; box-shadow: 0 4px 15px rgba(143, 210, 31, 0.4); }
+  .btn.primary:hover { background: var(--lime2); }
+  .btn.secondary { background: var(--s1); border: 1px solid var(--line2); color: var(--ink); }
+  
+  /* Mockup */
+  .mock { background: var(--s1); border: 1px solid var(--line2); border-radius: 24px; padding: 24px; box-shadow: 0 20px 40px -20px rgba(0,0,0,0.1); }
+  .mock .top { display: flex; gap: 6px; margin-bottom: 20px; }
+  .mock .top i { width: 10px; height: 10px; border-radius: 50%; background: var(--line2); }
+  .mock .ex { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 16px; letter-spacing: 1px; }
+  .mock .st { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 12px; background: var(--s2); margin-bottom: 8px; font-size: 14px; }
+  .mock .st b { margin-left: auto; color: var(--lime); font-size: 12px; }
+  .mock .st.on { border: 1px solid var(--lime); background: #fff; }
+  .mock .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line2); }
+  .mock .on .dot { background: var(--lime); }
+
+  /* Seções */
+  .sec { max-width: 1160px; margin: 80px auto; padding: 0 24px; }
+  .sec-h { margin-bottom: 40px; }
+  h2 { font-family: 'Space Grotesk', sans-serif; font-size: 36px; font-weight: 700; margin-bottom: 12px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+  .card { background: var(--s1); border: 1px solid var(--line); border-radius: 20px; padding: 32px; transition: 0.2s; }
+  .card:hover { border-color: var(--lime); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+  .ic { width: 48px; height: 48px; border-radius: 12px; background: rgba(143, 210, 31, 0.1); color: var(--lime2); display: grid; place-items: center; margin-bottom: 20px; font-size: 24px; }
+  .card h3 { font-family: 'Space Grotesk'; font-size: 20px; margin-bottom: 8px; }
+  .card p { color: var(--muted); font-size: 15px; }
+
+  /* Rodapé */
+  footer { border-top: 1px solid var(--line); background: var(--s1); padding: 60px 24px 30px; text-align: center; }
+  footer img { height: 60px; margin-bottom: 20px; }
+  footer p { color: var(--muted); font-size: 14px; }
+
+  @media (max-width: 860px) { .hero { grid-template-columns: 1fr; text-align: center; } h1 { font-size: 48px; } .lead { margin: 0 auto 32px; } .btn-group { justify-content: center; } nav { display: none; } }
+</style>
 </head>
 <body>
 
-    <!-- MENU ESCRITO DIRETO AQUI -->
-    <header style="background: #07090b; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222;">
-        <a href="index.html">
-            <img src="tech.png" alt="TechEmpire" style="height: 60px;">
-        </a>
-        <nav style="display: flex; gap: 20px;">
-            <a href="index.html" style="color: #b4f03c; text-decoration: none;">Início</a>
-            <a href="servicos.html" style="color: #fff; text-decoration: none;">Serviços</a>
-            <a href="contato.html" style="color: #fff; text-decoration: none;">Contato</a>
-            <a href="login.html" style="color: #fff; text-decoration: none; border: 1px solid #444; padding: 8px 16px; border-radius: 20px;">Entrar</a>
-        </nav>
-    </header>
+  <!-- HEADER FORÇADO -->
+  <header>
+    <div class="bar-in">
+      <a href="index.html" class="logo">
+        <img src="tech.png" alt="TechEmpire">
+      </a>
+      <nav>
+        <a href="index.html" style="color: var(--ink); font-weight: 600;">Início</a>
+        <a href="servicos.html">Serviços</a>
+        <a href="manutencao.html">Manutenção</a>
+        <a href="sobre.html">Sobre</a>
+        <a href="contato.html">Contato</a>
+        <a href="consulta.html" style="color: var(--lime2); font-weight: 600;">Acompanhar</a>
+        <a href="login.html" class="btn-nav">Entrar</a>
+        <a href="criar-conta.html" class="btn-nav primary">Criar conta</a>
+      </nav>
+    </div>
+  </header>
 
-    <!-- CONTEÚDO -->
-    <main style="padding: 60px 20px; max-width: 1100px; margin: 0 auto; text-align: center;">
-        <h1 style="font-family: 'Space Grotesk'; font-size: 60px; color: #fff;">Tech <br> <span style="color: #b4f03c;">Empire.</span></h1>
-        <p style="color: #97a0a6; font-size: 20px; max-width: 600px; margin: 20px auto;">
-            Manutenção de computadores, suporte técnico e criação de sites com preço justo.
-        </p>
-        <div style="margin-top: 40px;">
-            <a href="criar-conta.html" style="background: #b4f03c; color: #000; padding: 15px 30px; border-radius: 30px; text-decoration: none; font-weight: bold;">Criar minha conta</a>
-            <a href="servicos.html" style="background: transparent; color: #fff; padding: 15px 30px; border-radius: 30px; text-decoration: none; border: 1px solid #444; margin-left: 10px;">Ver serviços</a>
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main>
+    <section class="hero">
+      <div>
+        <span class="badge">Empresa júnior de TI</span>
+        <h1>Tecnologia que <br><em>funciona.</em></h1>
+        <p class="lead">Manutenção de computadores, suporte técnico e criação de sites com preço justo. Abra um chamado, converse com a gente pelo site e acompanhe cada etapa.</p>
+        <div class="btn-group">
+          <a href="criar-conta.html" class="btn primary">Criar minha conta →</a>
+          <a href="servicos.html" class="btn secondary">Ver serviços</a>
         </div>
-    </main>
+      </div>
 
-    <!-- RODAPÉ -->
-    <footer style="background: #0a0d0f; padding: 40px 20px; border-top: 1px solid #222; margin-top: 60px; text-align: center; color: #97a0a6;">
-        <img src="tech.png" alt="TechEmpire" style="height: 50px; margin-bottom: 20px;">
-        <p>© 2026 TechEmpire. Todos os direitos reservados.</p>
-    </footer>
+      <div class="mock">
+        <div class="top"><i></i><i></i><i></i></div>
+        <div class="ex">Exemplo ilustrativo de acompanhamento</div>
+        <div class="st"><span class="dot"></span>Chamado recebido<b>✓</b></div>
+        <div class="st"><span class="dot"></span>Diagnóstico e orçamento<b>✓</b></div>
+        <div class="st on"><span class="dot"></span>Em andamento<b>agora</b></div>
+        <div class="st"><span class="dot"></span>Concluído</div>
+      </div>
+    </section>
 
+    <section class="sec">
+      <div class="sec-h">
+        <span class="badge">Serviços</span>
+        <h2>Tudo o que sua tecnologia precisa.</h2>
+      </div>
+      <div class="cards" id="cards-servicos">
+        <!-- Injetado via JS (script.js) -->
+      </div>
+    </section>
+  </main>
+
+  <!-- RODAPÉ FORÇADO -->
+  <footer>
+    <img src="tech.png" alt="TechEmpire">
+    <p>© 2026 TechEmpire. Todos os direitos reservados.</p>
+    <p style="margin-top: 8px; font-size: 12px; opacity: 0.7;">Seus dados são tratados conforme a LGPD.</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="data.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
