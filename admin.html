@@ -2,10 +2,6 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1"><!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Painel Administrativo — TechEmpire</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -109,6 +105,27 @@
   .btn-modal.primary { background: var(--brand); color: #fff; }
   .btn-modal.danger { background: var(--err); color: #fff; }
   .btn-modal.secondary { background: var(--s1); border: 1px solid var(--line); color: var(--text-main); }
+body{min-height:100vh}
+.sidebar{position:relative;z-index:5;box-shadow:4px 0 24px rgba(15,23,42,.035)}
+.logo{letter-spacing:-.04em;font-size:20px}
+.logo i{box-shadow:0 5px 14px rgba(143,210,31,.24)}
+.sidebar a{transition:background .2s,color .2s,transform .2s}
+.sidebar a:hover{transform:translateX(3px)}
+.topbar{min-height:72px;position:sticky;top:0;z-index:4;box-shadow:0 3px 14px rgba(15,23,42,.025)}
+.content{scrollbar-width:thin;scrollbar-color:#cbd5e1 transparent}
+.summary-card,.box,.table-box,.notes-sidebar{box-shadow:0 8px 28px rgba(15,23,42,.045)}
+.summary-card{border-radius:14px}
+.summary-card h3{font-size:25px;color:var(--text-main)}
+.box{border-radius:14px}
+.btn-new,.btn-modal.primary{background:var(--brand-dark);color:#fff;transition:.2s}
+.btn-new:hover,.btn-modal.primary:hover{background:#659b12;transform:translateY(-1px)}
+table th{background:#f8fafc}
+table tbody tr:hover{background:#f8fafc}
+input:focus,select:focus,textarea:focus{outline:2px solid rgba(143,210,31,.25);border-color:var(--brand)}
+.notes-sidebar{box-shadow:-8px 0 28px rgba(15,23,42,.035)}
+@media(max-width:1180px){body{grid-template-columns:220px minmax(0,1fr)}.notes-sidebar{display:none}.grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){body{display:flex;flex-direction:column;height:auto;min-height:100vh;overflow:auto}.sidebar{padding:14px 16px;border-right:0;border-bottom:1px solid var(--line)}.logo{margin-bottom:14px}.sidebar nav{display:flex;flex-direction:row;overflow-x:auto;gap:6px}.sidebar a{white-space:nowrap;padding:9px 12px}.sidebar .sair{margin:0 0 0 auto}.main{overflow:visible}.topbar{padding:14px 18px}.content{padding:20px 16px;overflow:visible}.summary-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.summary-card{padding:16px}.grid-3{grid-template-columns:1fr}.box{padding:16px;max-height:none}.diario-table{min-width:760px}.tela{overflow-x:auto}.modal-box{padding:22px;max-height:90vh;overflow:auto}}
+@media(max-width:420px){.summary-grid{grid-template-columns:1fr}.page-header{align-items:flex-start;gap:12px;flex-direction:column}.topbar{gap:8px}.breadcrumb{font-size:11px}}
 </style>
 </head>
 <body>
