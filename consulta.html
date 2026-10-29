@@ -16,6 +16,14 @@
   .input-group input { flex: 1; padding: 16px; border-radius: 12px; border: 1px solid var(--line2); background: var(--bg); color: var(--ink); font-size: 16px; text-align: center; text-transform: uppercase; }
   .input-group button { padding: 0 24px; border-radius: 12px; background: var(--lime); color: #fff; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; }
   .input-group button:hover { background: var(--lime2); }
+  .consulta-box{max-width:620px;margin:64px auto;padding:clamp(26px,5vw,48px);box-shadow:0 18px 50px rgba(15,23,42,.07)}
+  .consulta-box:before{content:'ACOMPANHAMENTO DE SERVIÇO';display:inline-flex;padding:7px 12px;border-radius:99px;background:var(--tint);color:var(--lime2);font-size:11px;font-weight:700;letter-spacing:.12em;margin-bottom:20px}
+  .consulta-box h1{font-size:clamp(30px,5vw,42px);letter-spacing:-.04em}
+  .consulta-box p{max-width:440px;margin:0 auto 28px;line-height:1.7}
+  .input-group input{text-align:left;padding:16px 18px}
+  .input-group button{min-height:54px;padding:0 26px}
+  #msg-consulta{min-height:24px}
+  @media(max-width:560px){.consulta-box{margin:30px auto;padding:24px 18px}.input-group{flex-direction:column}.input-group button{padding:14px}}
 </style>
 </head>
 <body data-page="consulta" data-auth="public">
@@ -66,7 +74,7 @@
     }
 
     // Redireciona para o laudo com o protocolo correto
-    window.location.href = `laudo.html?protocolo=${protocolo}`;
+    window.location.href = 'laudo.html?id=' + encodeURIComponent(data.id);
   });
 </script>
 </body>
