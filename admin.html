@@ -310,7 +310,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid rgba(143,210,31,.25);b
     window.novoDiario=()=>{const f=document.getElementById('form-diario');f.reset();f.elements.id.value='';preencherProjetosSelect();abrirModal('modal-diario')};
     window.editarDiario=id=>{const d=diarioOrg.find(x=>x.id===id);if(!d)return;const f=document.getElementById('form-diario');f.elements.id.value=d.id;preencherProjetosSelect();f.elements.projeto_id.value=d.projeto_id;f.elements.ultimo_trabalho.value=d.ultimo_trabalho||'';f.elements.onde_parei.value=d.onde_parei||'';f.elements.proximo_passo.value=d.proximo_passo||'';f.elements.status.value=d.status||'Em desenvolvimento';abrirModal('modal-diario')};
     window.excluirDiario=async id=>{if(!confirm('Excluir este registro do histórico?'))return;const {error}=await db.from('onde_parei').delete().eq('id',id);if(error){alert('Erro ao excluir: '+error.message);return;}await carregarOrganizacao()};
-    document.getElementById('form-diario').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),id=f.get('id'),row={projeto_id:f.get('projeto_id'),ultimo_trabalho:f.get('ultimo_trabalho'),onde_parei:f.get('onde_parei'),proximo_passo:f.get('proximo_passo'),status:f.get('status')};const {error}=await db.from('onde_parei').insert(row);if(error){alert('Erro ao registrar progresso: '+error.message);return;}fecharModal('modal-diario');await carregarOrganizacao()};
+    document.getElementById('form-diario').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),id=f.get('id'),row={projeto_id:f.get('projeto_id'),ultimo_trabalho:f.get('ultimo_trabalho'),onde_parei:f.get('onde_parei'),proximo_passo:f.get('proximo_passo'),status:f.get('status')};const q=id?db.from('onde_parei').update(row).eq('id',id):db.from('onde_parei').insert(row);const {error}=await q;if(error){alert('Erro ao registrar progresso: '+error.message);return;}fecharModal('modal-diario');await carregarOrganizacao()};
 
     window.abrirChamado = async (id) => {
       const { data: c } = await db.from('chamados').select('*').eq('id', id).single();
@@ -344,24 +344,6 @@ input:focus,select:focus,textarea:focus{outline:2px solid rgba(143,210,31,.25);b
       fecharModal('modal-novo');
       e.target.reset();
       carregarDados();
-    };
-
-    document.getElementById('form-projeto').onsubmit = async (e) => {
-      e.preventDefault();
-      const form = new FormData(e.target);
-      await db.from('projetos').insert({ nome: form.get('nome'), url_github: form.get('github'), url_site: form.get('site') });
-      fecharModal('modal-projeto');
-      e.target.reset();
-      carregarOrganizacao();
-    };
-
-    document.getElementById('form-tarefa').onsubmit = async (e) => {
-      e.preventDefault();
-      const form = new FormData(e.target);
-      await db.from('tarefas').insert({ titulo: form.get('titulo'), data_entrega: form.get('data') });
-      fecharModal('modal-tarefa');
-      e.target.reset();
-      carregarOrganizacao();
     };
 
     window.salvarAnotacao = async () => {
