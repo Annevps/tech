@@ -8,10 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
-  /* TEMA ESCURO PREMIUM PARA A PÁGINA PÚBLICA (IGUAL À REFERÊNCIA) */
   body { background: #0B0D0F; color: #fff; font-family: 'Inter', sans-serif; display: flex; min-height: 100vh; margin: 0; padding: 40px; gap: 40px; }
-  
-  /* ÁREA ESQUERDA (BUSCA) */
   .search-area { width: 350px; flex-shrink: 0; display: flex; flex-direction: column; }
   .search-area h1 { font-family: 'Space Grotesk'; font-size: 42px; line-height: 1.1; margin-bottom: 16px; }
   .search-area h1 em { color: #00DDB5; font-style: normal; }
@@ -23,20 +20,15 @@
   
   .help-box { background: #121518; border: 1px solid #2A2D31; border-radius: 12px; padding: 20px; font-size: 13px; color: #8C939D; margin-top: 24px; }
 
-  /* ÁREA DIREITA (RESULTADO) */
   #resultado { flex: 1; display: none; flex-direction: column; gap: 24px; }
-  
-  /* Card de Status */
   .status-card { background: linear-gradient(90deg, rgba(0, 221, 181, 0.1), transparent); border: 1px solid rgba(0, 221, 181, 0.3); border-radius: 16px; padding: 24px; display: flex; justify-content: space-between; align-items: center; }
   .status-card h2 { font-family: 'Space Grotesk'; color: #00DDB5; font-size: 24px; margin: 0; }
   
-  /* Info Grid */
   .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; background: #121518; border: 1px solid #2A2D31; border-radius: 16px; padding: 24px; }
   .info-item { margin-bottom: 16px; }
   .info-item span { font-size: 11px; color: #8C939D; text-transform: uppercase; display: block; margin-bottom: 4px; }
   .info-item strong { font-size: 16px; color: #fff; display: block; }
   
-  /* Timeline */
   .timeline-container { background: #121518; border: 1px solid #2A2D31; border-radius: 16px; padding: 32px; }
   .timeline { display: flex; justify-content: space-between; position: relative; }
   .timeline::before { content: ""; position: absolute; top: 16px; left: 0; right: 0; height: 2px; background: #2A2D31; z-index: 1; }
@@ -47,12 +39,11 @@
   .step span { font-size: 12px; color: #8C939D; }
   .step.done span, .step.active span { color: #fff; font-weight: 600; }
   
-  @media (max-width: 900px) { body { flex-direction: column; } .search-area { width: 100%; } .info-grid { grid-template-columns: 1fr; } .timeline { flex-wrap: wrap; gap: 16px; } .timeline::before { display: none; } }
+  @media (max-width: 900px) { body { flex-direction: column; } .search-area { width: 100%; } .info-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
-  <!-- ÁREA DE BUSCA -->
   <div class="search-area">
     <a href="index.html" style="text-decoration: none; display: inline-block; margin-bottom: 40px;"><img src="tech.png" alt="TechEmpire" style="height: 50px;"></a>
     <h1>Acompanhe seu <br><em>atendimento</em></h1>
@@ -66,11 +57,10 @@
 
     <div class="help-box">
       <strong>Não encontrou seu protocolo?</strong><br>
-      Verifique se digitou corretamente. Em caso de dúvidas, entre em contato conosco pelo WhatsApp.
+      Verifique se digitou corretamente. Em caso de dúvidas, entre em contato conosco.
     </div>
   </div>
 
-  <!-- ÁREA DE RESULTADO -->
   <div id="resultado">
     <div class="status-card">
       <div>
@@ -97,9 +87,7 @@
 
     <div class="timeline-container">
       <h3 style="margin-bottom: 24px; font-family: 'Space Grotesk';">Etapas do atendimento</h3>
-      <div class="timeline" id="timeline-steps">
-        <!-- Injetado via JS -->
-      </div>
+      <div class="timeline" id="timeline-steps"></div>
     </div>
   </div>
 
@@ -107,39 +95,26 @@
   <script src="supabase-config.js"></script>
   <script>
     const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
-
     async function buscar() {
       const protocolo = document.getElementById('protocolo').value.trim().toUpperCase();
       const msg = document.getElementById('msg-consulta');
       const res = document.getElementById('resultado');
-      
       if (!protocolo) return;
-      msg.textContent = "Buscando...";
-      msg.style.color = "#00DDB5";
-
+      
+      msg.textContent = "Buscando..."; msg.style.color = "#00DDB5";
       const { data, error } = await db.from('chamados').select('*').eq('protocolo', protocolo).maybeSingle();
 
       if (error || !data) {
-        msg.textContent = "Protocolo não encontrado. Verifique se digitou corretamente.";
-        msg.style.color = "#FF6464";
-        res.style.display = "none";
-        return;
+        msg.textContent = "Protocolo não encontrado. Verifique se digitou corretamente."; msg.style.color = "#FF6464"; res.style.display = "none"; return;
       }
-
-      msg.textContent = "";
-      res.style.display = "flex";
-
-      // Preenche os dados
+      msg.textContent = ""; res.style.display = "flex";
       document.getElementById('res-protocolo').textContent = data.protocolo;
       document.getElementById('res-data').textContent = new Date(data.criado_em).toLocaleString('pt-BR');
       document.getElementById('res-nome').textContent = data.cliente_nome;
       document.getElementById('res-servico').textContent = data.categoria || 'Manutenção';
       document.getElementById('res-descricao').textContent = data.descricao;
+      document.getElementById('res-status').textContent = data.status;
       
-      const statusPill = document.getElementById('res-status');
-      statusPill.textContent = data.status;
-      
-      // Lógica da Timeline (Simulada com base no status)
       const steps = ["Recebido", "Diagnóstico", "Aguardando", "Em andamento", "Testes", "Concluído"];
       let currentIndex = 0;
       if (data.status === 'Em andamento') currentIndex = 3;
@@ -150,10 +125,7 @@
         let cls = "step";
         if (i < currentIndex) cls += " done";
         if (i === currentIndex) cls += " active";
-        return `<div class="${cls}">
-          <div class="step-circle">${i < currentIndex ? '✓' : i+1}</div>
-          <span>${step}</span>
-        </div>`;
+        return `<div class="${cls}"><div class="step-circle">${i < currentIndex ? '✓' : i+1}</div><span>${step}</span></div>`;
       }).join('');
     }
   </script>
