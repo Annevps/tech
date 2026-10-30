@@ -334,7 +334,32 @@ input,select,textarea{color-scheme:dark}
     </div>
   </div>
 
-  <div class="modal" id="modal-chamado"><div class="modal-box"><h2>Gerenciar Chamado</h2><input type="hidden" id="edit-id"><div class="form-group"><label>Status</label><select id="edit-status"><option>Nova chamada</option><option>Aguardando análise</option><option>Aguardando aprovação do orçamento</option><option>Aprovada</option><option>Em andamento</option><option>Aguardando informações do cliente</option><option>Aguardando pagamento</option><option>Concluída</option><option>Cancelada</option></select></div><div class="form-group"><label>Observação visível ao cliente</label><textarea id="edit-parecer" placeholder="Escreva uma atualização que aparecerá no acompanhamento do cliente..."></textarea></div><div class="modal-actions"><button type="button" class="btn-modal secondary" onclick="fecharModal('modal-chamado')">Cancelar</button><button type="button" class="btn-modal primary" onclick="salvarChamado()">Salvar atualização</button></div></div></div>
+  <div class="modal" id="modal-chamado"><div class="modal-box" style="max-width:760px;max-height:88vh;overflow-y:auto">
+    <h2>Gerenciar atendimento e laudo</h2>
+    <input type="hidden" id="edit-id">
+    <div class="org-form-grid">
+      <div class="org-modal-field"><label>Cliente</label><input id="edit-cliente" readonly></div>
+      <div class="org-modal-field"><label>Protocolo</label><input id="edit-protocolo" readonly></div>
+      <div class="org-modal-field"><label>Data de abertura</label><input id="edit-abertura" readonly></div>
+      <div class="org-modal-field"><label>Última atualização</label><input id="edit-atualizacao" readonly></div>
+      <div class="org-modal-field"><label>Status do atendimento</label><select id="edit-status"><option>Nova chamada</option><option>Aguardando análise</option><option>Aguardando aprovação do orçamento</option><option>Aprovada</option><option>Em andamento</option><option>Aguardando informações do cliente</option><option>Aguardando pagamento</option><option>Concluída</option><option>Cancelada</option></select></div>
+      <div class="org-modal-field"><label>Prazo previsto</label><input id="edit-prazo" type="date"></div>
+      <div class="org-modal-field"><label>Orçamento (R$)</label><input id="edit-orcamento" type="number" min="0" step="0.01" placeholder="Ex.: 250,00"></div>
+      <div class="org-modal-field org-full"><label>Parecer / observação da equipe (visível ao cliente)</label><textarea id="edit-parecer" rows="3" placeholder="Atualização sobre o atendimento que aparecerá para o cliente..."></textarea></div>
+      <div id="edit-bloco-manutencao" class="org-modal-field org-full"><h3>Laudo técnico — Manutenção</h3></div>
+      <div id="edit-manutencao-campos" class="org-modal-field org-full"><div class="org-form-grid">
+        <div class="org-modal-field org-full"><label>Diagnóstico técnico</label><textarea id="edit-diagnostico" rows="3" placeholder="Descreva o problema identificado..."></textarea></div>
+        <div class="org-modal-field org-full"><label>Solução aplicada</label><textarea id="edit-solucao" rows="3" placeholder="Descreva o serviço realizado ou a solução recomendada..."></textarea></div>
+        <div class="org-modal-field org-full"><label>Parecer técnico do laudo</label><textarea id="edit-laudo-parecer" rows="3" placeholder="Conclusão e recomendações técnicas..."></textarea></div>
+      </div></div>
+      <div id="edit-bloco-site" class="org-modal-field org-full"><h3>Briefing — Projeto de site</h3></div>
+      <div id="edit-site-campos" class="org-modal-field org-full"><div class="org-form-grid">
+        <div class="org-modal-field org-full"><label>Escopo do projeto</label><textarea id="edit-escopo" rows="3" placeholder="Páginas, funcionalidades e entregas combinadas..."></textarea></div>
+        <div class="org-modal-field org-full"><label>Link do preview</label><input id="edit-link" type="url" placeholder="https://..."></div>
+      </div></div>
+    </div>
+    <div class="modal-actions"><button type="button" class="btn-modal secondary" onclick="fecharModal('modal-chamado')">Cancelar</button><button type="button" class="btn-modal primary" onclick="salvarChamado()">Salvar atendimento e laudo</button></div>
+  </div></div>
 
   <div class="modal" id="modal-projeto"><div class="modal-box"><h2 id="org-projeto-titulo">Novo projeto</h2><form id="form-projeto"><input type="hidden" name="id"><div class="org-form-grid"><div class="org-modal-field"><label>Nome do projeto *</label><input name="nome" required></div><div class="org-modal-field"><label>Status</label><select name="status"><option>Em desenvolvimento</option><option>Aguardando</option><option>Pausado</option><option>Concluído</option><option>Cancelado</option></select></div><div class="org-modal-field org-full"><label>Descrição</label><textarea name="descricao"></textarea></div><div class="org-modal-field"><label>Link do GitHub</label><input name="github" type="url"></div><div class="org-modal-field"><label>Link do site</label><input name="site" type="url"></div></div><div class="modal-actions"><button type="button" class="btn-modal secondary" onclick="fecharModal('modal-projeto')">Cancelar</button><button type="submit" class="btn-modal primary">Salvar projeto</button></div></form></div></div>
   <div class="modal" id="modal-tarefa"><div class="modal-box"><h2 id="org-tarefa-titulo">Nova tarefa</h2><form id="form-tarefa"><input type="hidden" name="id"><div class="org-form-grid"><div class="org-modal-field org-full"><label>Título *</label><input name="titulo" required></div><div class="org-modal-field org-full"><label>Descrição</label><textarea name="descricao"></textarea></div><div class="org-modal-field"><label>Projeto</label><select name="projeto_id" id="org-task-project"></select></div><div class="org-modal-field"><label>Data de entrega</label><input name="data" type="date"></div><div class="org-modal-field"><label>Horário (referência)</label><input name="horario" type="time"></div><div class="org-modal-field"><label>Status</label><select name="status"><option>Pendente</option><option>Em andamento</option><option>Concluída</option></select></div></div><div class="modal-actions"><button type="button" class="btn-modal secondary" onclick="fecharModal('modal-tarefa')">Cancelar</button><button type="submit" class="btn-modal primary">Salvar tarefa</button></div></form></div></div>
@@ -437,10 +462,31 @@ input,select,textarea{color-scheme:dark}
     document.getElementById('form-diario').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),id=f.get('id'),row={projeto_id:f.get('projeto_id'),ultimo_trabalho:f.get('ultimo_trabalho'),onde_parei:f.get('onde_parei'),proximo_passo:f.get('proximo_passo'),status:f.get('status')};const q=id?db.from('onde_parei').update(row).eq('id',id):db.from('onde_parei').insert(row);const {error}=await q;if(error){alert('Erro ao registrar progresso: '+error.message);return;}fecharModal('modal-diario');await carregarOrganizacao()};
 
     window.abrirChamado = async (id) => {
-      const { data: c } = await db.from('chamados').select('*').eq('id', id).single();
+      const { data: c, error } = await db.from('chamados').select('*').eq('id', id).single();
+      if (error || !c) { alert('Não foi possível carregar o atendimento: ' + (error?.message || 'registro não encontrado')); return; }
+      const manutencao = !(c.categoria || '').toLowerCase().includes('site');
+      const laudo = c.laudo_tecnico || {};
+      const projeto = c.detalhes_projeto || {};
+      const dataCampo = v => v ? String(v).slice(0,10) : '';
+      const dataHora = v => v ? new Date(v).toLocaleString('pt-BR') : '—';
       document.getElementById('edit-id').value = c.id;
-      document.getElementById('edit-status').value = c.status;
+      document.getElementById('edit-cliente').value = c.cliente_nome || '—';
+      document.getElementById('edit-protocolo').value = c.protocolo || c.numero || '—';
+      document.getElementById('edit-abertura').value = dataHora(c.criado_em);
+      document.getElementById('edit-atualizacao').value = dataHora(c.atualizado_em || c.criado_em);
+      document.getElementById('edit-status').value = c.status || 'Nova chamada';
+      document.getElementById('edit-prazo').value = dataCampo(c.prazo_previsto);
+      document.getElementById('edit-orcamento').value = c.orcamento_valor ?? '';
       document.getElementById('edit-parecer').value = c.parecer_tecnico || '';
+      document.getElementById('edit-diagnostico').value = laudo.diagnostico || '';
+      document.getElementById('edit-solucao').value = laudo.solucao || '';
+      document.getElementById('edit-laudo-parecer').value = laudo.parecer || '';
+      document.getElementById('edit-escopo').value = projeto.escopo || '';
+      document.getElementById('edit-link').value = projeto.link || '';
+      document.getElementById('edit-bloco-manutencao').style.display = manutencao ? 'block' : 'none';
+      document.getElementById('edit-manutencao-campos').style.display = manutencao ? 'block' : 'none';
+      document.getElementById('edit-bloco-site').style.display = manutencao ? 'none' : 'block';
+      document.getElementById('edit-site-campos').style.display = manutencao ? 'none' : 'block';
       abrirModal('modal-chamado');
     };
 
@@ -448,9 +494,37 @@ input,select,textarea{color-scheme:dark}
       const id = document.getElementById('edit-id').value;
       const novoStatus = document.getElementById('edit-status').value;
       const observacao = document.getElementById('edit-parecer').value.trim();
-      const { data: anterior, error: buscaErro } = await db.from('chamados').select('status').eq('id', id).single();
-      if (buscaErro) { alert('Não foi possível carregar o chamado: ' + buscaErro.message); return; }
-      const { error } = await db.from('chamados').update({ status: novoStatus, parecer_tecnico: observacao || null, atualizado_em: new Date().toISOString() }).eq('id', id);
+      const prazo = document.getElementById('edit-prazo').value || null;
+      const orcamentoRaw = document.getElementById('edit-orcamento').value;
+      const orcamento = orcamentoRaw === '' ? null : Number(orcamentoRaw);
+      if (orcamento !== null && (!Number.isFinite(orcamento) || orcamento < 0)) { alert('Informe um orçamento válido.'); return; }
+      const { data: anterior, error: buscaErro } = await db.from('chamados').select('status,laudo_tecnico,detalhes_projeto,categoria').eq('id', id).single();
+      if (buscaErro) { alert('Não foi possível carregar o atendimento: ' + buscaErro.message); return; }
+      const manutencao = !(anterior.categoria || '').toLowerCase().includes('site');
+      const laudo = {...(anterior.laudo_tecnico || {})};
+      const projeto = {...(anterior.detalhes_projeto || {})};
+      if (manutencao) {
+        laudo.diagnostico = document.getElementById('edit-diagnostico').value.trim();
+        laudo.solucao = document.getElementById('edit-solucao').value.trim();
+        laudo.parecer = document.getElementById('edit-laudo-parecer').value.trim();
+        laudo.prazo = prazo;
+        laudo.valor = orcamento;
+      } else {
+        projeto.escopo = document.getElementById('edit-escopo').value.trim();
+        projeto.link = document.getElementById('edit-link').value.trim();
+        projeto.prazo = prazo;
+        projeto.valor = orcamento;
+      }
+      const atualizacao = {
+        status: novoStatus,
+        prazo_previsto: prazo,
+        orcamento_valor: orcamento,
+        parecer_tecnico: observacao || null,
+        laudo_tecnico: manutencao ? laudo : (anterior.laudo_tecnico || {}),
+        detalhes_projeto: manutencao ? (anterior.detalhes_projeto || {}) : projeto,
+        atualizado_em: new Date().toISOString()
+      };
+      const { error } = await db.from('chamados').update(atualizacao).eq('id', id);
       if (error) { alert('Não foi possível salvar: ' + error.message); return; }
       if (anterior.status !== novoStatus || observacao) {
         const { error: histError } = await db.from('historico_status').insert({ chamado_id: id, status_anterior: anterior.status, status_novo: novoStatus, observacao: observacao || 'Status do atendimento atualizado.' });
@@ -458,7 +532,7 @@ input,select,textarea{color-scheme:dark}
       }
       fecharModal('modal-chamado');
       await carregarDados();
-      alert('Atualização salva. O acompanhamento do cliente será atualizado automaticamente.');
+      alert('Atendimento e informações do laudo salvos. Os dados públicos serão atualizados no acompanhamento do cliente.');
     };
 
     document.getElementById('form-novo').onsubmit = async (e) => {
