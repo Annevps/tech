@@ -107,19 +107,23 @@
         return;
       }
 
-      // ==========================================
-      // REDIRECIONAMENTO INTELIGENTE
-      // ==========================================
-      
-      // Verifica na tabela 'usuarios' se é admin
-      const { data: p } = await db.from("usuarios").select("is_admin").eq("id", data.user.id).maybeSingle();
+      // Acesso administrativo depende exclusivamente do perfil confirmado no banco.
+      const { data: perfil, error: perfilError } = await db
+        .from("usuarios")
+        .select("is_admin")
+        .eq("id", data.user.id)
+        .maybeSingle();
 
-      // Se o email for o admin@tech.com OU se a coluna is_admin for true
-      if (email === 'admin@tech.com' || p?.is_admin === true) {
-        window.location.href = "admin.html";
-      } else {
-        window.location.href = "painel.html";
+      if (perfilError) {
+        await db.auth.signOut({ scope: "local" });
+        btn.disabled = false;
+        btn.textContent = "Entrar";
+        msg.textContent = "Não foi possível confirmar as permissões da conta. Tente novamente.";
+        msg.className = "msg on err";
+        return;
       }
+
+      window.location.href = perfil?.is_admin === true ? "admin.html" : "painel.html";
     });
   </script>
 </body>
