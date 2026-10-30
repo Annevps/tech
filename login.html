@@ -118,7 +118,8 @@
         await db.auth.signOut({ scope: "local" });
         btn.disabled = false;
         btn.textContent = "Entrar";
-        msg.textContent = "Não foi possível confirmar as permissões da conta. Tente novamente.";
+        console.error("Erro ao consultar perfil administrativo:", perfilError);
+        msg.textContent = "Falha ao consultar permissões: " + (perfilError.message || perfilError.code || "erro desconhecido");
         msg.className = "msg on err";
         return;
       }
