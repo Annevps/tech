@@ -44,7 +44,7 @@ function desenharChrome() {
   if (headerEl && document.body.dataset.page !== 'admin') {
     headerEl.innerHTML = `<div class="bar-in">
       <a class="logo" href="index.html" aria-label="TechEmpire — início" style="display:flex; align-items:center; text-decoration:none;">
-        <img src="tech.png?v=99" alt="TechEmpire" style="height: 60px; width: auto; object-fit: contain;">
+        <img src="tech.png?v=99" alt="" style="height: 52px; width: auto; object-fit: contain;"><span class="brand-name">TECH <b>EMPIRE</b><small>MANUTENÇÃO E TECNOLOGIA</small></span>
       </a>
      <button class="menu" aria-expanded="false" aria-label="Abrir menu">☰</button>
      <nav id="nav">${l("index.html", "Início")}${l("servicos.html", "Serviços")}${l("manutencao.html", "Manutenção")}${l("sobre.html", "Sobre")}${l("contato.html", "Contato")}
@@ -56,14 +56,18 @@ function desenharChrome() {
 
   const footerEl = $("#site-footer");
   if (footerEl && document.body.dataset.page !== 'admin') {
-    footerEl.innerHTML = `<div class="foot">
-      <div>
-        <a href="index.html" style="display:inline-block; margin-bottom:24px;"><img src="tech.png?v=99" alt="TechEmpire" style="height: 80px; width: auto; object-fit: contain;"></a>
-        <p>Manutenção de dispositivos, suporte técnico e criação de sites. Tecnologia que funciona.</p>
+    footerEl.innerHTML = `<div class="footer-main">
+      <div class="footer-about">
+        <a class="footer-brand" href="index.html"><img src="tech.png?v=99" alt="Tech Empire"><span>TECH <b>EMPIRE</b><small>SEU DISPOSITIVO, NOSSA PRIORIDADE</small></span></a>
+        <p>Somos uma empresa júnior de tecnologia, dedicada à manutenção de computadores, suporte técnico e criação de sites. Tecnologia que conecta você ao que realmente importa.</p>
+        <a class="footer-help" href="contato.html"><span class="footer-help-icon">◉</span><span><b>Precisa de ajuda?</b><small>Fale com a nossa equipe.</small></span><span class="footer-arrow">→</span></a>
       </div>
-      <div><h4>Site</h4><a href="servicos.html">Serviços</a><a href="manutencao.html">Manutenção preventiva</a><a href="sobre.html">Sobre</a><a href="contato.html">Contato</a></div>
-      <div><h4>Sua conta</h4><a href="login.html">Entrar</a><a href="criar-conta.html">Criar conta</a><a href="recuperar-senha.html">Recuperar senha</a></div></div>
-      <div class="copy">© ${new Date().getFullYear()} TechEmpire · Seus dados são tratados conforme a LGPD.</div>`;
+      <div class="footer-col"><h4>Links rápidos</h4><a href="index.html">Início</a><a href="servicos.html">Serviços</a><a href="manutencao.html">Manutenção</a><a href="sobre.html">Sobre nós</a><a href="contato.html">Contato</a></div>
+      <div class="footer-col"><h4>Nossos serviços</h4><a href="manutencao.html">Manutenção de computadores</a><a href="servicos.html">Suporte técnico</a><a href="servicos.html">Criação de sites</a></div>
+      <div class="footer-col footer-contact"><h4>Fale conosco</h4><p>Tem alguma dúvida ou precisa de suporte?</p><a href="contato.html">Entre em contato com a Tech Empire →</a><small>Atendimento conforme disponibilidade da equipe.</small></div>
+    </div>
+    <div class="footer-benefits"><div><b>◇</b><span><strong>Qualidade e cuidado</strong><small>Atenção em cada serviço</small></span></div><div><b>ϟ</b><span><strong>Atendimento próximo</strong><small>Comunicação transparente</small></span></div><div><b>◎</b><span><strong>Suporte especializado</strong><small>Equipe pronta para ajudar</small></span></div><div><b>☆</b><span><strong>Compromisso</strong><small>Seu projeto importa</small></span></div></div>
+    <div class="footer-bottom"><span>© ${new Date().getFullYear()} Tech Empire. Todos os direitos reservados.</span><nav><a href="privacidade.html">Política de Privacidade</a><a href="termos.html">Termos de Uso</a><span>LGPD</span></nav><span class="footer-secure">♙ Dados tratados com responsabilidade</span></div>`;
   }
 }
 
