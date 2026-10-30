@@ -386,5 +386,65 @@ input:focus,select:focus,textarea:focus{outline:2px solid rgba(143,210,31,.25);b
       fecharModal('modal-novo');e.target.reset();await carregarDados();
       alert('Chamado criado'+(data.protocolo?'! Protocolo: '+data.protocolo:'.'));
     };
-
-
+    // Carregamento central dos dados do painel
+    const safeText = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    async function carregarDados() {
+      const chamadosEl = document.getElementById('tabela-chamados-body');
+      const clientesEl = document.getElementById('tabela-clientes-body');
+      const notasEl = document.getElementById('lista-anotacoes');
+      try {
+        const [chamadosRes, notasRes] = await Promise.all([
+          db.from('chamados').select('*').order('criado_em', {ascending:false}),
+          db.from('anotacoes').select('*').order('criado_em', {ascending:false})
+        ]);
+        if (chamadosRes.error) {
+          chamadosEl.innerHTML = '<tr><td colspan="4" style="padding:16px;color:#ef4444">Erro ao carregar chamados: '+safeText(chamadosRes.error.message)+'</td></tr>';
+          clientesEl.innerHTML = '<tr><td colspan="3" style="padding:16px">Não foi possível carregar os clientes.</td></tr>';
+          ['kpi-total','kpi-pendentes','kpi-concluidos','kpi-clientes'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—'});
+        } else {
+          const chamados = chamadosRes.data || [];
+          chamadosEl.innerHTML = chamados.length ? chamados.map(c => '<tr><td style="padding:14px 16px;border-bottom:1px solid var(--line)">'+safeText(c.protocolo || c.numero || c.id)+'</td><td style="padding:14px 16px;border-bottom:1px solid var(--line)">'+safeText(c.cliente_nome || 'Cliente cadastrado')+'</td><td style="padding:14px 16px;border-bottom:1px solid var(--line)">'+safeText(c.status || 'Nova chamada')+'</td><td style="padding:14px 16px;border-bottom:1px solid var(--line)"><button class="btn-new" style="padding:7px 12px" onclick="abrirChamado(\''+safeText(c.id)+'\')">Gerenciar</button></td></tr>').join('') : '<tr><td colspan="4" style="padding:18px;text-align:center;color:var(--text-muted)">Nenhum chamado encontrado.</td></tr>';
+          const clientes = new Map();
+          chamados.forEach(c => { const key=c.cliente_id || c.cliente_email || c.cliente_telefone || c.cliente_nome; if(key && !clientes.has(key)) clientes.set(key,c); });
+          clientesEl.innerHTML = clientes.size ? [...clientes.values()].map(c=>'<tr><td style="padding:12px">'+safeText(c.cliente_nome||'—')+'</td><td style="padding:12px">'+safeText(c.cliente_email||'—')+'</td><td style="padding:12px">'+safeText(c.cliente_telefone||'—')+'</td></tr>').join('') : '<tr><td colspan="3" style="padding:16px;text-align:center">Nenhum cliente encontrado.</td></tr>';
+          const total=chamados.length, concluidos=chamados.filter(c=>['Concluída','Concluído'].includes(c.status)).length;
+          document.getElementById('kpi-total').textContent=total;
+          document.getElementById('kpi-pendentes').textContent=total-concluidos;
+          document.getElementById('kpi-concluidos').textContent=concluidos;
+          document.getElementById('kpi-clientes').textContent=clientes.size;
+        }
+        if (notasRes.error) {
+          notasEl.innerHTML='<p style="color:#ef4444;font-size:12px">Erro ao carregar anotações: '+safeText(notasRes.error.message)+'</p>';
+        } else {
+          const notas=notasRes.data||[];
+          notasEl.innerHTML=notas.length?notas.map(n=>'<article class="note-item" style="padding:12px;margin-bottom:10px;border-radius:8px"><div style="display:flex;justify-content:space-between;gap:8px"><b>'+safeText((n.texto||'Anotação').split('\n')[0].replace(/^\[ | \]$/g,''))+'</b><button type="button" onclick="excluirAnotacao(\''+safeText(n.id)+'\')">Excluir</button></div><p style="white-space:pre-wrap;margin-top:6px">'+safeText((n.texto||'').split('\n').slice(1).join('\n') || n.texto || '')+'</p></article>').join(''):'<p style="font-size:12px;color:var(--text-muted)">Nenhuma anotação salva.</p>';
+        }
+      } catch (err) {
+        console.error('Falha ao carregar painel:',err);
+        chamadosEl.innerHTML='<tr><td colspan="4" style="padding:16px;color:#ef4444">Falha ao carregar: '+safeText(err.message)+'</td></tr>';
+      }
+    }
+    window.salvarAnotacao = async () => {
+      const titulo=document.getElementById('note-titulo').value.trim();
+      const texto=document.getElementById('note-texto').value.trim();
+      if(!titulo && !texto){alert('Digite um título ou o conteúdo da anotação.');return;}
+      const {data,error:sessionError}=await db.auth.getSession();
+      if(sessionError || !data.session?.user){alert('Sua sessão expirou. Entre novamente no painel.');return;}
+      const {error}=await db.from('anotacoes').insert({admin_id:data.session.user.id,texto:(titulo?'[ '+titulo+' ]\n':'')+texto});
+      if(error){alert('Erro ao salvar anotação: '+error.message);return;}
+      document.getElementById('note-titulo').value='';
+      document.getElementById('note-texto').value='';
+      await carregarDados();
+    };
+    window.excluirAnotacao = async id => {
+      if(!confirm('Excluir esta anotação?'))return;
+      const {error}=await db.from('anotacoes').delete().eq('id',id);
+      if(error){alert('Erro ao excluir anotação: '+error.message);return;}
+      await carregarDados();
+    };
+    // Inicializa os dados ao abrir o painel.
+    carregarDados();
+    if (document.getElementById('tela-organizacao')?.classList.contains('active')) carregarOrganizacao();
+  </script>
+</body>
+</html>
