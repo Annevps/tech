@@ -160,6 +160,63 @@ input:focus,select:focus,textarea:focus{outline:2px solid rgba(143,210,31,.25);b
 .note-item{border:1px solid #173b5b;border-left:3px solid #00d6a0;background:#0b2036;color:#e7f0ff}
 .note-item p{white-space:pre-wrap;overflow-wrap:anywhere;color:#b8cbe3;font-size:12px}
 @media(max-width:700px){.modal-box .org-form-grid{grid-template-columns:1fr}.modal-box .org-full{grid-column:auto}}
+
+/* ===== IDENTIDADE VISUAL TECH EMPIRE — TEMA ESCURO INTEGRADO ===== */
+:root{
+  --bg:#071321;--s1:#0b1d30;--s2:#10263c;--line:#1b3852;
+  --text-main:#e8f1fb;--text-muted:#9aafc5;
+  --brand:#18d6a0;--brand-dark:#08b88a;--err:#fb7185;
+  --blue:#60a5fa;--yellow:#fbbf24;
+}
+body{background:#061321;color:var(--text-main);grid-template-columns:204px minmax(0,1fr) 256px}
+.sidebar{background:#081827;border-right:1px solid #19344d;padding:24px 14px;box-shadow:none}
+.logo{color:#f3f7fc;font-size:18px;margin:0 8px 48px}
+.logo i{background:linear-gradient(145deg,#22d3a2,#079b81);color:#03251f;border-radius:9px}
+.sidebar nav{gap:7px}
+.sidebar a{color:#b4c5d7;border-radius:9px;padding:11px 13px;font-size:13px}
+.sidebar a:hover,.sidebar a.active{background:linear-gradient(90deg,rgba(20,190,145,.22),rgba(20,190,145,.08));color:#48e5bc;transform:none}
+.sidebar .sair{color:#fb7185}
+.main{background:#071321;min-width:0}
+.topbar{background:#0a1b2d;border-bottom:1px solid #1b3852;padding:14px 26px;min-height:58px;box-shadow:none}
+.breadcrumb{color:#9aafc5}.breadcrumb b{color:#e8f1fb}
+.content{padding:28px 24px;scrollbar-color:#29445d transparent}
+.page-header h1{color:#f1f6ff}
+.page-header p{color:#9aafc5}
+.summary-card,.box,.table-box{background:#0b2035!important;border-color:#1b3b57!important;color:#e8f1fb;box-shadow:0 8px 24px rgba(0,0,0,.16)}
+.summary-card h3,.box-header h3{color:#edf5ff}
+.summary-card p{color:#9aafc5}
+table th{background:#10263b!important;color:#9fb5cb!important}
+table td{color:#dce8f5;border-color:#1b3852!important}
+table tbody tr:hover{background:#10263b!important}
+.btn-new,.btn-modal.primary{background:#12c99a;color:#04251e}
+.notes-sidebar{background:#0a1b2c;border-left:1px solid #1b3852;padding:22px 18px;box-shadow:none;color:#e8f1fb}
+.notes-sidebar .box-header{border-color:#1b3852}
+.notes-sidebar .box-header h3{color:#e8f1fb}
+.notes-sidebar input,.notes-sidebar textarea{background:#10263b!important;border:1px solid #29465f!important;color:#e8f1fb!important}
+.notes-sidebar input::placeholder,.notes-sidebar textarea::placeholder{color:#8299b1}
+.notes-sidebar .btn-new{background:#13bd91;color:#03251f}
+.note-item{background:#10263b!important;border-color:#1b3852!important;border-left-color:#18d6a0!important}
+.modal-box{background:#0b2035!important;color:#e8f1fb!important;border-color:#25445e!important}
+.modal-box .form-group input,.modal-box .form-group select,.modal-box .form-group textarea{background:#071a2c!important;border-color:#29465f!important;color:#edf5ff!important}
+input,select,textarea{color-scheme:dark}
+.org-page{margin:-28px -24px!important;padding:28px 24px!important;min-height:100%;background:#071827!important}
+.org-page .org-head{align-items:center;margin-bottom:24px}
+.org-page .org-head h1{font-size:29px;letter-spacing:-.6px}
+.org-page .quick{gap:14px;margin-bottom:22px}
+.org-page .quick button{min-height:88px;padding:17px 16px;border-radius:11px}
+.org-page .quick i{min-width:44px;min-height:44px;display:grid;place-items:center;font-size:21px}
+.org-page .org-grid{grid-template-columns:minmax(0,1.02fr) minmax(0,1.2fr) minmax(0,1.02fr);gap:14px}
+.org-page .org-box{padding:17px;border-radius:12px;background:linear-gradient(145deg,#0c2238,#091b2e)!important}
+.org-page .org-box-head{margin-bottom:14px}
+.org-page .project-row,.org-page .task-row{padding:12px 0}
+.org-page .project-logo{width:48px;height:48px}
+.org-page .cal-day{min-height:58px}
+.org-page .diary-wrap{margin-top:16px}
+.org-page th{background:transparent!important}
+.org-page .org-box-head h3{font-size:14px}
+@media(max-width:1250px){body{grid-template-columns:190px minmax(0,1fr)}.notes-sidebar{display:none}.org-page .org-grid{grid-template-columns:1fr 1fr}.org-page .org-grid .org-box:last-child{grid-column:1/-1}}
+@media(max-width:760px){body{display:flex;flex-direction:column;height:auto;min-height:100vh;overflow:auto}.sidebar{padding:14px 16px}.logo{margin:0 0 14px}.org-page{margin:-20px -16px!important;padding:18px 16px!important}.org-page .org-grid,.org-page .quick{grid-template-columns:1fr}.org-page .org-grid .org-box:last-child{grid-column:auto}}
+
 </style>
 </head>
 <body style="visibility:hidden">
