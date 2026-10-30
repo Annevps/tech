@@ -162,7 +162,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid rgba(143,210,31,.25);b
 @media(max-width:700px){.modal-box .org-form-grid{grid-template-columns:1fr}.modal-box .org-full{grid-column:auto}}
 </style>
 </head>
-<body>
+<body style="visibility:hidden">
 
   <div class="sidebar">
     <a href="index.html" class="logo"><i>TE</i><span>Tech<b>Empire</b></span></a>
@@ -171,7 +171,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid rgba(143,210,31,.25);b
       <a id="nav-chamados" class="active" onclick="mudarAba('chamados')">Chamados</a>
       <a id="nav-clientes" onclick="mudarAba('clientes')">Clientes</a>
       <a id="nav-organizacao" onclick="mudarAba('organizacao')">Organização</a>
-      <a href="login.html" class="sair">Sair</a>
+      <a href="#" class="sair" onclick="sairAdmin(event)">Sair</a>
     </nav>
   </div>
 
@@ -290,6 +290,35 @@ input:focus,select:focus,textarea:focus{outline:2px solid rgba(143,210,31,.25);b
       throw new Error('Supabase ou configuração não carregados.');
     }
     const db = window.supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
+    let adminAutorizado = false;
+    async function protegerPainel() {
+      try {
+        const { data: authData, error: authError } = await db.auth.getUser();
+        if (authError || !authData?.user) {
+          window.location.replace('login.html?destino=admin');
+          return false;
+        }
+        const { data: perfil, error: perfilError } = await db.from('usuarios').select('is_admin').eq('id', authData.user.id).maybeSingle();
+        if (perfilError || perfil?.is_admin !== true) {
+          await db.auth.signOut({ scope: 'local' });
+          alert('Esta conta não tem permissão para acessar o painel administrativo.');
+          window.location.replace('login.html');
+          return false;
+        }
+        adminAutorizado = true;
+        document.body.style.visibility = 'visible';
+        return true;
+      } catch (err) {
+        console.error('Falha ao validar acesso administrativo:', err);
+        window.location.replace('login.html?destino=admin');
+        return false;
+      }
+    }
+    window.sairAdmin = async (event) => {
+      event?.preventDefault();
+      await db.auth.signOut({ scope: 'local' });
+      window.location.replace('login.html');
+    };
     let dataAtual = new Date();
     let tarefasGlobal = [], projetosOrg = [], diarioOrg = [], filtroOrg = 'all';
     const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -468,9 +497,12 @@ input:focus,select:focus,textarea:focus{outline:2px solid rgba(143,210,31,.25);b
       if(error){alert('Erro ao excluir anotação: '+error.message);return;}
       await carregarDados();
     };
-    // Inicializa os dados ao abrir o painel.
-    carregarDados();
-    if (document.getElementById('tela-organizacao')?.classList.contains('active')) carregarOrganizacao();
+    // Só carrega dados depois de confirmar a identidade e o perfil administrativo.
+    protegerPainel().then(ok => {
+      if (!ok || !adminAutorizado) return;
+      carregarDados();
+      if (document.getElementById('tela-organizacao')?.classList.contains('active')) carregarOrganizacao();
+    });
   </script>
 </body>
 </html>
