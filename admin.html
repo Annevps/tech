@@ -282,7 +282,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid rgba(143,210,31,.25);b
   <div class="modal" id="modal-projeto"><div class="modal-box"><h2 id="org-projeto-titulo">Novo projeto</h2><form id="form-projeto"><input type="hidden" name="id"><div class="org-form-grid"><div class="org-modal-field"><label>Nome do projeto *</label><input name="nome" required></div><div class="org-modal-field"><label>Status</label><select name="status"><option>Em desenvolvimento</option><option>Aguardando</option><option>Pausado</option><option>Concluído</option><option>Cancelado</option></select></div><div class="org-modal-field org-full"><label>Descrição</label><textarea name="descricao"></textarea></div><div class="org-modal-field"><label>Link do GitHub</label><input name="github" type="url"></div><div class="org-modal-field"><label>Link do site</label><input name="site" type="url"></div></div><div class="modal-actions"><button type="button" class="btn-modal secondary" onclick="fecharModal('modal-projeto')">Cancelar</button><button type="submit" class="btn-modal primary">Salvar projeto</button></div></form></div></div>
   <div class="modal" id="modal-tarefa"><div class="modal-box"><h2 id="org-tarefa-titulo">Nova tarefa</h2><form id="form-tarefa"><input type="hidden" name="id"><div class="org-form-grid"><div class="org-modal-field org-full"><label>Título *</label><input name="titulo" required></div><div class="org-modal-field org-full"><label>Descrição</label><textarea name="descricao"></textarea></div><div class="org-modal-field"><label>Projeto</label><select name="projeto_id" id="org-task-project"></select></div><div class="org-modal-field"><label>Data de entrega</label><input name="data" type="date"></div><div class="org-modal-field"><label>Horário (referência)</label><input name="horario" type="time"></div><div class="org-modal-field"><label>Status</label><select name="status"><option>Pendente</option><option>Em andamento</option><option>Concluída</option></select></div></div><div class="modal-actions"><button type="button" class="btn-modal secondary" onclick="fecharModal('modal-tarefa')">Cancelar</button><button type="submit" class="btn-modal primary">Salvar tarefa</button></div></form></div></div>
   <div class="modal" id="modal-diario"><div class="modal-box"><h2 id="org-diario-titulo">Registrar progresso</h2><form id="form-diario"><input type="hidden" name="id"><div class="org-modal-field"><label>Projeto *</label><select name="projeto_id" id="org-diary-project" required></select></div><div class="org-modal-field"><label>Último ponto trabalhado</label><textarea name="ultimo_trabalho"></textarea></div><div class="org-modal-field"><label>Onde parei?</label><textarea name="onde_parei"></textarea></div><div class="org-modal-field"><label>Próximo passo</label><textarea name="proximo_passo"></textarea></div><div class="org-modal-field"><label>Status</label><select name="status"><option>Em desenvolvimento</option><option>Aguardando</option><option>Pausado</option><option>Concluído</option></select></div><div class="modal-actions"><button type="button" class="btn-modal secondary" onclick="fecharModal('modal-diario')">Cancelar</button><button type="submit" class="btn-modal primary">Salvar registro</button></div></form></div></div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="supabase-config.js"></script>
   <script>
     if (!window.supabase || !window.SUPABASE_CONFIG) {
@@ -375,17 +375,43 @@ input:focus,select:focus,textarea:focus{outline:2px solid rgba(143,210,31,.25);b
       alert('Atualização salva. O acompanhamento do cliente será atualizado automaticamente.');
     };
 
-    document.getElementById('form-novo').onsubmit=async(e)=>{
+    document.getElementById('form-novo').onsubmit = async (e) => {
       e.preventDefault();
-      const form=new FormData(e.target),{data:{session}}=await db.auth.getSession();
-      const row={cliente_id:null,admin_id:session?.user?.id||null,cliente_nome:String(form.get('nome')||'').trim(),cliente_telefone:String(form.get('telefone')||'').replace(/\\D/g,''),categoria:form.get('categoria'),titulo:String(form.get('titulo')||'').trim(),descricao:String(form.get('descricao')||'').trim(),status:'Nova chamada'};
-      const btn=e.target.querySelector('button[type="submit"]');btn.disabled=true;btn.textContent='Criando...';
-      const {data,error}=await db.from('chamados').insert(row).select('*').single();
-      btn.disabled=false;btn.textContent='Criar';
-      if(error){alert('Não foi possível criar o chamado: '+error.message+'\\nConfira as permissões e os campos obrigatórios da tabela chamados.');return;}
-      fecharModal('modal-novo');e.target.reset();await carregarDados();
-      alert('Chamado criado'+(data.protocolo?'! Protocolo: '+data.protocolo:'.'));
+      const form = new FormData(e.target);
+      const { data: sessionData, error: sessionError } = await db.auth.getSession();
+      if (sessionError) { alert('Erro ao verificar sua sessão: ' + sessionError.message); return; }
+      const row = {
+        cliente_id: null,
+        admin_id: sessionData.session?.user?.id || null,
+        cliente_nome: String(form.get('nome') || '').trim(),
+        cliente_telefone: String(form.get('telefone') || '').replace(/\\D/g, ''),
+        categoria: String(form.get('categoria') || 'Manutenção'),
+        titulo: String(form.get('titulo') || '').trim(),
+        descricao: String(form.get('descricao') || '').trim(),
+        status: 'Nova chamada'
+      };
+      if (!row.cliente_nome || !row.cliente_telefone || !row.titulo || !row.descricao) {
+        alert('Preencha nome, telefone, assunto e descrição.');
+        return;
+      }
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.textContent = 'Criando...';
+      try {
+        const { data, error } = await db.from('chamados').insert(row).select('*').single();
+        if (error) throw error;
+        fecharModal('modal-novo');
+        e.target.reset();
+        await carregarDados();
+        alert('Chamado criado com sucesso.' + (data.protocolo ? '\\nProtocolo: ' + data.protocolo : ''));
+      } catch (error) {
+        alert('Não foi possível criar o chamado: ' + (error.message || 'Erro desconhecido') + '\\nVerifique as permissões e os campos obrigatórios no Supabase.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Criar';
+      }
     };
+
     // Carregamento central dos dados do painel
     const safeText = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
     async function carregarDados() {
