@@ -121,10 +121,14 @@ body{background:#eef1f5;padding:42px 18px;color:#17202b}
     <button class="btn-acao" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="supabase-config.js"></script>
   <script>
-    const db = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
+    if (!window.supabase || !window.SUPABASE_CONFIG) {
+      document.body.insertAdjacentHTML('afterbegin','<p style="padding:16px;color:#b91c1c">Não foi possível conectar ao sistema. Atualize a página.</p>');
+      throw new Error('Supabase ou configuração não carregados.');
+    }
+    const db = window.supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
 
     async function carregarLaudo() {
       const urlParams = new URLSearchParams(window.location.search);
