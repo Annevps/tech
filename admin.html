@@ -126,6 +126,39 @@ input:focus,select:focus,textarea:focus{outline:2px solid rgba(143,210,31,.25);b
 @media(max-width:1180px){body{grid-template-columns:220px minmax(0,1fr)}.notes-sidebar{display:none}.grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){body{display:flex;flex-direction:column;height:auto;min-height:100vh;overflow:auto}.sidebar{padding:14px 16px;border-right:0;border-bottom:1px solid var(--line)}.logo{margin-bottom:14px}.sidebar nav{display:flex;flex-direction:row;overflow-x:auto;gap:6px}.sidebar a{white-space:nowrap;padding:9px 12px}.sidebar .sair{margin:0 0 0 auto}.main{overflow:visible}.topbar{padding:14px 18px}.content{padding:20px 16px;overflow:visible}.summary-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.summary-card{padding:16px}.grid-3{grid-template-columns:1fr}.box{padding:16px;max-height:none}.diario-table{min-width:760px}.tela{overflow-x:auto}.modal-box{padding:22px;max-height:90vh;overflow:auto}}
 @media(max-width:420px){.summary-grid{grid-template-columns:1fr}.page-header{align-items:flex-start;gap:12px;flex-direction:column}.topbar{gap:8px}.breadcrumb{font-size:11px}}
+ 
+/* Refinamento visual TechEmpire: branco, grafite e verde-lima */
+.org-page{--obg:#f8f9fa;--opanel:#fff;--oline:#e5e7eb;--otext:#1f2937;--omuted:#6b7280;--ogreen:#7ab81a;background:#f8f9fa!important;color:#1f2937!important}
+.org-page .org-box,.org-page .quick button{background:#fff!important;border-color:#e5e7eb!important;color:#1f2937!important;box-shadow:0 5px 18px rgba(31,41,55,.045)}
+.org-page .org-head p,.org-page .quote,.org-page .project-info p,.org-page .muted,.org-page .cal-name,.org-page .task-copy small{color:#6b7280!important}
+.org-page .quote{border-color:#8fd21f!important}
+.org-page .quick i{background:rgba(143,210,31,.13)!important;color:#6c9f16!important}
+.org-page .project-row,.org-page .task-row,.org-page .upcoming{border-color:#e5e7eb!important}
+.org-page .project-logo{background:#f3f4f6!important;border-color:#e5e7eb!important;color:#6c9f16!important}
+.org-page .tag{background:rgba(143,210,31,.14)!important;color:#5c8a10!important}
+.org-page .calendar-top button,.org-page .cal-day,.org-page .filters button{background:#f3f4f6!important;border-color:#e5e7eb!important;color:#374151!important}
+.org-page .cal-day.today{border:2px solid #8fd21f!important;color:#5c8a10!important}
+.org-page .cal-day.has,.org-page .filters button.active{background:rgba(143,210,31,.16)!important;color:#5c8a10!important}
+.org-page .org-box-head button,.org-page .org-outline{color:#5c8a10!important;border-color:#b7d98a!important;background:#f8fced!important}
+.org-page .org-modal-field input,.org-page .org-modal-field select,.org-page .org-modal-field textarea{background:#f8f9fa!important;border-color:#d1d5db!important;color:#1f2937!important}
+.org-page .org-modal-field label{color:#6b7280!important}
+.org-page .row-actions button,.org-page td button{color:#5c8a10!important;font-size:11px;padding:4px 7px;border:1px solid #dce9c9;border-radius:6px;background:#f8fced}
+.org-page .org-box-head{border-color:#e5e7eb!important}
+.modal{padding:18px;overflow-y:auto}
+.modal-box{background:#fff!important;color:#1f2937!important;border:1px solid #e5e7eb;max-height:90vh;overflow-y:auto;gap:12px}
+.modal-box h2{color:#5c8a10!important}
+.modal-box .form-group input,.modal-box .form-group select,.modal-box .form-group textarea{display:block;width:100%;min-height:44px;padding:11px 13px;background:#f8f9fa;border:1px solid #d1d5db;border-radius:9px;color:#1f2937;font:14px Inter,sans-serif}
+.modal-box .form-group textarea{min-height:90px}
+.modal-box .org-modal-field input,.modal-box .org-modal-field select,.modal-box .org-modal-field textarea{display:block;width:100%;min-height:42px;padding:10px 12px;background:#f8f9fa;border:1px solid #d1d5db;border-radius:9px;color:#1f2937;font:14px Inter,sans-serif}
+.modal-box .org-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.modal-box .org-full{grid-column:1/-1}
+.modal-box .org-modal-field label,.modal-box .form-group label{display:block;margin-bottom:6px;font-size:12px;font-weight:600;color:#4b5563}
+.modal-box .modal-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.modal-box .btn-modal.primary{background:#8fd21f;color:#fff}
+.notes-sidebar input,.notes-sidebar textarea{font:13px Inter,sans-serif;line-height:1.5}
+.note-item{border:1px solid #e5e7eb;border-left:3px solid #8fd21f;background:#f8f9fa;color:#1f2937}
+.note-item p{white-space:pre-wrap;overflow-wrap:anywhere;color:#4b5563;font-size:12px}
+@media(max-width:700px){.modal-box .org-form-grid{grid-template-columns:1fr}.modal-box .org-full{grid-column:auto}}
 </style>
 </head>
 <body>
@@ -337,27 +370,16 @@ input:focus,select:focus,textarea:focus{outline:2px solid rgba(143,210,31,.25);b
       alert('Atualização salva. O acompanhamento do cliente será atualizado automaticamente.');
     };
 
-    document.getElementById('form-novo').onsubmit = async (e) => {
+    document.getElementById('form-novo').onsubmit=async(e)=>{
       e.preventDefault();
-      const form = new FormData(e.target);
-      await db.from('chamados').insert({ cliente_nome: form.get('nome'), cliente_telefone: form.get('telefone'), categoria: form.get('categoria'), titulo: form.get('titulo'), descricao: form.get('descricao'), status: "Nova chamada" });
-      fecharModal('modal-novo');
-      e.target.reset();
-      carregarDados();
+      const form=new FormData(e.target),{data:{session}}=await db.auth.getSession();
+      const row={cliente_id:null,admin_id:session?.user?.id||null,cliente_nome:String(form.get('nome')||'').trim(),cliente_telefone:String(form.get('telefone')||'').replace(/\\D/g,''),categoria:form.get('categoria'),titulo:String(form.get('titulo')||'').trim(),descricao:String(form.get('descricao')||'').trim(),status:'Nova chamada'};
+      const btn=e.target.querySelector('button[type="submit"]');btn.disabled=true;btn.textContent='Criando...';
+      const {data,error}=await db.from('chamados').insert(row).select('*').single();
+      btn.disabled=false;btn.textContent='Criar';
+      if(error){alert('Não foi possível criar o chamado: '+error.message+'\\nConfira as permissões e os campos obrigatórios da tabela chamados.');return;}
+      fecharModal('modal-novo');e.target.reset();await carregarDados();
+      alert('Chamado criado'+(data.protocolo?'! Protocolo: '+data.protocolo:'.'));
     };
 
-    window.salvarAnotacao = async () => {
-      const t = document.getElementById('note-titulo').value;
-      const x = document.getElementById('note-texto').value;
-      if(!x) return;
-      await db.from('anotacoes').insert({ titulo: t, texto: x });
-      document.getElementById('note-titulo').value = '';
-      document.getElementById('note-texto').value = '';
-      carregarDados();
-    };
 
-    carregarDados();
-    carregarOrganizacao();
-  </script>
-</body>
-</html>
