@@ -75,7 +75,7 @@ Pages.manutencao = () => {
     return g; 
   }
 
-  const W = 3.2, H = 6.0, D = 5.8;
+  const W = 4.2, H = 7.0, D = 3.0;
 
   // Gabinete de Vidro e Estrutura
   pc.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(W, H, D)), new THREE.LineBasicMaterial({ color: 0x8fd21f, transparent: true, opacity: .5 })));
@@ -86,7 +86,7 @@ Pages.manutencao = () => {
   pc.add(caixa(W, .2, D, matDark, 0, -H/2, 0));
 
   // Placa-mãe
-  pc.add(caixa(.15, 5.0, 5.0, matDark, -1.5, .2, .2));
+  pc.add(caixa(.15, 5.8, 2.35, matDark, -1.9, .1, -.1));
 
   // Processador (CPU)
   const cpuG = new THREE.Group(); 
@@ -96,7 +96,7 @@ Pages.manutencao = () => {
 
   // Memória RAM
   const ramG = new THREE.Group(); 
-  [-1.2, -1.6, -2.0].forEach(z => { 
+  [-.55, -.95, -1.35].forEach(z => { 
     ramG.add(caixa(.15, 1.3, .2, matMetal, -1.2, 1.6, z)); 
     ramG.add(caixa(.16, .1, .22, matGreen, -1.2, 2.15, z)); // LED verde na RAM
   }); 
@@ -111,7 +111,7 @@ Pages.manutencao = () => {
 
   // Ventoinhas do Gabinete
   const fanG = new THREE.Group(); 
-  [[1.5, 2.8], [-1.0, 2.8], [1.5, 1.0]].forEach(([y, z]) => { const f = fan(1.1, false); f.position.set(.4, y, z); fanG.add(f); }); 
+  [[1.8, 1.45], [-.2, 1.45], [-2.1, 1.45]].forEach(([y, z]) => { const f = fan(.62, false); f.position.set(.4, y, z); fanG.add(f); }); 
   marcar("fans", fanG);
 
   // Fonte (PSU)
