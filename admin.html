@@ -298,8 +298,8 @@ input:focus,select:focus,textarea:focus{outline:2px solid rgba(143,210,31,.25);b
           window.location.replace('login.html?destino=admin');
           return false;
         }
-        const { data: perfil, error: perfilError } = await db.from('usuarios').select('is_admin').eq('id', authData.user.id).maybeSingle();
-        if (perfilError || perfil?.is_admin !== true) {
+        const { data: perfilAdmin, error: perfilError } = await db.rpc('is_admin');
+        if (perfilError || perfilAdmin !== true) {
           await db.auth.signOut({ scope: 'local' });
           alert('Esta conta não tem permissão para acessar o painel administrativo.');
           window.location.replace('login.html');
