@@ -93,17 +93,17 @@ async function consultarNoServidor(){
 async function buscar(){
  protocoloAtual=document.getElementById("protocolo").value.trim().toUpperCase();
  telefoneAtual=document.getElementById("telefone-verificacao").value.replace(/\D/g,"");
- const msg=document.getElementById("msg"),resultado=document.getElementById("resultado");
+ const msg=document.getElementById("msg"),resultado=document.getElementById("resultado"),estadoInicial=document.getElementById("estado-inicial");
  if(!protocoloAtual||telefoneAtual.length<10){msg.textContent="Informe o protocolo e o telefone cadastrado com DDD.";return;}
  msg.textContent="Verificando protocolo e telefone...";
  try{
   const data=await consultarNoServidor();
-  if(!data){msg.textContent="Não encontramos um atendimento com esses dados. Confira o protocolo e o telefone cadastrado.";resultado.style.display="none";chamadoAtual=null;return;}
-  msg.textContent="";resultado.style.display="flex";render(data);iniciarAtualizacoes();
+  if(!data){msg.textContent="Não encontramos um atendimento com esses dados. Confira o protocolo e o telefone cadastrado.";resultado.style.display="none";estadoInicial.style.display="flex";chamadoAtual=null;return;}
+  msg.textContent="";estadoInicial.style.display="none";resultado.style.display="flex";render(data);iniciarAtualizacoes();
  }catch(error){
   console.error("Erro na consulta protegida:",error);
   msg.textContent="Não foi possível consultar agora. Confirme se a função de acompanhamento já foi instalada no Supabase.";
-  resultado.style.display="none";
+  resultado.style.display="none";estadoInicial.style.display="flex";
  }
 }
 function iniciarAtualizacoes(){
