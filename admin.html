@@ -336,16 +336,17 @@ input,select,textarea{color-scheme:dark}
 
   <div class="modal" id="modal-chamado"><div class="modal-box" style="max-width:760px;max-height:88vh;overflow-y:auto">
     <h2>Gerenciar atendimento e laudo</h2>
+    <p style="color:#64748b;font-size:12px;line-height:1.6;margin:7px 0 16px">Edite as informações que o cliente verá na página Acompanhar Atendimento. Depois de salvar, o sistema atualiza a data da última alteração automaticamente.</p>
     <input type="hidden" id="edit-id">
     <div class="org-form-grid">
       <div class="org-modal-field"><label>Cliente</label><input id="edit-cliente" readonly></div>
       <div class="org-modal-field"><label>Protocolo</label><input id="edit-protocolo" readonly></div>
-      <div class="org-modal-field"><label>Data de abertura</label><input id="edit-abertura" readonly></div>
-      <div class="org-modal-field"><label>Última atualização</label><input id="edit-atualizacao" readonly></div>
-      <div class="org-modal-field"><label>Status do atendimento</label><select id="edit-status"><option>Nova chamada</option><option>Aguardando análise</option><option>Aguardando aprovação do orçamento</option><option>Aprovada</option><option>Em andamento</option><option>Aguardando informações do cliente</option><option>Aguardando pagamento</option><option>Concluída</option><option>Cancelada</option></select></div>
-      <div class="org-modal-field"><label>Prazo previsto</label><input id="edit-prazo" type="date"></div>
-      <div class="org-modal-field"><label>Orçamento (R$)</label><input id="edit-orcamento" type="number" min="0" step="0.01" placeholder="Ex.: 250,00"></div>
-      <div class="org-modal-field org-full"><label>Parecer / observação da equipe (visível ao cliente)</label><textarea id="edit-parecer" rows="3" placeholder="Atualização sobre o atendimento que aparecerá para o cliente..."></textarea></div>
+      <div class="org-modal-field"><label>Data de abertura (automática)</label><input id="edit-abertura" readonly></div>
+      <div class="org-modal-field"><label>Última atualização (automática)</label><input id="edit-atualizacao" readonly></div>
+      <div class="org-modal-field"><label>Status do atendimento — aparece ao cliente</label><select id="edit-status"><option>Nova chamada</option><option>Equipamento recebido</option><option>Aguardando análise</option><option>Em diagnóstico</option><option>Aguardando aprovação do orçamento</option><option>Aprovada</option><option>Em andamento</option><option>Aguardando informações do cliente</option><option>Aguardando pagamento</option><option>Em testes</option><option>Concluída</option><option>Cancelada</option></select></div>
+      <div class="org-modal-field"><label>Prazo previsto — editável</label><input id="edit-prazo" type="date"></div>
+      <div class="org-modal-field"><label>Orçamento (R$) — editável</label><input id="edit-orcamento" type="number" min="0" step="0.01" placeholder="Ex.: 250,00"></div>
+      <div class="org-modal-field org-full"><label>Parecer / observação da equipe — exibido ao cliente</label><textarea id="edit-parecer" rows="3" placeholder="Escreva aqui a atualização que aparecerá no acompanhamento do cliente..."></textarea></div>
       <div id="edit-bloco-manutencao" class="org-modal-field org-full"><h3>Laudo técnico — Manutenção</h3></div>
       <div id="edit-manutencao-campos" class="org-modal-field org-full"><div class="org-form-grid">
         <div class="org-modal-field org-full"><label>Diagnóstico técnico</label><textarea id="edit-diagnostico" rows="3" placeholder="Descreva o problema identificado..."></textarea></div>
@@ -498,7 +499,7 @@ input,select,textarea{color-scheme:dark}
       const orcamentoRaw = document.getElementById('edit-orcamento').value;
       const orcamento = orcamentoRaw === '' ? null : Number(orcamentoRaw);
       if (orcamento !== null && (!Number.isFinite(orcamento) || orcamento < 0)) { alert('Informe um orçamento válido.'); return; }
-      const { data: anterior, error: buscaErro } = await db.from('chamados').select('status,laudo_tecnico,detalhes_projeto,categoria').eq('id', id).single();
+      const { data: anterior, error: buscaErro } = await db.from('chamados').select('status,parecer_tecnico,prazo_previsto,orcamento_valor,laudo_tecnico,detalhes_projeto,categoria').eq('id', id).single();
       if (buscaErro) { alert('Não foi possível carregar o atendimento: ' + buscaErro.message); return; }
       const manutencao = !(anterior.categoria || '').toLowerCase().includes('site');
       const laudo = {...(anterior.laudo_tecnico || {})};
@@ -526,8 +527,23 @@ input,select,textarea{color-scheme:dark}
       };
       const { error } = await db.from('chamados').update(atualizacao).eq('id', id);
       if (error) { alert('Não foi possível salvar: ' + error.message); return; }
-      if (anterior.status !== novoStatus || observacao) {
-        const { error: histError } = await db.from('historico_status').insert({ chamado_id: id, status_anterior: anterior.status, status_novo: novoStatus, observacao: observacao || 'Status do atendimento atualizado.' });
+      const parecerAnterior = String(anterior.parecer_tecnico || '').trim();
+      const parecerMudou = parecerAnterior !== observacao;
+      const dadosMudaram = anterior.status !== novoStatus || parecerMudou ||
+        String(anterior.prazo_previsto || '').slice(0,10) !== String(prazo || '') ||
+        Number(anterior.orcamento_valor ?? -1) !== Number(orcamento ?? -1);
+      if (dadosMudaram) {
+        const textoHistorico = parecerMudou
+          ? (observacao || 'A observação da equipe foi removida.')
+          : (anterior.status !== novoStatus
+            ? 'Status do atendimento atualizado pela equipe.'
+            : 'Prazo ou orçamento do atendimento atualizado pela equipe.');
+        const { error: histError } = await db.from('historico_status').insert({
+          chamado_id: id,
+          status_anterior: anterior.status,
+          status_novo: novoStatus,
+          observacao: textoHistorico
+        });
         if (histError) console.error('Histórico não gravado:', histError.message);
       }
       fecharModal('modal-chamado');
