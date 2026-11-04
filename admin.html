@@ -382,19 +382,35 @@ input,select,textarea{color-scheme:dark}
           window.location.replace('login.html?destino=admin');
           return false;
         }
-        const { data: perfilAdmin, error: perfilError } = await db.rpc('is_admin');
-        if (perfilError || perfilAdmin !== true) {
+
+        // Usa a mesma verificação de perfil adotada na página de login.
+        // Assim, o painel não depende de uma RPC is_admin que pode não estar instalada.
+        const { data: perfilAdmin, error: perfilError } = await db
+          .from('usuarios')
+          .select('is_admin')
+          .eq('id', authData.user.id)
+          .maybeSingle();
+
+        if (perfilError) {
+          console.error('Não foi possível verificar o perfil administrativo:', perfilError);
+          document.body.style.visibility = 'visible';
+          document.body.innerHTML = '<main style="min-height:100vh;display:grid;place-items:center;padding:24px;background:#071321;color:#fff;font-family:Inter,sans-serif;text-align:center"><section><h2>Não foi possível validar seu acesso</h2><p style="margin:12px 0;color:#cbd5e1">Verifique a conexão e as permissões de leitura do seu próprio perfil na tabela usuarios.</p><a href="login.html" style="color:#8fd21f">Voltar ao login</a></section></main>';
+          return false;
+        }
+
+        if (perfilAdmin?.is_admin !== true) {
           await db.auth.signOut({ scope: 'local' });
-          alert('Esta conta não tem permissão para acessar o painel administrativo.');
           window.location.replace('login.html');
           return false;
         }
+
         adminAutorizado = true;
         document.body.style.visibility = 'visible';
         return true;
       } catch (err) {
         console.error('Falha ao validar acesso administrativo:', err);
-        window.location.replace('login.html?destino=admin');
+        document.body.style.visibility = 'visible';
+        document.body.innerHTML = '<main style="min-height:100vh;display:grid;place-items:center;padding:24px;background:#071321;color:#fff;font-family:Inter,sans-serif;text-align:center"><section><h2>Falha ao abrir o painel</h2><p style="margin:12px 0;color:#cbd5e1">Atualize a página ou entre novamente.</p><a href="login.html" style="color:#8fd21f">Voltar ao login</a></section></main>';
         return false;
       }
     }
