@@ -43,7 +43,7 @@ body{background:#eef1f5;padding:42px 18px;color:#17202b}
 .box-texto{background:#f8fafb;border:1px solid #e7ebef;border-radius:10px;min-height:70px}
 .destaque-financeiro{border:1px solid rgba(143,210,31,.55);border-left:5px solid #8fd21f;background:#f8fbf2;border-radius:12px;align-items:center}
 .destaque-financeiro h2{color:#18232e}
-.assinaturas{padding-top:90px}
+.autorizacao{margin-top:28px;padding:20px 22px;border:1.5px solid #aeb8c2;border-radius:10px;break-inside:avoid;page-break-inside:avoid}.autorizacao h2{font-family:'Space Grotesk';font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:#18232e;margin-bottom:10px}.autorizacao p{font-size:12px;line-height:1.65;color:#374151}.opcoes-autorizacao{display:flex;gap:28px;flex-wrap:wrap;margin:16px 0 20px}.opcao-autorizacao{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;color:#18232e}.quadrado-opcao{width:17px;height:17px;border:1.5px solid #18232e;display:inline-block;flex:0 0 17px}.campos-assinatura-cliente{display:grid;grid-template-columns:1fr 170px;gap:24px;margin-top:28px}.linha-preenchimento{border-top:1px solid #374151;padding-top:7px;text-align:center;font-size:11px;color:#5b6570}.assinatura-tecnica{margin-top:30px;max-width:48%;border-top:1px solid #374151;padding-top:7px;text-align:center;font-size:11px;color:#5b6570}@media(max-width:700px){.campos-assinatura-cliente{grid-template-columns:1fr}.assinatura-tecnica{max-width:100%}}@media print{.autorizacao{border-color:#555;background:#fff!important}.opcao-autorizacao,.linha-preenchimento,.assinatura-tecnica{color:#111}}\n.assinaturas{padding-top:90px}
 .acoes{bottom:24px;right:24px}
 .btn-acao{border-radius:10px;background:#7ab81a;box-shadow:0 8px 22px rgba(15,23,42,.16);transition:.2s}
 .btn-acao:hover{transform:translateY(-2px);background:#659b12}
@@ -110,10 +110,19 @@ body{background:#eef1f5;padding:42px 18px;color:#17202b}
       </div>
     </div>
 
-    <div class="assinaturas">
-      <div class="linha-assinatura">TechEmpire<br>Responsável Técnico</div>
-      <div class="linha-assinatura">Cliente<br>Aprovação do Orçamento</div>
-    </div>
+    <section class="autorizacao" aria-labelledby="titulo-autorizacao">
+      <h2 id="titulo-autorizacao">Autorização do orçamento e do serviço</h2>
+      <p>Eu, identificado(a) neste documento, declaro que recebi as informações sobre o diagnóstico/escopo, o serviço proposto, o prazo e o valor apresentados acima. Assinalo minha decisão abaixo e autorizo a execução somente se marcar “AUTORIZO”. Qualquer serviço ou custo adicional deverá ser previamente informado e aprovado por mim.</p>
+      <div class="opcoes-autorizacao">
+        <div class="opcao-autorizacao"><span class="quadrado-opcao"></span> AUTORIZO a execução pelo valor informado.</div>
+        <div class="opcao-autorizacao"><span class="quadrado-opcao"></span> NÃO AUTORIZO a execução.</div>
+      </div>
+      <div class="campos-assinatura-cliente">
+        <div class="linha-preenchimento">Assinatura do(a) cliente</div>
+        <div class="linha-preenchimento">Data: ____/____/________</div>
+      </div>
+      <div class="assinatura-tecnica">Tech Empire — Responsável pelo atendimento</div>
+    </section>
   </div>
 
   <div class="acoes">
@@ -172,7 +181,7 @@ body{background:#eef1f5;padding:42px 18px;color:#17202b}
         document.getElementById('proj-escopo').textContent = p.escopo || 'Aguardando definição';
         document.getElementById('proj-link').textContent = p.link || 'Aguardando definição';
         prazo = p.prazo || 'A definir';
-        valor = p.valor;
+        valor = p.valor ?? c.orcamento_valor;
       } else {
         document.getElementById('bloco-manutencao').style.display = 'block';
         document.getElementById('bloco-site').style.display = 'none';
@@ -182,7 +191,7 @@ body{background:#eef1f5;padding:42px 18px;color:#17202b}
         document.getElementById('laudo-solucao').textContent = l.solucao || 'Aguardando solução';
         document.getElementById('laudo-parecer').textContent = l.parecer || 'Aguardando preenchimento';
         prazo = l.prazo || 'A definir';
-        valor = l.valor;
+        valor = l.valor ?? c.orcamento_valor;
       }
 
       document.getElementById('laudo-prazo').textContent = prazo;
