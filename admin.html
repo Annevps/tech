@@ -359,7 +359,7 @@ input,select,textarea{color-scheme:dark}
         <div class="org-modal-field org-full"><label>Link do preview</label><input id="edit-link" type="url" placeholder="https://..."></div>
       </div></div>
     </div>
-    <div class="modal-actions"><button type="button" class="btn-modal secondary" onclick="fecharModal('modal-chamado')">Cancelar</button><button type="button" class="btn-modal primary" onclick="salvarChamado()">Salvar atendimento e laudo</button></div>
+    <div class="modal-actions"><button type="button" class="btn-modal secondary" onclick="fecharModal('modal-chamado')">Cancelar</button><button type="button" class="btn-modal secondary" onclick="abrirLaudoImpressao()">Visualizar / imprimir laudo</button><button type="button" class="btn-modal primary" onclick="salvarChamado()">Salvar atendimento e laudo</button></div>
   </div></div>
 
   <div class="modal" id="modal-projeto"><div class="modal-box"><h2 id="org-projeto-titulo">Novo projeto</h2><form id="form-projeto"><input type="hidden" name="id"><div class="org-form-grid"><div class="org-modal-field"><label>Nome do projeto *</label><input name="nome" required></div><div class="org-modal-field"><label>Status</label><select name="status"><option>Em desenvolvimento</option><option>Aguardando</option><option>Pausado</option><option>Concluído</option><option>Cancelado</option></select></div><div class="org-modal-field org-full"><label>Descrição</label><textarea name="descricao"></textarea></div><div class="org-modal-field"><label>Link do GitHub</label><input name="github" type="url"></div><div class="org-modal-field"><label>Link do site</label><input name="site" type="url"></div></div><div class="modal-actions"><button type="button" class="btn-modal secondary" onclick="fecharModal('modal-projeto')">Cancelar</button><button type="submit" class="btn-modal primary">Salvar projeto</button></div></form></div></div>
@@ -489,6 +489,13 @@ input,select,textarea{color-scheme:dark}
       document.getElementById('edit-bloco-site').style.display = manutencao ? 'none' : 'block';
       document.getElementById('edit-site-campos').style.display = manutencao ? 'none' : 'block';
       abrirModal('modal-chamado');
+    };
+
+    window.abrirLaudoImpressao = () => {
+      const id = document.getElementById('edit-id').value;
+      if (!id) { alert('Abra um atendimento antes de imprimir o laudo.'); return; }
+      alert('Antes de imprimir, clique em “Salvar atendimento e laudo” para garantir que as alterações mais recentes apareçam no documento.');
+      window.open('laudo.html?id=' + encodeURIComponent(id), '_blank', 'noopener');
     };
 
     window.salvarChamado = async () => {
