@@ -365,7 +365,8 @@ input,select,textarea{color-scheme:dark}
   <div class="modal" id="modal-projeto"><div class="modal-box"><h2 id="org-projeto-titulo">Novo projeto</h2><form id="form-projeto"><input type="hidden" name="id"><div class="org-form-grid"><div class="org-modal-field"><label>Nome do projeto *</label><input name="nome" required></div><div class="org-modal-field"><label>Status</label><select name="status"><option>Em desenvolvimento</option><option>Aguardando</option><option>Pausado</option><option>Concluído</option><option>Cancelado</option></select></div><div class="org-modal-field org-full"><label>Descrição</label><textarea name="descricao"></textarea></div><div class="org-modal-field"><label>Link do GitHub</label><input name="github" type="url"></div><div class="org-modal-field"><label>Link do site</label><input name="site" type="url"></div></div><div class="modal-actions"><button type="button" class="btn-modal secondary" onclick="fecharModal('modal-projeto')">Cancelar</button><button type="submit" class="btn-modal primary">Salvar projeto</button></div></form></div></div>
   <div class="modal" id="modal-tarefa"><div class="modal-box"><h2 id="org-tarefa-titulo">Nova tarefa</h2><form id="form-tarefa"><input type="hidden" name="id"><div class="org-form-grid"><div class="org-modal-field org-full"><label>Título *</label><input name="titulo" required></div><div class="org-modal-field org-full"><label>Descrição</label><textarea name="descricao"></textarea></div><div class="org-modal-field"><label>Projeto</label><select name="projeto_id" id="org-task-project"></select></div><div class="org-modal-field"><label>Data de entrega</label><input name="data" type="date"></div><div class="org-modal-field"><label>Horário (referência)</label><input name="horario" type="time"></div><div class="org-modal-field"><label>Status</label><select name="status"><option>Pendente</option><option>Em andamento</option><option>Concluída</option></select></div></div><div class="modal-actions"><button type="button" class="btn-modal secondary" onclick="fecharModal('modal-tarefa')">Cancelar</button><button type="submit" class="btn-modal primary">Salvar tarefa</button></div></form></div></div>
   <div class="modal" id="modal-diario"><div class="modal-box"><h2 id="org-diario-titulo">Registrar progresso</h2><form id="form-diario"><input type="hidden" name="id"><div class="org-modal-field"><label>Projeto *</label><select name="projeto_id" id="org-diary-project" required></select></div><div class="org-modal-field"><label>Último ponto trabalhado</label><textarea name="ultimo_trabalho"></textarea></div><div class="org-modal-field"><label>Onde parei?</label><textarea name="onde_parei"></textarea></div><div class="org-modal-field"><label>Próximo passo</label><textarea name="proximo_passo"></textarea></div><div class="org-modal-field"><label>Status</label><select name="status"><option>Em desenvolvimento</option><option>Aguardando</option><option>Pausado</option><option>Concluído</option></select></div><div class="modal-actions"><button type="button" class="btn-modal secondary" onclick="fecharModal('modal-diario')">Cancelar</button><button type="submit" class="btn-modal primary">Salvar registro</button></div></form></div></div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <div id="alerta-nova-chamada" role="status" aria-live="polite" style="display:none;position:sticky;top:12px;z-index:50;margin:12px 0;padding:14px 18px;border:1px solid #39d9a5;border-left:5px solid #39d9a5;border-radius:12px;background:#102b2a;color:#eafff8;box-shadow:0 10px 28px rgba(0,0,0,.22)"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><strong style="display:block;font-size:14px">🔔 Nova chamada recebida!</strong><span id="texto-nova-chamada" style="font-size:13px">Um novo atendimento chegou.</span></div><button type="button" onclick="document.getElementById('alerta-nova-chamada').style.display='none'" style="background:transparent;border:1px solid #65e6bd;color:#eafff8;border-radius:8px;padding:7px 11px;cursor:pointer">Dispensar</button></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="supabase-config.js"></script>
   <script>
     if (!window.supabase || !window.SUPABASE_CONFIG) {
@@ -595,6 +596,36 @@ input,select,textarea{color-scheme:dark}
       }
     };
 
+    let idsChamadosConhecidos = null;
+    let idsChamadosNovos = new Set();
+    let audioLiberado = false;
+    document.addEventListener('pointerdown', () => { audioLiberado = true; }, { once: true });
+    function tocarAlertaNovaChamada() {
+      if (!audioLiberado) return;
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const tocar = (freq, inicio) => {
+          const osc=ctx.createOscillator(), gain=ctx.createGain();
+          osc.type='sine'; osc.frequency.value=freq;
+          gain.gain.setValueAtTime(0.0001,ctx.currentTime+inicio);
+          gain.gain.exponentialRampToValueAtTime(0.14,ctx.currentTime+inicio+0.025);
+          gain.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+inicio+0.22);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(ctx.currentTime+inicio); osc.stop(ctx.currentTime+inicio+0.24);
+        };
+        ctx.resume().then(()=>{tocar(740,0);tocar(988,0.2);setTimeout(()=>ctx.close(),700);}).catch(()=>{});
+      } catch (_) {}
+    }
+    function avisarNovasChamadas(novas) {
+      if (!novas.length) return;
+      novas.forEach(c=>idsChamadosNovos.add(String(c.id)));
+      const c=novas[0], alerta=document.getElementById('alerta-nova-chamada'), texto=document.getElementById('texto-nova-chamada');
+      if(alerta&&texto){texto.textContent=novas.length===1?'Protocolo '+(c.protocolo||c.numero||'novo')+' — '+(c.cliente_nome||'Novo cliente'):novas.length+' novos atendimentos recebidos.';alerta.style.display='block';}
+      tocarAlertaNovaChamada();
+    }
+
     // Carregamento central dos dados do painel
     const safeText = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
     async function carregarDados() {
@@ -612,7 +643,13 @@ input,select,textarea{color-scheme:dark}
           ['kpi-total','kpi-pendentes','kpi-concluidos','kpi-clientes'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—'});
         } else {
           const chamados = chamadosRes.data || [];
-          chamadosEl.innerHTML = chamados.length ? chamados.map(c => '<tr><td style="padding:14px 16px;border-bottom:1px solid var(--line)">'+safeText(c.protocolo || c.numero || c.id)+'</td><td style="padding:14px 16px;border-bottom:1px solid var(--line)">'+safeText(c.cliente_nome || 'Cliente cadastrado')+'</td><td style="padding:14px 16px;border-bottom:1px solid var(--line)">'+safeText(c.status || 'Nova chamada')+'</td><td style="padding:14px 16px;border-bottom:1px solid var(--line)"><button class="btn-new" style="padding:7px 12px" onclick="abrirChamado(\''+safeText(c.id)+'\')">Gerenciar</button></td></tr>').join('') : '<tr><td colspan="4" style="padding:18px;text-align:center;color:var(--text-muted)">Nenhum chamado encontrado.</td></tr>';
+          if (idsChamadosConhecidos === null) idsChamadosConhecidos = new Set(chamados.map(c=>String(c.id)));
+          else {
+            const novos=chamados.filter(c=>!idsChamadosConhecidos.has(String(c.id)));
+            if(novos.length) avisarNovasChamadas(novos);
+            chamados.forEach(c=>idsChamadosConhecidos.add(String(c.id)));
+          }
+          chamadosEl.innerHTML = chamados.length ? chamados.map(c => '<tr style="'+(idsChamadosNovos.has(String(c.id))?'background:rgba(57,217,165,.13);outline:1px solid rgba(57,217,165,.35);':'')+'"><td style="padding:14px 16px;border-bottom:1px solid var(--line)">'+(idsChamadosNovos.has(String(c.id))?'<strong style="color:#39d9a5">● NOVO </strong>':'')+safeText(c.protocolo || c.numero || c.id)+'</td><td style="padding:14px 16px;border-bottom:1px solid var(--line)">'+safeText(c.cliente_nome || 'Cliente cadastrado')+'</td><td style="padding:14px 16px;border-bottom:1px solid var(--line)">'+safeText(c.status || 'Nova chamada')+'</td><td style="padding:14px 16px;border-bottom:1px solid var(--line)"><button class="btn-new" style="padding:7px 12px" onclick="abrirChamado(\\''+safeText(c.id)+'\\')">Gerenciar</button></td></tr>').join('') : '<tr><td colspan="4" style="padding:18px;text-align:center;color:var(--text-muted)">Nenhum chamado encontrado.</td></tr>';
           const clientes = new Map();
           chamados.forEach(c => { const key=c.cliente_id || c.cliente_email || c.cliente_telefone || c.cliente_nome; if(key && !clientes.has(key)) clientes.set(key,c); });
           clientesEl.innerHTML = clientes.size ? [...clientes.values()].map(c=>'<tr><td style="padding:12px">'+safeText(c.cliente_nome||'—')+'</td><td style="padding:12px">'+safeText(c.cliente_email||'—')+'</td><td style="padding:12px">'+safeText(c.cliente_telefone||'—')+'</td></tr>').join('') : '<tr><td colspan="3" style="padding:16px;text-align:center">Nenhum cliente encontrado.</td></tr>';
@@ -655,6 +692,7 @@ input,select,textarea{color-scheme:dark}
     protegerPainel().then(ok => {
       if (!ok || !adminAutorizado) return;
       carregarDados();
+      setInterval(carregarDados, 15000);
       if (document.getElementById('tela-organizacao')?.classList.contains('active')) carregarOrganizacao();
     });
   </script>
