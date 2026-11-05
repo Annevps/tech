@@ -515,6 +515,15 @@ input,select,textarea{color-scheme:dark}
       window.open('laudo.html?id=' + encodeURIComponent(id), '_blank', 'noopener');
     };
 
+    window.excluirChamado = async (id) => {
+      if (!id) return;
+      if (!confirm('Tem certeza de que deseja apagar esta chamada? Esta ação não pode ser desfeita.')) return;
+      const { error } = await db.from('chamados').delete().eq('id', id);
+      if (error) { alert('Não foi possível apagar a chamada: ' + error.message); return; }
+      idsChamadosNovos.delete(String(id));
+      await carregarDados();
+      alert('Chamada apagada com sucesso.');
+    };
     window.salvarChamado = async () => {
       const id = document.getElementById('edit-id').value;
       const novoStatus = document.getElementById('edit-status').value;
@@ -665,7 +674,7 @@ input,select,textarea{color-scheme:dark}
             if(novos.length) avisarNovasChamadas(novos);
             chamados.forEach(c=>idsChamadosConhecidos.add(String(c.id)));
           }
-          chamadosEl.innerHTML = chamados.length ? chamados.map(c => '<tr style="'+(idsChamadosNovos.has(String(c.id))?'background:rgba(57,217,165,.13);outline:1px solid rgba(57,217,165,.35);':'')+'"><td style="padding:14px 16px;border-bottom:1px solid var(--line)">'+(idsChamadosNovos.has(String(c.id))?'<strong style="color:#39d9a5">● NOVO </strong>':'')+safeText(c.protocolo || c.numero || c.id)+'</td><td style="padding:14px 16px;border-bottom:1px solid var(--line)">'+safeText(c.cliente_nome || 'Cliente cadastrado')+'</td><td style="padding:14px 16px;border-bottom:1px solid var(--line)">'+safeText(c.status || 'Nova chamada')+'</td><td style="padding:14px 16px;border-bottom:1px solid var(--line)"><button class="btn-new" style="padding:7px 12px" onclick="abrirChamado(\\''+safeText(c.id)+'\\')">Gerenciar</button></td></tr>').join('') : '<tr><td colspan="4" style="padding:18px;text-align:center;color:var(--text-muted)">Nenhum chamado encontrado.</td></tr>';
+          chamadosEl.innerHTML = chamados.length ? chamados.map(c => '<tr style="'+(idsChamadosNovos.has(String(c.id))?'background:rgba(57,217,165,.13);outline:1px solid rgba(57,217,165,.35);':'')+'"><td style="padding:14px 16px;border-bottom:1px solid var(--line)">'+(idsChamadosNovos.has(String(c.id))?'<strong style="color:#39d9a5">● NOVO </strong>':'')+safeText(c.protocolo || c.numero || c.id)+'</td><td style="padding:14px 16px;border-bottom:1px solid var(--line)">'+safeText(c.cliente_nome || 'Cliente cadastrado')+'</td><td style="padding:14px 16px;border-bottom:1px solid var(--line)">'+safeText(c.status || 'Nova chamada')+'</td><td style="padding:14px 16px;border-bottom:1px solid var(--line)"><button class="btn-new" style="padding:7px 12px" onclick="abrirChamado(\\''+safeText(c.id)+'\\')">Gerenciar</button> <button type="button" style="padding:7px 12px;border-radius:8px;background:#7f1d1d;color:#fff;font-weight:600" onclick="excluirChamado(\\''+safeText(c.id)+'\\')">Excluir</button></td></tr>').join('') : '<tr><td colspan="4" style="padding:18px;text-align:center;color:var(--text-muted)">Nenhum chamado encontrado.</td></tr>';
           const clientes = new Map();
           chamados.forEach(c => { const key=c.cliente_id || c.cliente_email || c.cliente_telefone || c.cliente_nome; if(key && !clientes.has(key)) clientes.set(key,c); });
           clientesEl.innerHTML = clientes.size ? [...clientes.values()].map(c=>'<tr><td style="padding:12px">'+safeText(c.cliente_nome||'—')+'</td><td style="padding:12px">'+safeText(c.cliente_email||'—')+'</td><td style="padding:12px">'+safeText(c.cliente_telefone||'—')+'</td></tr>').join('') : '<tr><td colspan="3" style="padding:16px;text-align:center">Nenhum cliente encontrado.</td></tr>';
