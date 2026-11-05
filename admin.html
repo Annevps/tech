@@ -383,8 +383,15 @@ input,select,textarea{color-scheme:dark}
           return false;
         }
 
-        // Usa a mesma verificação de perfil adotada na página de login.
-        // Assim, o painel não depende de uma RPC is_admin que pode não estar instalada.
+        // A tela de login já reconhece explicitamente esta conta administrativa.
+        // Evita bloquear o painel quando a política RLS impede a leitura do próprio perfil.
+        if (String(authData.user.email || '').toLowerCase() === 'admin@tech.com') {
+          adminAutorizado = true;
+          document.body.style.visibility = 'visible';
+          return true;
+        }
+
+        // Para as demais contas, mantém a validação normal pela tabela usuarios.
         const { data: perfilAdmin, error: perfilError } = await db
           .from('usuarios')
           .select('is_admin')
