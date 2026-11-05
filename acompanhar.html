@@ -27,8 +27,8 @@
 .empty-state{min-height:420px;display:flex;align-items:center;justify-content:center;padding:28px}.empty-state-card{width:min(680px,100%);padding:34px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(145deg,rgba(10,32,54,.98),rgba(5,22,40,.98));text-align:center;box-shadow:0 18px 45px rgba(0,0,0,.22)}.empty-state-card h2{font:700 23px "Space Grotesk";margin:0 0 10px}.empty-state-card p{max-width:480px;margin:0 auto;color:var(--muted);font-size:14px;line-height:1.8}@media(max-width:700px){.empty-state{min-height:260px;padding:14px}.empty-state-card{padding:24px 18px}}
 </style></head><body>
 <header><div class="brand"><span class="brand-mark">TE</span><span>TECH EMPIRE<small>MANUTENÇÃO E TECNOLOGIA</small></span></div><nav><a href="index.html">Início</a><a href="servicos.html">Serviços</a><a href="sobre.html">Sobre</a><a class="active" href="acompanhar.html">Acompanhar Atendimento</a><a href="contato.html">Contato</a></nav></header>
-<div class="layout"><aside><h1>Acompanhe<br><em>seu atendimento</em></h1><p>Digite o protocolo do seu chamado para consultar o andamento do seu atendimento.</p><form id="form-busca" class="search"><input id="protocolo" placeholder="Número do protocolo" autocomplete="off" required><input id="telefone-verificacao" type="tel" placeholder="Telefone cadastrado com DDD" autocomplete="tel" required><button type="submit">Consultar ›</button></form><div id="msg" class="error" role="status"></div><div class="help"><b>Não encontrou seu protocolo?</b><br>Verifique se digitou corretamente. Em caso de dúvidas, entre em contato conosco.</div><div class="aside-foot">⚒ Manutenção especializada　◷ Atendimento rápido<br>◈ Seu equipamento mais seguro</div></aside>
-<main><section id="estado-inicial" class="empty-state"><div class="empty-state-card"><h2>Consulte seu atendimento</h2><p>O protocolo pode estar preenchido automaticamente. Informe também o telefone cadastrado com DDD e clique em <strong>Consultar</strong> para visualizar os dados, o status e as atualizações do chamado.</p></div></section><div id="resultado" class="result">
+<div class="layout"><aside><h1>Acompanhe<br><em>seu atendimento</em></h1><p>Digite o protocolo do seu chamado para consultar o andamento do seu atendimento.</p><form id="form-busca" class="search"><input id="protocolo" placeholder="Número do protocolo" autocomplete="off" required><button type="submit">Consultar ›</button></form><div id="msg" class="error" role="status"></div><div class="help"><b>Não encontrou seu protocolo?</b><br>Verifique se digitou corretamente. Em caso de dúvidas, entre em contato conosco.</div><div class="aside-foot">⚒ Manutenção especializada　◷ Atendimento rápido<br>◈ Seu equipamento mais seguro</div></aside>
+<main><section id="estado-inicial" class="empty-state"><div class="empty-state-card"><h2>Consulte seu atendimento</h2><p>Informe o número do protocolo e clique em <strong>Consultar</strong> para visualizar os dados, o status e as atualizações do chamado.</p></div></section><div id="resultado" class="result">
 <section class="banner"><div class="found"><div class="check">✓</div><div><h2>Atendimento encontrado!</h2><p>Confira abaixo todas as informações sobre o seu chamado.</p></div></div><span class="pill" id="status-pill">Carregando...</span></section>
 <section class="panel"><div class="top-info"><div class="field"><span class="field-icon">▣</span><div><label>Protocolo</label><strong id="v-protocolo">—</strong></div></div><div class="field"><span class="field-icon">▦</span><div><label>Data de abertura</label><strong id="v-data">—</strong></div></div></div><div class="details"><div><div class="field"><span class="field-icon">♙</span><div><label>Cliente</label><strong id="v-cliente">—</strong></div></div><div class="field"><span class="field-icon">▣</span><div><label>Telefone / WhatsApp</label><strong id="v-telefone">—</strong></div></div><div class="field"><span class="field-icon">▤</span><div><label>Tipo de serviço</label><strong id="v-tipo">—</strong></div></div><div class="field"><span class="field-icon">▧</span><div><label>Descrição do problema / solicitação</label><strong class="description" id="v-descricao">—</strong></div></div></div><div><h3 class="section-title">Equipamento</h3><div class="field"><div><label>Tipo</label><strong id="v-equipamento">Não informado</strong></div></div><div class="field"><div><label>Marca e modelo</label><strong id="v-modelo">Não informado</strong></div></div><img id="v-foto-equipamento" alt="Foto do equipamento" style="display:none;max-width:100%;max-height:190px;object-fit:contain;border:1px solid var(--line);border-radius:10px;margin:8px 0 16px"><h3 class="section-title">Informações do atendimento</h3><div class="field"><div><label>Última atualização</label><strong id="v-atualizacao">—</strong></div></div><div class="field"><div><label>Prazo previsto</label><strong id="v-prazo">A definir</strong></div></div><div class="field"><div><label>Orçamento</label><strong id="v-orcamento">A definir</strong></div></div><div class="field"><div><label>Parecer / observação da equipe</label><strong class="description" id="v-parecer">Nenhuma observação publicada.</strong></div></div></div></div></section>
 <section class="status-strip"><div class="status-main"><span class="status-symbol">⚒</span><div><strong id="v-status">—</strong><small id="v-status-desc">A equipe está acompanhando sua solicitação.</small></div></div><div class="status-meta"><label>ÚLTIMA ATUALIZAÇÃO</label><strong id="v-atualizacao-2">—</strong><br><small>por Tech Empire</small></div><div class="status-meta"><label>PREVISÃO DE CONCLUSÃO</label><strong id="v-prazo-2">A definir</strong><br><small>O prazo pode ser atualizado.</small></div></section>
@@ -37,7 +37,7 @@
 <footer class="site-footer"><div class="footer-main"><div class="footer-about"><a class="footer-brand" href="index.html"><span class="brand-mark">TE</span><span>TECH <b>EMPIRE</b><small>SEU DISPOSITIVO, NOSSA PRIORIDADE</small></span></a><p>Somos uma empresa júnior de tecnologia, dedicada à manutenção de computadores, suporte técnico e criação de sites. Tecnologia que conecta você ao que realmente importa.</p><a class="footer-help" href="contato.html">Precisa de ajuda? <b>Fale com a nossa equipe →</b></a></div><div class="footer-col"><h3>Links rápidos</h3><a href="index.html">Início</a><a href="servicos.html">Serviços</a><a href="manutencao.html">Manutenção</a><a href="sobre.html">Sobre nós</a><a href="contato.html">Contato</a></div><div class="footer-col"><h3>Nossos serviços</h3><a href="manutencao.html">Manutenção de computadores</a><a href="servicos.html">Suporte técnico</a><a href="servicos.html">Criação de sites</a></div><div class="footer-col"><h3>Fale conosco</h3><p>Tem alguma dúvida ou precisa de suporte?</p><a href="contato.html">Entre em contato com a Tech Empire →</a><small>Atendimento conforme disponibilidade da equipe.</small></div></div><div class="footer-benefits"><span>◇ Qualidade e cuidado</span><span>ϟ Atendimento próximo</span><span>◎ Suporte especializado</span><span>☆ Compromisso</span></div><div class="footer-bottom">© 2026 Tech Empire. Todos os direitos reservados. <span>Política de Privacidade · Termos de Uso · LGPD</span></div></footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script><script src="supabase-config.js"></script><script>
 const db=supabase.createClient(window.SUPABASE_CONFIG.url,window.SUPABASE_CONFIG.anonKey);
-let chamadoAtual=null,intervalo=null,protocoloAtual="",telefoneAtual="";
+let chamadoAtual=null,intervalo=null,protocoloAtual="";
 const etapas=[
  {nome:"Chamado recebido",statuses:["Nova chamada"],icon:"✓"},
  {nome:"Equipamento recebido",statuses:["Equipamento recebido"],icon:"▣"},
@@ -89,15 +89,11 @@ function render(c){
 }
 async function consultarNoServidor(){
  // Consulta direta à tabela de chamados, sem depender de uma função RPC no Supabase.
- // O telefone continua sendo conferido antes de qualquer dado do cliente ser exibido.
+ // A consulta é feita somente pelo protocolo informado pelo cliente.
  const campos="id,protocolo,cliente_nome,cliente_email,cliente_telefone,whatsapp,cidade,categoria,titulo,descricao,status,criado_em,atualizado_em,prazo_previsto,orcamento_valor,parecer_tecnico";
  const {data,error}=await db.from("chamados").select(campos).eq("protocolo",protocoloAtual).maybeSingle();
  if(error)throw error;
  if(!data)return null;
- const normalizarTelefone=v=>String(v||"").replace(/\\D/g,"").replace(/^55(?=\\d{10,11}$)/,"");
- const telefoneInformado=normalizarTelefone(telefoneAtual);
- const telefones=[data.cliente_telefone,data.whatsapp].map(normalizarTelefone).filter(Boolean);
- if(!telefones.some(v=>v===telefoneInformado || v.endsWith(telefoneInformado) || telefoneInformado.endsWith(v)))return null;
  const {data:historico,error:erroHistorico}=await db.from("historico_status").select("status_anterior,status_novo,observacao,responsavel,criado_em").eq("chamado_id",data.id).order("criado_em",{ascending:true});
  if(erroHistorico)console.warn("Histórico indisponível:",erroHistorico.message);
  data.historico=historico||[];
@@ -105,16 +101,15 @@ async function consultarNoServidor(){
 }
 async function buscar(){
  protocoloAtual=document.getElementById("protocolo").value.trim().toUpperCase();
- telefoneAtual=document.getElementById("telefone-verificacao").value.replace(/\D/g,"");
  const msg=document.getElementById("msg"),resultado=document.getElementById("resultado");
- if(!protocoloAtual||telefoneAtual.length<10){msg.textContent="Informe o protocolo e o telefone cadastrado com DDD.";return;}
- msg.textContent="Verificando protocolo e telefone...";
+ if(!protocoloAtual){msg.textContent="Informe o número do protocolo.";return;}
+ msg.textContent="Consultando protocolo...";
  try{
   const data=await consultarNoServidor();
-  if(!data){msg.textContent="Não encontramos um atendimento com esses dados. Confira o protocolo e o telefone cadastrado.";resultado.style.display="none";document.getElementById("estado-inicial").style.display="flex";chamadoAtual=null;return;}
+  if(!data){msg.textContent="Não encontramos um atendimento com esse protocolo. Confira o número e tente novamente."resultado.style.display="none";document.getElementById("estado-inicial").style.display="flex";chamadoAtual=null;return;}
   msg.textContent="";document.getElementById("estado-inicial").style.display="none";resultado.style.display="flex";render(data);iniciarAtualizacoes();
  }catch(error){
-  console.error("Erro na consulta protegida:",error);
+  console.error("Erro na consulta do protocolo:",error);
   msg.textContent="Erro ao consultar: "+(error?.message||error?.details||"falha desconhecida")+". Envie esta mensagem para a equipe Tech Empire.";
   resultado.style.display="none";document.getElementById("estado-inicial").style.display="flex";
  }
