@@ -106,7 +106,7 @@ async function buscar(){
  msg.textContent="Consultando protocolo...";
  try{
   const data=await consultarNoServidor();
-  if(!data){msg.textContent="Não encontramos um atendimento com esse protocolo. Confira o número e tente novamente."resultado.style.display="none";document.getElementById("estado-inicial").style.display="flex";chamadoAtual=null;return;}
+  if(!data){msg.textContent="Não encontramos um atendimento com esse protocolo. Confira o número e tente novamente.";resultado.style.display="none";document.getElementById("estado-inicial").style.display="flex";chamadoAtual=null;return;}
   msg.textContent="";document.getElementById("estado-inicial").style.display="none";resultado.style.display="flex";render(data);iniciarAtualizacoes();
  }catch(error){
   console.error("Erro na consulta do protocolo:",error);
