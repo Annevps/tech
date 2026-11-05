@@ -88,7 +88,7 @@ function render(c){
 async function consultarNoServidor(){
  // Recupera o fluxo direto usado na versão anterior da página.
  // A busca é limitada ao protocolo informado; o telefone é conferido antes de renderizar qualquer dado.
- const campos="id,protocolo,cliente_nome,cliente_email,cliente_telefone,whatsapp,cidade,categoria,titulo,descricao,status,criado_em,atualizado_em,prazo_previsto,orcamento_valor,parecer_tecnico,equipamento,laudo,laudo_tecnico,projeto,detalhes_projeto";
+ const campos="id,protocolo,cliente_nome,cliente_email,cliente_telefone,whatsapp,cidade,categoria,titulo,descricao,status,criado_em,atualizado_em,prazo_previsto,orcamento_valor,parecer_tecnico";
  const {data,error}=await db.from("chamados").select(campos).eq("protocolo",protocoloAtual).maybeSingle();
  if(error)throw error;
  if(!data)return null;
