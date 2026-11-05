@@ -152,29 +152,56 @@ body{background:#eef1f5;padding:42px 18px;color:#17202b}
       document.getElementById('btn-imprimir-laudo').disabled = true;
     }
 
+    async function carregarBibliotecaPDF() {
+      if (typeof window.html2pdf === 'function') return true;
+      const fontes = [
+        'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js',
+        'https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js'
+      ];
+      for (const src of fontes) {
+        try {
+          await new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+          });
+          if (typeof window.html2pdf === 'function') return true;
+        } catch (_) {}
+      }
+      return false;
+    }
+
     async function gerarPDFLaudo() {
       const botao = document.getElementById('btn-imprimir-laudo');
       const protocolo = document.getElementById('doc-protocolo').textContent.replace('Protocolo:', '').trim() || 'sem-protocolo';
-      if (typeof window.html2pdf !== 'function') {
-        // Alternativa nativa: permite salvar o documento como PDF pelo navegador.
-        window.print();
+      const elemento = document.querySelector('.folha');
+      if (!elemento || !document.getElementById('cli-nome').textContent.trim()) {
+        informarStatusLaudo('O laudo ainda não terminou de carregar. Aguarde os dados antes de gerar o PDF.', true);
         return;
       }
       botao.disabled = true;
-      botao.textContent = 'Gerando PDF...';
+      botao.textContent = 'Preparando PDF...';
       try {
-        const elemento = document.querySelector('.folha');
+        const bibliotecaCarregada = await carregarBibliotecaPDF();
+        if (!bibliotecaCarregada) {
+          informarStatusLaudo('Não foi possível carregar o gerador de PDF. Verifique a conexão e tente novamente.', true);
+          return;
+        }
+        botao.textContent = 'Gerando PDF...';
         await window.html2pdf().set({
           margin: [10, 10, 10, 10],
           filename: 'Laudo-TechEmpire-' + protocolo.replace(/[^a-zA-Z0-9_-]/g, '-') + '.pdf',
           image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false },
           jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
           pagebreak: { mode: ['css', 'legacy'], avoid: ['.autorizacao', '.assinaturas'] }
         }).from(elemento).save();
+        informarStatusLaudo('PDF gerado. Confira a pasta de downloads.', false);
       } catch (erro) {
         console.error('Erro ao gerar PDF:', erro);
-        informarStatusLaudo('Não foi possível gerar o PDF. Atualize a página e tente novamente.', true);
+        informarStatusLaudo('Falha ao gerar o PDF: ' + (erro?.message || 'erro desconhecido'), true);
       } finally {
         botao.disabled = false;
         botao.textContent = '⬇️ Baixar laudo em PDF';
