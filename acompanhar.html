@@ -106,7 +106,7 @@ async function buscar(){
   msg.textContent="";resultado.style.display="flex";render(data);iniciarAtualizacoes();
  }catch(error){
   console.error("Erro na consulta protegida:",error);
-  msg.textContent="Não foi possível validar o atendimento. Confira o protocolo e o telefone e tente novamente.";
+  msg.textContent="Erro ao consultar: "+(error?.message||error?.details||"falha desconhecida")+". Envie esta mensagem para a equipe Tech Empire.";
   resultado.style.display="none";
  }
 }
