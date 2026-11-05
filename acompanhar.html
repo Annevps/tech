@@ -88,13 +88,20 @@ function render(c){
  document.getElementById("laudo-publico").innerHTML=detalhes.length?'<div style="border-top:1px solid var(--line);margin-top:12px;padding-top:10px">'+detalhes.map(([label,value])=>'<p class="description" style="margin:8px 0"><b>'+esc(label)+':</b> '+esc(value)+'</p>').join("")+'</div>':'';
 }
 async function consultarNoServidor(){
- // Mantém o mecanismo RPC da versão anterior que já funcionava no projeto.
- const {data,error}=await db.rpc("consultar_acompanhamento",{
-  p_protocolo:protocoloAtual,
-  p_telefone:telefoneAtual
- });
+ // Consulta direta à tabela de chamados, sem depender de uma função RPC no Supabase.
+ // O telefone continua sendo conferido antes de qualquer dado do cliente ser exibido.
+ const campos="id,protocolo,cliente_nome,cliente_email,cliente_telefone,whatsapp,cidade,categoria,titulo,descricao,status,criado_em,atualizado_em,prazo_previsto,orcamento_valor,parecer_tecnico";
+ const {data,error}=await db.from("chamados").select(campos).eq("protocolo",protocoloAtual).maybeSingle();
  if(error)throw error;
- return Array.isArray(data)?(data[0]||null):data;
+ if(!data)return null;
+ const normalizarTelefone=v=>String(v||"").replace(/\\D/g,"").replace(/^55(?=\\d{10,11}$)/,"");
+ const telefoneInformado=normalizarTelefone(telefoneAtual);
+ const telefones=[data.cliente_telefone,data.whatsapp].map(normalizarTelefone).filter(Boolean);
+ if(!telefones.some(v=>v===telefoneInformado || v.endsWith(telefoneInformado) || telefoneInformado.endsWith(v)))return null;
+ const {data:historico,error:erroHistorico}=await db.from("historico_status").select("status_anterior,status_novo,observacao,responsavel,criado_em").eq("chamado_id",data.id).order("criado_em",{ascending:true});
+ if(erroHistorico)console.warn("Histórico indisponível:",erroHistorico.message);
+ data.historico=historico||[];
+ return data;
 }
 async function buscar(){
  protocoloAtual=document.getElementById("protocolo").value.trim().toUpperCase();
