@@ -74,13 +74,25 @@ function render(c){
  const rows=Array.isArray(c.historico)?c.historico:[];
  desenharTimeline(c.status,rows);
  document.getElementById("historico").innerHTML=rows.length?rows.map(h=>'<div class="history-item"><span class="dot"></span><div><strong>'+esc(fmt(h.criado_em))+' | '+esc(h.status_novo||"Atualização")+'</strong><p>'+esc(h.observacao||"Status atualizado.")+'<br><small>'+esc(h.responsavel||"Equipe Tech Empire")+'</small></p></div></div>').join(""):'<p class="empty">Nenhuma atualização registrada.</p>';
- const obs=[c.parecer_tecnico,c.laudo?.diagnostico,c.laudo?.solucao,c.laudo?.parecer].filter(Boolean);
+ const laudo=c.laudo||c.laudo_tecnico||{};
+ const projeto=c.projeto||c.detalhes_projeto||{};
+ const obs=[c.parecer_tecnico,laudo.parecer].filter(Boolean);
  document.getElementById("observacoes").innerHTML=obs.length?obs.map(x=>'<p class="description" style="margin:8px 0">'+esc(x)+'</p>').join(""):'<p class="empty">Nenhuma observação publicada.</p>';
+ const detalhes=[];
+ if(laudo.diagnostico)detalhes.push(['Diagnóstico técnico',laudo.diagnostico]);
+ if(laudo.solucao)detalhes.push(['Solução aplicada',laudo.solucao]);
+ if(projeto.escopo)detalhes.push(['Escopo do projeto',projeto.escopo]);
+ if(projeto.link)detalhes.push(['Link do projeto',projeto.link]);
+ document.getElementById("laudo-publico").innerHTML=detalhes.length?'<div style="border-top:1px solid var(--line);margin-top:12px;padding-top:10px">'+detalhes.map(([label,value])=>'<p class="description" style="margin:8px 0"><b>'+esc(label)+':</b> '+esc(value)+'</p>').join("")+'</div>':'';
 }
 async function consultarNoServidor(){
- const {data,error}=await db.rpc("consultar_acompanhamento",{p_protocolo:protocoloAtual,p_telefone:telefoneAtual});
+ // Mantém o mecanismo RPC da versão anterior que já funcionava no projeto.
+ const {data,error}=await db.rpc("consultar_acompanhamento",{
+  p_protocolo:protocoloAtual,
+  p_telefone:telefoneAtual
+ });
  if(error)throw error;
- return data;
+ return Array.isArray(data)?(data[0]||null):data;
 }
 async function buscar(){
  protocoloAtual=document.getElementById("protocolo").value.trim().toUpperCase();
@@ -94,7 +106,7 @@ async function buscar(){
   msg.textContent="";resultado.style.display="flex";render(data);iniciarAtualizacoes();
  }catch(error){
   console.error("Erro na consulta protegida:",error);
-  msg.textContent="Não foi possível consultar agora. Confirme se a função de acompanhamento já foi instalada no Supabase.";
+  msg.textContent="Erro ao consultar: "+(error?.message||error?.details||"falha desconhecida")+". Envie esta mensagem para a equipe Tech Empire.";
   resultado.style.display="none";
  }
 }
