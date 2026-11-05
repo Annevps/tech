@@ -339,10 +339,13 @@ input,select,textarea{color-scheme:dark}
     <p style="color:#64748b;font-size:12px;line-height:1.6;margin:7px 0 16px">Edite as informações que o cliente verá na página Acompanhar Atendimento. Depois de salvar, o sistema atualiza a data da última alteração automaticamente.</p>
     <input type="hidden" id="edit-id">
     <div class="org-form-grid">
-      <div class="org-modal-field"><label>Cliente</label><input id="edit-cliente" readonly></div>
+      <div class="org-modal-field"><label>Nome do cliente — editável</label><input id="edit-cliente" type="text" required></div>
+      <div class="org-modal-field"><label>Telefone do cliente — editável</label><input id="edit-telefone" type="tel" required></div>
+      <div class="org-modal-field"><label>Assunto do chamado — editável</label><input id="edit-titulo" type="text" required></div>
       <div class="org-modal-field"><label>Protocolo</label><input id="edit-protocolo" readonly></div>
       <div class="org-modal-field"><label>Data de abertura (automática)</label><input id="edit-abertura" readonly></div>
       <div class="org-modal-field"><label>Última atualização (automática)</label><input id="edit-atualizacao" readonly></div>
+      <div class="org-modal-field org-full"><label>Descrição informada pelo cliente — editável</label><textarea id="edit-descricao" rows="3"></textarea></div>
       <div class="org-modal-field"><label>Status do atendimento — aparece ao cliente</label><select id="edit-status"><option>Nova chamada</option><option>Equipamento recebido</option><option>Aguardando análise</option><option>Em diagnóstico</option><option>Aguardando aprovação do orçamento</option><option>Aprovada</option><option>Em andamento</option><option>Aguardando informações do cliente</option><option>Aguardando pagamento</option><option>Em testes</option><option>Concluída</option><option>Cancelada</option></select></div>
       <div class="org-modal-field"><label>Prazo previsto — editável</label><input id="edit-prazo" type="date"></div>
       <div class="org-modal-field"><label>Orçamento (R$) — editável</label><input id="edit-orcamento" type="number" min="0" step="0.01" placeholder="Ex.: 250,00"></div>
@@ -495,7 +498,10 @@ input,select,textarea{color-scheme:dark}
       const dataCampo = v => v ? String(v).slice(0,10) : '';
       const dataHora = v => v ? new Date(v).toLocaleString('pt-BR') : '—';
       document.getElementById('edit-id').value = c.id;
-      document.getElementById('edit-cliente').value = c.cliente_nome || '—';
+      document.getElementById('edit-cliente').value = c.cliente_nome || '';
+      document.getElementById('edit-telefone').value = c.cliente_telefone || c.whatsapp || '';
+      document.getElementById('edit-titulo').value = c.titulo || '';
+      document.getElementById('edit-descricao').value = c.descricao || '';
       document.getElementById('edit-protocolo').value = c.protocolo || c.numero || '—';
       document.getElementById('edit-abertura').value = dataHora(c.criado_em);
       document.getElementById('edit-atualizacao').value = dataHora(c.atualizado_em || c.criado_em);
@@ -539,7 +545,7 @@ input,select,textarea{color-scheme:dark}
       const orcamentoRaw = document.getElementById('edit-orcamento').value;
       const orcamento = orcamentoRaw === '' ? null : Number(orcamentoRaw);
       if (orcamento !== null && (!Number.isFinite(orcamento) || orcamento < 0)) { alert('Informe um orçamento válido.'); return; }
-      const { data: anterior, error: buscaErro } = await db.from('chamados').select('status,parecer_tecnico,prazo_previsto,orcamento_valor,laudo_tecnico,detalhes_projeto,categoria').eq('id', id).single();
+      const { data: anterior, error: buscaErro } = await db.from('chamados').select('status,parecer_tecnico,prazo_previsto,orcamento_valor,laudo_tecnico,detalhes_projeto,categoria,cliente_nome,cliente_telefone,titulo,descricao').eq('id', id).single();
       if (buscaErro) { alert('Não foi possível carregar o atendimento: ' + buscaErro.message); return; }
       const manutencao = !(anterior.categoria || '').toLowerCase().includes('site');
       const laudo = {...(anterior.laudo_tecnico || {})};
@@ -556,7 +562,19 @@ input,select,textarea{color-scheme:dark}
         projeto.prazo = prazo;
         projeto.valor = orcamento;
       }
+      const nomeCliente = document.getElementById('edit-cliente').value.trim();
+      const telefoneCliente = document.getElementById('edit-telefone').value.replace(/\D/g, '');
+      const tituloChamado = document.getElementById('edit-titulo').value.trim();
+      const descricaoChamado = document.getElementById('edit-descricao').value.trim();
+      if (!nomeCliente || !telefoneCliente || !tituloChamado) {
+        alert('Preencha o nome, telefone e assunto do cliente.');
+        return;
+      }
       const atualizacao = {
+        cliente_nome: nomeCliente,
+        cliente_telefone: telefoneCliente,
+        titulo: tituloChamado,
+        descricao: descricaoChamado || null,
         status: novoStatus,
         prazo_previsto: prazo,
         orcamento_valor: orcamento,
