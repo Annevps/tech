@@ -88,7 +88,7 @@ function render(c){
 async function consultarNoServidor(){
  // Recupera o fluxo direto usado na versão anterior da página.
  // A busca é limitada ao protocolo informado; o telefone é conferido antes de renderizar qualquer dado.
- const campos="id,protocolo,cliente_nome,cliente_email,cliente_telefone,whatsapp,cidade,categoria,titulo,descricao,status,criado_em,atualizado_em,prazo_previsto,orcamento_valor,parecer_tecnico";
+ const campos="*";
  const {data,error}=await db.from("chamados").select(campos).eq("protocolo",protocoloAtual).maybeSingle();
  if(error)throw error;
  if(!data)return null;
@@ -113,7 +113,7 @@ async function buscar(){
   msg.textContent="";resultado.style.display="flex";render(data);iniciarAtualizacoes();
  }catch(error){
   console.error("Erro na consulta protegida:",error);
-  msg.textContent="Não foi possível consultar o atendimento. Atualize a página e tente novamente. Se persistir, o acesso de leitura da tabela chamados pode estar indisponível.";
+  msg.textContent="Falha ao consultar: "+(error?.message||"erro desconhecido")+". Confira o protocolo e tente novamente.";
   resultado.style.display="none";
  }
 }
