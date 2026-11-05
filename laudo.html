@@ -267,6 +267,11 @@ body{background:#eef1f5;padding:42px 18px;color:#17202b}
 
       document.getElementById('status-laudo').style.display = 'none';
       document.getElementById('btn-imprimir-laudo').disabled = false;
+
+      // Quando solicitado pelo painel, inicia o download após preencher o documento.
+      if (new URLSearchParams(window.location.search).get('baixar') === '1') {
+        setTimeout(() => gerarPDFLaudo(), 350);
+      }
     }
 
     carregarLaudo().catch(err => {
