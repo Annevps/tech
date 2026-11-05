@@ -134,7 +134,7 @@ body{background:#eef1f5;padding:42px 18px;color:#17202b}
     <button id="btn-imprimir-laudo" class="btn-acao" onclick="gerarPDFLaudo()" disabled>⬇️ Baixar laudo em PDF</button>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="supabase-config.js"></script>
   <script>
@@ -156,7 +156,8 @@ body{background:#eef1f5;padding:42px 18px;color:#17202b}
       const botao = document.getElementById('btn-imprimir-laudo');
       const protocolo = document.getElementById('doc-protocolo').textContent.replace('Protocolo:', '').trim() || 'sem-protocolo';
       if (typeof window.html2pdf !== 'function') {
-        informarStatusLaudo('A ferramenta de PDF não carregou. Verifique a conexão com a internet e tente novamente.', true);
+        // Alternativa nativa: permite salvar o documento como PDF pelo navegador.
+        window.print();
         return;
       }
       botao.disabled = true;
