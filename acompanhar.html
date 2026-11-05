@@ -86,8 +86,19 @@ function render(c){
  document.getElementById("laudo-publico").innerHTML=detalhes.length?'<div style="border-top:1px solid var(--line);margin-top:12px;padding-top:10px">'+detalhes.map(([label,value])=>'<p class="description" style="margin:8px 0"><b>'+esc(label)+':</b> '+esc(value)+'</p>').join("")+'</div>':'';
 }
 async function consultarNoServidor(){
- const {data,error}=await db.rpc("consultar_acompanhamento",{p_protocolo:protocoloAtual,p_telefone:telefoneAtual});
+ // Recupera o fluxo direto usado na versão anterior da página.
+ // A busca é limitada ao protocolo informado; o telefone é conferido antes de renderizar qualquer dado.
+ const campos="id,protocolo,cliente_nome,cliente_email,cliente_telefone,whatsapp,cidade,categoria,titulo,descricao,status,criado_em,atualizado_em,prazo_previsto,orcamento_valor,parecer_tecnico,equipamento,laudo,laudo_tecnico,projeto,detalhes_projeto";
+ const {data,error}=await db.from("chamados").select(campos).eq("protocolo",protocoloAtual).maybeSingle();
  if(error)throw error;
+ if(!data)return null;
+ const normalizarTelefone=v=>String(v||"").replace(/\\D/g,"").replace(/^55(?=\\d{10,11}$)/,"");
+ const telefoneInformado=normalizarTelefone(telefoneAtual);
+ const telefones=[data.cliente_telefone,data.whatsapp].map(normalizarTelefone).filter(Boolean);
+ if(!telefones.some(v=>v===telefoneInformado || v.endsWith(telefoneInformado) || telefoneInformado.endsWith(v)))return null;
+ const {data:historico,error:erroHistorico}=await db.from("historico_status").select("status_anterior,status_novo,observacao,responsavel,criado_em").eq("chamado_id",data.id).order("criado_em",{ascending:true});
+ if(erroHistorico)console.warn("Histórico indisponível:",erroHistorico.message);
+ data.historico=historico||[];
  return data;
 }
 async function buscar(){
@@ -102,7 +113,7 @@ async function buscar(){
   msg.textContent="";resultado.style.display="flex";render(data);iniciarAtualizacoes();
  }catch(error){
   console.error("Erro na consulta protegida:",error);
-  msg.textContent="Não foi possível consultar agora. Confirme se a função de acompanhamento já foi instalada no Supabase.";
+  msg.textContent="Não foi possível consultar o atendimento. Atualize a página e tente novamente. Se persistir, o acesso de leitura da tabela chamados pode estar indisponível.";
   resultado.style.display="none";
  }
 }
