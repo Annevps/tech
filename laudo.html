@@ -131,9 +131,10 @@ body{background:#eef1f5;padding:42px 18px;color:#17202b}
 
   <div class="acoes">
     <button class="btn-acao btn-fechar" onclick="window.history.back()">Voltar</button>
-    <button id="btn-imprimir-laudo" class="btn-acao" onclick="window.print()" disabled>🖨️ Imprimir / Salvar PDF</button>
+    <button id="btn-imprimir-laudo" class="btn-acao" onclick="gerarPDFLaudo()" disabled>⬇️ Baixar laudo em PDF</button>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="supabase-config.js"></script>
   <script>
@@ -149,6 +150,34 @@ body{background:#eef1f5;padding:42px 18px;color:#17202b}
       status.classList.toggle('erro', erro);
       status.style.display = 'block';
       document.getElementById('btn-imprimir-laudo').disabled = true;
+    }
+
+    async function gerarPDFLaudo() {
+      const botao = document.getElementById('btn-imprimir-laudo');
+      const protocolo = document.getElementById('doc-protocolo').textContent.replace('Protocolo:', '').trim() || 'sem-protocolo';
+      if (typeof window.html2pdf !== 'function') {
+        informarStatusLaudo('A ferramenta de PDF não carregou. Verifique a conexão com a internet e tente novamente.', true);
+        return;
+      }
+      botao.disabled = true;
+      botao.textContent = 'Gerando PDF...';
+      try {
+        const elemento = document.querySelector('.folha');
+        await window.html2pdf().set({
+          margin: [10, 10, 10, 10],
+          filename: 'Laudo-TechEmpire-' + protocolo.replace(/[^a-zA-Z0-9_-]/g, '-') + '.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['css', 'legacy'], avoid: ['.autorizacao', '.assinaturas'] }
+        }).from(elemento).save();
+      } catch (erro) {
+        console.error('Erro ao gerar PDF:', erro);
+        informarStatusLaudo('Não foi possível gerar o PDF. Atualize a página e tente novamente.', true);
+      } finally {
+        botao.disabled = false;
+        botao.textContent = '⬇️ Baixar laudo em PDF';
+      }
     }
 
     async function carregarLaudo() {
