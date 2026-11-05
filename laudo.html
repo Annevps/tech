@@ -30,6 +30,9 @@
   .acoes { position: fixed; bottom: 30px; right: 30px; display: flex; gap: 10px; }
   .btn-acao { background: #8fd21f; color: #fff; padding: 14px 28px; border-radius: 8px; font-weight: 700; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
   .btn-fechar { background: #333; color: #fff; }
+  .btn-acao:disabled { opacity: .5; cursor: not-allowed; }
+  #status-laudo { max-width: 860px; margin: 0 auto 14px; padding: 14px 18px; border-radius: 8px; background: #fff8e1; color: #624b00; font: 14px Inter, sans-serif; }
+  #status-laudo.erro { background: #fff0f0; color: #9b1c1c; }
   @media print { body { background: #fff; padding: 0; } .folha { box-shadow: none; max-width: 100%; padding: 40px; } .acoes { display: none; } }
 body{background:#eef1f5;padding:42px 18px;color:#17202b}
 .folha{max-width:860px;min-height:1120px;padding:64px 68px;border:1px solid #e4e8ee;border-radius:8px;box-shadow:0 24px 70px rgba(15,23,42,.13)}
@@ -53,6 +56,7 @@ body{background:#eef1f5;padding:42px 18px;color:#17202b}
 </style>
 </head>
 <body>
+  <div id="status-laudo" role="status">Carregando os dados do laudo. Aguarde antes de imprimir...</div>
   <div class="folha">
     <div class="header">
       <div style="display: flex; align-items: center; gap: 12px;">
@@ -127,7 +131,7 @@ body{background:#eef1f5;padding:42px 18px;color:#17202b}
 
   <div class="acoes">
     <button class="btn-acao btn-fechar" onclick="window.history.back()">Voltar</button>
-    <button class="btn-acao" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+    <button id="btn-imprimir-laudo" class="btn-acao" onclick="window.print()" disabled>🖨️ Imprimir / Salvar PDF</button>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -139,21 +143,28 @@ body{background:#eef1f5;padding:42px 18px;color:#17202b}
     }
     const db = window.supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
 
+    function informarStatusLaudo(mensagem, erro = false) {
+      const status = document.getElementById('status-laudo');
+      status.textContent = mensagem;
+      status.classList.toggle('erro', erro);
+      status.style.display = 'block';
+      document.getElementById('btn-imprimir-laudo').disabled = true;
+    }
+
     async function carregarLaudo() {
+      informarStatusLaudo('Carregando os dados do laudo. Aguarde antes de imprimir...');
       const urlParams = new URLSearchParams(window.location.search);
       const id = urlParams.get('id');
       
       if (!id) {
-        alert("Documento não encontrado.");
-        window.location.href = "index.html";
+        informarStatusLaudo('Não foi informado o código deste laudo. Volte ao painel e abra o documento novamente.', true);
         return;
       }
 
       const { data: c, error } = await db.from("chamados").select("*").eq("id", id).single();
       
       if (error || !c) {
-        alert("Não encontramos nenhum documento.");
-        window.location.href = "acompanhar.html";
+        informarStatusLaudo('Não foi possível carregar este laudo. Verifique se você está conectado ao painel e se tem permissão para consultar este chamado. Detalhe: ' + (error?.message || 'documento não encontrado'), true);
         return;
       }
 
@@ -196,9 +207,15 @@ body{background:#eef1f5;padding:42px 18px;color:#17202b}
 
       document.getElementById('laudo-prazo').textContent = prazo;
       document.getElementById('laudo-valor').textContent = valor ? `R$ ${Number(valor).toFixed(2).replace('.', ',')}` : 'A definir';
+
+      document.getElementById('status-laudo').style.display = 'none';
+      document.getElementById('btn-imprimir-laudo').disabled = false;
     }
 
-    carregarLaudo();
+    carregarLaudo().catch(err => {
+      console.error('Erro ao carregar laudo:', err);
+      informarStatusLaudo('Ocorreu um erro ao montar o documento. Atualize a página; se continuar, avise o responsável pelo sistema.', true);
+    });
   </script>
 </body>
 </html>
